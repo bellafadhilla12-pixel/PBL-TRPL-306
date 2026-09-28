@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'registrasi_warga_screen.dart';
-import 'login_pengurus_screen.dart';
+import 'login_warga_screen.dart';
 
-class LoginScreenWarga extends StatefulWidget {
-  const LoginScreenWarga({super.key});
+class LoginScreenPengurus extends StatefulWidget {
+  const LoginScreenPengurus({super.key});
 
   @override
-  State<LoginScreenWarga> createState() =>
-      _LoginScreenWargaState();
+  State<LoginScreenPengurus> createState() =>
+      _LoginScreenPengurusState();
 }
 
-class _LoginScreenWargaState
-    extends State<LoginScreenWarga> {
-  final _waController = TextEditingController();
+class _LoginScreenPengurusState
+    extends State<LoginScreenPengurus> {
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
@@ -28,7 +27,7 @@ class _LoginScreenWargaState
 
   @override
   void dispose() {
-    _waController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -38,15 +37,15 @@ class _LoginScreenWargaState
   // =====================================================
 
   void _handleLogin() {
-    final wa = _waController.text.trim();
+    final username = _usernameController.text.trim();
     final password =
         _passwordController.text.trim();
 
-    if (wa.isEmpty || password.isEmpty) {
+    if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Nomor WhatsApp dan kata sandi wajib diisi',
+            'Username dan kata sandi wajib diisi',
           ),
         ),
       );
@@ -55,20 +54,21 @@ class _LoginScreenWargaState
 
     // TODO:
     // Hubungkan ke Firebase Authentication
+    // (username + password untuk Pengurus / UBS)
 
-    debugPrint('Login attempt: $wa');
+    debugPrint('Login pengurus/UBS attempt: $username');
   }
 
   // =====================================================
-  // KE REGISTRASI
+  // KE LOGIN WARGA
   // =====================================================
 
-  void _goToRegister() {
-    Navigator.push(
+  void _goToLoginWarga() {
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) =>
-            const RegistrasiWargaScreen(),
+            const LoginScreenWarga(),
       ),
     );
   }
@@ -76,8 +76,6 @@ class _LoginScreenWargaState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Membuat body dapat berada di belakang
-      // navigation bar
       extendBody: true,
 
       body: Container(
@@ -186,16 +184,13 @@ class _LoginScreenWargaState
                 const SizedBox(height: 16),
 
                 // =================================================
-                // NOMOR WHATSAPP
+                // USERNAME
                 // =================================================
 
                 _buildInputField(
-                  controller: _waController,
-                  hint: 'Nomor Whatsapp',
-                  icon:
-                      Icons.smartphone_outlined,
-                  keyboardType:
-                      TextInputType.phone,
+                  controller: _usernameController,
+                  hint: 'Username',
+                  icon: Icons.person_outline,
                 ),
 
                 const SizedBox(height: 12),
@@ -295,49 +290,10 @@ class _LoginScreenWargaState
                   ),
                 ),
 
-                const SizedBox(height: 12),
-
-                // =================================================
-                // DAFTAR AKUN
-                // =================================================
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-
-                  child: ElevatedButton(
-                    onPressed: _goToRegister,
-
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor: darkGreen,
-                      foregroundColor:
-                          Colors.white,
-
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          16,
-                        ),
-                      ),
-                    ),
-
-                    child: const Text(
-                      'Daftar Akun',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight:
-                            FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-
                 const SizedBox(height: 16),
 
                 // =================================================
-                // LOGIN PENGURUS / UBS
+                // KE LOGIN WARGA
                 // =================================================
 
                 Row(
@@ -346,19 +302,12 @@ class _LoginScreenWargaState
 
                   children: [
                     const Text(
-                      'Apakah Anda Pengurus atau UBS? ',
+                      'Apakah Anda Warga? ',
                     ),
 
-                  GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const LoginScreenPengurus(),
-                      ),
-                    );
-                  },
+                    GestureDetector(
+                      onTap: _goToLoginWarga,
+
                       child: const Text(
                         'Login',
                         style: TextStyle(
@@ -371,9 +320,6 @@ class _LoginScreenWargaState
                   ],
                 ),
 
-                // Tambahan jarak bawah
-                // supaya konten tidak terlalu dekat
-                // dengan navigation bar
                 const SizedBox(height: 20),
               ],
             ),

@@ -24,16 +24,16 @@ class _RegistrasiWargaScreenState
   bool _obscurePassword = true;
 
   static const Color darkGreen =
-      Color(0xFF087A63);
+    Color(0xFF087A63);
 
-  static const Color mint =
-      Color(0xFF59C8A8);
+static const Color mint =
+    Color(0xFFFFFBFB);
 
-  static const Color orange =
-      Color(0xFFFFCA72);
+static const Color orange =
+    Color(0xFFFFFBFB);
 
-  static const Color background =
-      Color(0xFFF5F3EA);
+static const Color background =
+    Color(0xFFF5F3EA);
 
   @override
   void dispose() {
@@ -98,14 +98,14 @@ class _RegistrasiWargaScreenState
 }) {
   return InputDecoration(
     hintText: hint,
-    hintStyle: const TextStyle(
-      color: Color(0xFF0B4A3C),
+    hintStyle: TextStyle(
+      color: Color(0xFF0B4A3C).withValues(alpha: 0.55),
       fontSize: 13,
       fontWeight: FontWeight.w500,
     ),
     prefixIcon: Icon(
       icon,
-      color: const Color(0xFF0B4A3C),
+      color: const Color(0xFF0B4A3C).withValues(alpha: 0.55),
     ),
     filled: true,
     fillColor: mint,
@@ -127,15 +127,15 @@ class _RegistrasiWargaScreenState
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFFE0DFD9),
         borderRadius:
             BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
             color: Colors.black
-                .withValues(alpha: 0.18),
+                .withValues(alpha: 0.20),
             blurRadius: 8,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -246,48 +246,29 @@ class _RegistrasiWargaScreenState
 
                 Row(
                   mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                      MainAxisAlignment.end,
 
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      alignment:
-                          Alignment.center,
-                      decoration:
-                          const BoxDecoration(
-                        color: Color(0xFFE6E4DD),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Text(
-                        'Logo',
-                        style:
-                            TextStyle(fontSize: 11),
-                      ),
-                    ),
 
-                    Row(
                       children: [
-                        const Icon(
-                          Icons
-                              .account_circle_outlined,
-                          size: 35,
-                          color: darkGreen,
-                        ),
 
-                        const SizedBox(
-                          width: 15,
-                        ),
-
-                        const Icon(
+                        IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const LoginScreenWarga(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(
                           Icons.logout,
                           size: 25,
                           color: darkGreen,
                         ),
+                      ),
                       ],
                     ),
-                  ],
-                ),
 
                 const SizedBox(height: 20),
 
@@ -333,7 +314,7 @@ class _RegistrasiWargaScreenState
                         ),
                         decoration:
                             BoxDecoration(
-                          color: mint,
+                          color: const Color(0xFF62BCA5),
                           borderRadius:
                               BorderRadius.circular(
                             20,
@@ -489,7 +470,7 @@ class _RegistrasiWargaScreenState
                         decoration:
                             _inputDecoration(
                           hint:
-                              'Contoh: Bpk. Bambang Sutrisno',
+                              'Contoh: Bambang Sutrisno',
                           icon:
                               Icons.person_outline,
                         ),
@@ -759,7 +740,7 @@ class _RegistrasiWargaScreenState
                   child: Text(
                     'Sudah terdaftar sebagai nasabah?',
                     style:
-                        TextStyle(fontSize: 12),
+                        TextStyle(fontSize: 15),
                   ),
                 ),
 
