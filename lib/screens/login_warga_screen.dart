@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'registrasi_warga_screen.dart';
 import 'login_pengurus_screen.dart';
+import 'beranda_warga_screen.dart';
 
 class LoginScreenWarga extends StatefulWidget {
   const LoginScreenWarga({super.key});
@@ -18,7 +19,7 @@ class _LoginScreenWargaState
   bool _obscurePassword = true;
 
   static const Color darkGreen =
-      Color(0xFF1B6E5C);
+      Color(0xFF0F6E56);
 
   static const Color lightMint =
       Color(0xFFB8E0D2);
@@ -109,6 +110,7 @@ class _LoginScreenWargaState
               children: [
                 const SizedBox(height: 8),
 
+
                 // =================================================
                 // WELCOME
                 // =================================================
@@ -119,7 +121,7 @@ class _LoginScreenWargaState
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
-                    color: darkGreen,
+                    color: Color(0xFF0F6E56),
                     height: 1.1,
                   ),
                 ),
@@ -136,7 +138,7 @@ class _LoginScreenWargaState
                     child: Icon(
                       Icons.security_rounded,
                       size: 180,
-                      color: darkGreen,
+                      color: Color(0xFF0F6E56),
                     ),
                   ),
                 ),
@@ -370,6 +372,22 @@ class _LoginScreenWargaState
                     ),
                   ],
                 ),
+
+                // BUAT DEBUG BUTTON UNTUK LEWATI KE BERANDA
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const BerandaWargaScreen()),
+                    );
+                  },
+                  child: const Text(
+                    '[DEBUG] Lewati ke Beranda',
+                    style: TextStyle(color: Colors.grey, fontSize: 11),
+                  ),
+                ),
+
+              // BATAS DEBUG BUTTON BERANDA WARGA
 
                 // Tambahan jarak bawah
                 // supaya konten tidak terlalu dekat
