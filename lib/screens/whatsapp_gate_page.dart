@@ -21,29 +21,37 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
   // BUKA GRUP WHATSAPP / LINK DUMMY
   // =====================================================
   Future<void> _openWhatsAppGroup(BuildContext context) async {
-    final Uri url = Uri.parse(whatsappGroupUrl);
+  final Uri url = Uri.parse('https://www.google.com');
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(
-        url,
-        mode: LaunchMode.externalApplication,
-      );
+  try {
+    final bool berhasil = await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
 
-      if (!mounted) return;
+    if (!mounted) return;
 
+    if (berhasil) {
       setState(() {
         _whatsappOpened = true;
       });
     } else {
-      if (!context.mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Tidak dapat membuka link'),
+          content: Text('Link tidak dapat dibuka'),
         ),
       );
     }
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Terjadi kesalahan: $e'),
+      ),
+    );
   }
+}
 
   // =====================================================
   // KE BERANDA
