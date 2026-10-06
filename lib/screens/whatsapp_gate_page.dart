@@ -1,30 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class WhatsAppGatePage extends StatelessWidget {
+class WhatsAppGatePage extends StatefulWidget {
   const WhatsAppGatePage({super.key});
 
+  @override
+  State<WhatsAppGatePage> createState() => _WhatsAppGatePageState();
+}
+
+class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
+  bool _whatsappOpened = false;
   final String whatsappGroupUrl =
       'https://chat.whatsapp.com/ISI_LINK_GRUP_KAMU';
 
   Future<void> _openWhatsAppGroup(BuildContext context) async {
-    final Uri url = Uri.parse(whatsappGroupUrl);
+  final Uri url = Uri.parse(whatsappGroupUrl);
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(
-        url,
-        mode: LaunchMode.externalApplication,
-      );
-    } else {
-      if (!context.mounted) return;
+  if (await canLaunchUrl(url)) {
+    await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tidak dapat membuka WhatsApp'),
-        ),
-      );
-    }
+    if (!mounted) return;
+
+    setState(() {
+      _whatsappOpened = true;
+    });
+  } else {
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Tidak dapat membuka WhatsApp'),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
