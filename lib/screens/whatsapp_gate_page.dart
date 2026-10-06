@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'beranda_warga_screen.dart';
 
 class WhatsAppGatePage extends StatefulWidget {
   const WhatsAppGatePage({super.key});
@@ -10,33 +11,55 @@ class WhatsAppGatePage extends StatefulWidget {
 
 class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
   bool _whatsappOpened = false;
+
   final String whatsappGroupUrl =
-      'https://chat.whatsapp.com/ISI_LINK_GRUP_KAMU';
+      'https://chat.whatsapp.com/IRy7sSBN7LpDbDezsmhTLL?s=cl&p=i&mlu=0&ilr=4';
+
+  // =====================================================
+  // BUKA GRUP WHATSAPP
+  // =====================================================
 
   Future<void> _openWhatsAppGroup(BuildContext context) async {
-  final Uri url = Uri.parse(whatsappGroupUrl);
+    final Uri url = Uri.parse(whatsappGroupUrl);
 
-  if (await canLaunchUrl(url)) {
-    await launchUrl(
-      url,
-      mode: LaunchMode.externalApplication,
-    );
+    if (await canLaunchUrl(url)) {
+      await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      _whatsappOpened = true;
-    });
-  } else {
-    if (!context.mounted) return;
+      setState(() {
+        _whatsappOpened = true;
+      });
+    } else {
+      if (!context.mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Tidak dapat membuka WhatsApp'),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tidak dapat membuka WhatsApp'),
+        ),
+      );
+    }
+  }
+
+  // =====================================================
+  // KE BERANDA
+  // =====================================================
+
+  void _goToBeranda() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const BerandaWargaScreen(),
       ),
     );
   }
-}
+
+  // =====================================================
+  // BUILD
+  // =====================================================
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +71,7 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
           child: Column(
             children: [
               _buildHeader(),
+
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
@@ -90,7 +114,15 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
 
                       const SizedBox(height: 35),
 
+                      // Tombol membuka grup WhatsApp
                       _buildWhatsAppButton(context),
+
+                      // Tombol lanjut hanya muncul setelah
+                      // link WhatsApp pernah dibuka
+                      if (_whatsappOpened) ...[
+                        const SizedBox(height: 16),
+                        _buildContinueButton(),
+                      ],
 
                       const SizedBox(height: 26),
 
@@ -119,6 +151,10 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
       ),
     );
   }
+
+  // =====================================================
+  // HEADER
+  // =====================================================
 
   Widget _buildHeader() {
     return Container(
@@ -172,11 +208,15 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+
                     SizedBox(width: 7),
+
                     _PlamoBadge(),
                   ],
                 ),
+
                 SizedBox(height: 2),
+
                 Text(
                   'Posko Lingkungan RT 04 / RW 08',
                   style: TextStyle(
@@ -218,6 +258,10 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
     );
   }
 
+  // =====================================================
+  // BADGE PORTAL
+  // =====================================================
+
   Widget _buildPortalBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -242,7 +286,9 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
             Icons.badge_outlined,
             size: 18,
           ),
+
           SizedBox(width: 10),
+
           Text(
             'Portal Masuk Warga',
             style: TextStyle(
@@ -254,6 +300,10 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
       ),
     );
   }
+
+  // =====================================================
+  // STATUS AKUN
+  // =====================================================
 
   Widget _buildStatusCard() {
     return Container(
@@ -299,7 +349,9 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
+
                 SizedBox(height: 4),
+
                 Text(
                   'Nomor WhatsApp Anda terdaftar otomatis pada\n'
                   'sistem RT 04 / RW 08 Plamo Garden.',
@@ -317,6 +369,10 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
     );
   }
 
+  // =====================================================
+  // TOMBOL WHATSAPP
+  // =====================================================
+
   Widget _buildWhatsAppButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -332,10 +388,10 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
             borderRadius: BorderRadius.circular(13),
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 17,
               backgroundColor: Colors.white,
               child: Icon(
@@ -344,10 +400,14 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
                 size: 23,
               ),
             ),
-            SizedBox(width: 14),
+
+            const SizedBox(width: 14),
+
             Text(
-              'Masuk Ke Grup WA Sekarang',
-              style: TextStyle(
+              _whatsappOpened
+                  ? 'Buka Grup WhatsApp Lagi'
+                  : 'Masuk Ke Grup WA Sekarang',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
               ),
@@ -357,6 +417,80 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
       ),
     );
   }
+
+  // =====================================================
+  // TOMBOL LANJUT KE BERANDA
+  // =====================================================
+
+  Widget _buildContinueButton() {
+    return Column(
+      children: [
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: Color(0xFF087D6A),
+              size: 18,
+            ),
+
+            SizedBox(width: 7),
+
+            Text(
+              'Link grup WhatsApp telah dibuka',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF087D6A),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: _goToBeranda,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF60CEAD),
+              foregroundColor: const Color(0xFF073F35),
+              elevation: 4,
+              shadowColor: Colors.black26,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(13),
+              ),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 23,
+                ),
+
+                SizedBox(width: 10),
+
+                Text(
+                  'Saya Sudah Bergabung',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // =====================================================
+  // SYARAT AKSES
+  // =====================================================
 
   Widget _buildRequirementCard() {
     return Container(
@@ -406,6 +540,10 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
     );
   }
 }
+
+// =====================================================
+// BADGE PLAMO
+// =====================================================
 
 class _PlamoBadge extends StatelessWidget {
   const _PlamoBadge();
