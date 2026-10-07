@@ -97,6 +97,7 @@ class _LoginScreenWargaState
 
         child: SafeArea(
           child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.symmetric(
               horizontal: 24,
               vertical: 16,
