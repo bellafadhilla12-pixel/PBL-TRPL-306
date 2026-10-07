@@ -17,7 +17,7 @@ class _LoginScreenPengurusState
   bool _obscurePassword = true;
 
   static const Color darkGreen =
-      Color(0xFF1B6E5C);
+      Color(0xFF0F6E56);
 
   static const Color lightMint =
       Color(0xFFB8E0D2);
