@@ -34,6 +34,7 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
       backgroundColor: background,
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
