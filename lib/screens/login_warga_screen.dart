@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'registrasi_warga_screen.dart';
 import 'login_pengurus_screen.dart';
+import 'whatsapp_gate_page.dart';
 
 class LoginScreenWarga extends StatefulWidget {
   const LoginScreenWarga({super.key});
@@ -38,27 +39,30 @@ class _LoginScreenWargaState
   // =====================================================
 
   void _handleLogin() {
-    final wa = _waController.text.trim();
-    final password =
-        _passwordController.text.trim();
+  final wa = _waController.text.trim();
+  final password = _passwordController.text.trim();
 
-    if (wa.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Nomor WhatsApp dan kata sandi wajib diisi',
-          ),
+  if (wa.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Nomor WhatsApp dan kata sandi wajib diisi',
         ),
-      );
-      return;
-    }
+      ),
+    );
 
-    // TODO:
-    // Hubungkan ke Firebase Authentication
-
-    debugPrint('Login attempt: $wa');
+    return;
   }
 
+  debugPrint('Login attempt: $wa');
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const WhatsAppGatePage(),
+    ),
+  );
+}
   // =====================================================
   // KE REGISTRASI
   // =====================================================
@@ -97,6 +101,7 @@ class _LoginScreenWargaState
 
         child: SafeArea(
           child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.symmetric(
               horizontal: 24,
               vertical: 16,

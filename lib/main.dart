@@ -21,6 +21,24 @@ void main() {
   runApp(const MyApp());
 }
 
+class NoStretchScrollBehavior extends MaterialScrollBehavior {
+  const NoStretchScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics();
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -29,6 +47,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'TRIM',
       debugShowCheckedModeBanner: false,
+
+      scrollBehavior: const NoStretchScrollBehavior(),
 
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

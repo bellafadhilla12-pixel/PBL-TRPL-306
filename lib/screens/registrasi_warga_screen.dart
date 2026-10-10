@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'login_warga_screen.dart';
 
 class RegistrasiWargaScreen extends StatefulWidget {
@@ -21,10 +23,11 @@ class _RegistrasiWargaScreenState
   final rtController = TextEditingController();
   final rwController = TextEditingController();
 
-  bool _obscurePassword = true;
+bool _obscurePassword = true;
+bool _isLoading = false;
 
   static const Color darkGreen =
-    Color(0xFF087A63);
+    Color(0xFF0F6E56);
 
 static const Color mint =
     Color(0xFFFFFBFB);
@@ -52,41 +55,67 @@ static const Color background =
   // REGISTRASI
   // =====================================================
 
-  void _registrasi() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+  Future<void> _registrasi() async {
+  if (!_formKey.currentState!.validate()) {
+    return;
+  }
 
-    final nama = namaController.text.trim();
-    final whatsapp =
-        whatsappController.text.trim();
-    final password =
-        passwordController.text.trim();
-    final blok = blokController.text.trim();
-    final nomorRumah =
-        nomorRumahController.text.trim();
-    final rt = rtController.text.trim();
-    final rw = rwController.text.trim();
+  final nama = namaController.text.trim();
+  final whatsapp = whatsappController.text.trim();
+  final password = passwordController.text.trim();
+  final blok = blokController.text.trim();
+  final nomorRumah = nomorRumahController.text.trim();
+  final rt = rtController.text.trim();
+  final rw = rwController.text.trim();
 
-    debugPrint('Nama: $nama');
-    debugPrint('WhatsApp: $whatsapp');
-    debugPrint('Password: $password');
-    debugPrint('Blok: $blok');
-    debugPrint('Nomor Rumah: $nomorRumah');
-    debugPrint('RT: $rt');
-    debugPrint('RW: $rw');
+  setState(() => _isLoading = true);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Data registrasi berhasil diisi',
-        ),
-      ),
+  try {
+    // GANTI URL INI setelah backend MySQL kamu sudah jadi
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:3000/api/warga/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'nama': nama,
+        'whatsapp': whatsapp,
+        'password': password,
+        'blok': blok,
+        'nomor_rumah': nomorRumah,
+        'rt': rt,
+        'rw': rw,
+      }),
     );
 
-    // TODO:
-    // Hubungkan data registrasi ke Firebase
+    if (!mounted) return;
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registrasi berhasil, silakan login'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreenWarga()),
+      );
+    } else {
+      final data = jsonDecode(response.body);
+      final pesanError = data['message'] ?? 'Registrasi gagal, coba lagi';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(pesanError)),
+      );
+    }
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Tidak bisa terhubung ke server, cek koneksi internet'),
+      ),
+    );
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
   }
+}
 
   // =====================================================
   // INPUT DECORATION
@@ -99,13 +128,13 @@ static const Color background =
   return InputDecoration(
     hintText: hint,
     hintStyle: TextStyle(
-      color: Color(0xFF0B4A3C).withValues(alpha: 0.55),
+      color: Color(0xFF0F6E56).withValues(alpha: 0.55),
       fontSize: 13,
       fontWeight: FontWeight.w500,
     ),
     prefixIcon: Icon(
       icon,
-      color: const Color(0xFF0B4A3C).withValues(alpha: 0.55),
+      color: const Color(0xFF0F6E56).withValues(alpha: 0.55),
     ),
     filled: true,
     fillColor: mint,
@@ -688,48 +717,42 @@ static const Color background =
                 // =================================================
 
                 SizedBox(
-                  width: double.infinity,
-                  height: 45,
-                  child: ElevatedButton(
-                    onPressed: _registrasi,
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor: darkGreen,
-                      foregroundColor:
-                          Colors.white,
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          12,
-                        ),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Daftar Akun Sekarang',
-                          style: TextStyle(
-                            fontWeight:
-                                FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-
-                        SizedBox(width: 7),
-
-                        Icon(
-                          Icons
-                              .arrow_circle_right,
-                          size: 18,
-                        ),
-                      ],
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _registrasi,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: darkGreen,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Daftar Akun Sekarang',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            SizedBox(width: 7),
+                            Icon(Icons.arrow_circle_right, size: 18),
+                          ],
+                        ),
                 ),
-
+              ),
                 const SizedBox(height: 30),
 
                 // =================================================
