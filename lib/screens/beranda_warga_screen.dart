@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_warga_screen.dart';
+import 'antrean_timbang_screen.dart';
 
 class BerandaWargaScreen extends StatefulWidget {
   const BerandaWargaScreen({super.key});
@@ -167,9 +168,15 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      // TODO: navigasi ke halaman ambil antrean
-                    },
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const AntreanTimbangScreen(),
+                      ),
+                    );
+                  },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: iconOrange,
                       foregroundColor: Colors.black87,
@@ -995,7 +1002,13 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
           icon: Icons.event_busy_outlined,
           label: 'Ambil Antrean',
           onTap: () {
-            // TODO: navigasi ke halaman ambil antrean
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    const AntreanTimbangScreen(),
+              ),
+            );
           },
           imagePath: 'assets/images/queue.png',
         ),
