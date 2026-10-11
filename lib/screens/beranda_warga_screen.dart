@@ -6,6 +6,8 @@ import 'antrean_timbang_screen.dart';
 
 import 'katalog_hargasampah.dart';
 
+import 'profilWarga.dart';
+
 class BerandaWargaScreen extends StatefulWidget {
   const BerandaWargaScreen({super.key});
 
@@ -121,6 +123,13 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
     });
   }
 
+  void _bukaProfil() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfilWargaScreen()),
+    );
+  }
+
   // =====================================================
 
   // HEADER
@@ -154,7 +163,14 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
 
         const Spacer(),
 
-        const Icon(Icons.account_circle_outlined, size: 32, color: darkGreen),
+        GestureDetector(
+          onTap: _bukaProfil,
+          child: const Icon(
+            Icons.account_circle_outlined,
+            size: 32,
+            color: darkGreen,
+          ),
+        ),
 
         const SizedBox(width: 10),
 
@@ -1702,9 +1718,13 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
       unselectedItemColor: Colors.black38,
 
       onTap: (index) {
+        if (index == 2) {
+          _bukaProfil();
+          return;
+        }
         setState(() => _selectedNavIndex = index);
 
-        // TODO: navigasi ke halaman Dompet / Warga sesuai index
+        // TODO: navigasi ke halaman Dompet (index 1)
       },
 
       items: const [

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'login_warga_screen.dart';
 
+import 'profilWarga.dart';
+
 // ====== MODEL DATA ======
 class SampahItem {
   final String kode;
@@ -292,7 +294,15 @@ class _KatalogPageState extends State<KatalogPage> {
         selectedIndex: 0,
         onDestinationSelected: (i) {
           if (i == 0) Navigator.pop(context);
-          // TODO: Dompet (1) dan Warga (2)
+          if (i == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfilWargaScreen(),
+              ),
+            );
+          }
+          // TODO: Dompet (1)
         },
         destinations: const [
           NavigationDestination(
@@ -331,7 +341,21 @@ class _KatalogPageState extends State<KatalogPage> {
               ),
             ),
           ),
-          const Icon(Icons.account_circle_outlined, color: _hijau, size: 32),
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilWargaScreen(),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.account_circle_outlined,
+              color: _hijau,
+              size: 32,
+            ),
+          ),
           IconButton(
             onPressed: () {
               Navigator.pushAndRemoveUntil(
