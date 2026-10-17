@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_warga_screen.dart';
+import 'kelola_antrian_pengumuman_screen.dart';
 
 class LoginScreenPengurus extends StatefulWidget {
   const LoginScreenPengurus({super.key});
@@ -36,28 +37,31 @@ class _LoginScreenPengurusState
   // LOGIN
   // =====================================================
 
-  void _handleLogin() {
-    final username = _usernameController.text.trim();
-    final password =
-        _passwordController.text.trim();
+  
+void _handleLogin() {
+  final username = _usernameController.text.trim();
+  final password = _passwordController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Username dan kata sandi wajib diisi',
-          ),
-        ),
-      );
-      return;
-    }
-
-    // TODO:
-    // Hubungkan ke Firebase Authentication
-    // (username + password untuk Pengurus / UBS)
-
-    debugPrint('Login pengurus/UBS attempt: $username');
+  if (username.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Username dan kata sandi wajib diisi'),
+      ),
+    );
+    return;
   }
+
+  // SEMENTARA UNTUK PENGUJIAN FRONTEND
+  // Belum menggunakan autentikasi Firebase.
+
+  Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) =>
+        const KelolaAntrianPengumumanScreen(),
+  ),
+);
+}
 
   // =====================================================
   // KE LOGIN WARGA
