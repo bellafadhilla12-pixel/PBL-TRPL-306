@@ -290,9 +290,11 @@ class _KatalogPageState extends State<KatalogPage> {
           ],
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        onDestinationSelected: (i) {
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        selectedItemColor: _hijau,
+        unselectedItemColor: Colors.black38,
+        onTap: (i) {
           if (i == 0) Navigator.pop(context);
           if (i == 2) {
             Navigator.push(
@@ -304,16 +306,16 @@ class _KatalogPageState extends State<KatalogPage> {
           }
           // TODO: Dompet (1)
         },
-        destinations: const [
-          NavigationDestination(
+        items: const [
+          BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             label: 'Beranda',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet_outlined),
             label: 'Dompet',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             label: 'Warga',
           ),
