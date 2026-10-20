@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'katalog_pengurus.dart';
 import 'login_pengurus_screen.dart';
+import 'profil_pengurus.dart';
 
 // =====================================================
 // =====================================================
@@ -134,40 +136,25 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
   void _verifikasi(WargaMenunggu w) {
     setState(() => _menunggu.remove(w));
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${w.nama} berhasil diverifikasi'),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('${w.nama} berhasil diverifikasi')));
   }
 
   void _tolak(WargaMenunggu w) {
     setState(() => _menunggu.remove(w));
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${w.nama} ditolak'),
-      ),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('${w.nama} ditolak')));
   }
 
   void _hubungiWa(WargaMenunggu w) {
     // Simulasi tahap front-end: belum dihubungkan ke WhatsApp / backend.
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Simulasi: membuka chat WhatsApp ${w.nama}'),
-      ),
+      SnackBar(content: Text('Simulasi: membuka chat WhatsApp ${w.nama}')),
     );
   }
 
-  void _keluar() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const LoginScreenPengurus(),
-      ),
-    );
-  }
 
   // =====================================================
   // BARIS ATAS (PROFIL & KELUAR)
@@ -180,9 +167,10 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
 
         GestureDetector(
           onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Menu profil pengurus belum tersedia'),
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfilPengurusScreen(),
               ),
             );
           },
@@ -203,31 +191,10 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
             ),
           ),
         ),
-
-        const SizedBox(width: 10),
-
-        GestureDetector(
-          onTap: _keluar,
-
-          child: Container(
-            width: 38,
-            height: 38,
-
-            decoration: BoxDecoration(
-              color: _hijau,
-              borderRadius: BorderRadius.circular(12),
-            ),
-
-            child: const Icon(
-              Icons.logout,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-        ),
       ],
     );
   }
+
 
   // =====================================================
   // JUDUL HALAMAN
@@ -245,11 +212,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
             border: Border.all(color: _hijau, width: 2),
           ),
 
-          child: const Icon(
-            Icons.verified_outlined,
-            color: _hijau,
-            size: 22,
-          ),
+          child: const Icon(Icons.verified_outlined, color: _hijau, size: 22),
         ),
 
         const SizedBox(width: 12),
@@ -433,10 +396,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
             child: Text(
               'Pendaftaran mandiri hari ini',
 
-              style: TextStyle(
-                fontSize: 11.5,
-                color: _teksAbu,
-              ),
+              style: TextStyle(fontSize: 11.5, color: _teksAbu),
             ),
           ),
 
@@ -535,11 +495,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
 
                     Row(
                       children: [
-                        const Icon(
-                          Icons.call,
-                          size: 14,
-                          color: _teksGelap,
-                        ),
+                        const Icon(Icons.call, size: 14, color: _teksGelap),
 
                         const SizedBox(width: 6),
 
@@ -559,10 +515,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
                     Text(
                       w.alamat,
 
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: _teksAbu,
-                      ),
+                      style: const TextStyle(fontSize: 11.5, color: _teksAbu),
                     ),
                   ],
                 ),
@@ -771,13 +724,30 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
       onTap: (index) {
         if (index == 0) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Halaman "${_labelNav[index]}" belum tersedia '
-              '(tahap front-end)',
+        Widget? tujuan;
+        switch (index) {
+          case 1:
+            tujuan = const KatalogPengurusScreen();
+            break;
+          case 4:
+            tujuan = const ProfilPengurusScreen();
+            break;
+        }
+
+        if (tujuan == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Halaman "${_labelNav[index]}" belum tersedia (tahap front-end)',
+              ),
             ),
-          ),
+          );
+          return;
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => tujuan!),
         );
       },
 
@@ -797,10 +767,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
           label: 'Antrean Warga',
         ),
 
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart),
-          label: 'Rekap',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
 
         BottomNavigationBarItem(
           icon: Icon(Icons.person_outline),
