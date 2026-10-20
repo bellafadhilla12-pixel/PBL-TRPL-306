@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'login_pengurus_screen.dart';
 import 'verifikasi_warga_screen.dart';
+import 'kelola_antrian_pengumuman_screen.dart';
 import 'profil_pengurus.dart';
 
 // ====== MODEL DATA ======
@@ -25,7 +24,7 @@ class SampahItem {
   });
 }
 
-const _hijau = Color(0xFF2E7D4F);
+const _hijau = Color(0xFF0F6E56);
 const _bg = Color(0xFFF4F1E8);
 const _merah = Color(0xFFD32F2F);
 
@@ -308,6 +307,9 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
         switch (index) {
           case 0:
             tujuan = const VerifikasiWargaScreen();
+            break;
+          case 2:
+            tujuan = const KelolaAntrianPengumumanScreen();
             break;
           case 4:
             tujuan = const ProfilPengurusScreen();

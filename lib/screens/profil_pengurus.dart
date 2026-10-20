@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'katalog_pengurus.dart';
 import 'login_pengurus_screen.dart';
 import 'verifikasi_warga_screen.dart';
+import 'kelola_antrian_pengumuman_screen.dart';
 
 class ProfilPengurusScreen extends StatelessWidget {
   const ProfilPengurusScreen({super.key});
@@ -579,6 +580,9 @@ class ProfilPengurusScreen extends StatelessWidget {
             break;
           case 1:
             tujuan = const KatalogPengurusScreen();
+            break;
+          case 2:
+            tujuan = const KelolaAntrianPengumumanScreen();
             break;
         }
 

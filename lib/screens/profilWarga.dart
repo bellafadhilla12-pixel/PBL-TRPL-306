@@ -43,8 +43,6 @@ class ProfilWargaScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
           child: Column(
             children: [
-              _topBar(context),
-              const SizedBox(height: 16),
               _profileCard(),
               const SizedBox(height: 20),
               _aksesCard(),
@@ -59,21 +57,6 @@ class ProfilWargaScreen extends StatelessWidget {
       bottomNavigationBar: _bottomNav(context),
     );
   }
-
-  // ====== TOP BAR ======
-  Widget _topBar(BuildContext context) => Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: [
-      const Icon(Icons.account_circle_outlined, size: 32, color: darkGreen),
-      const SizedBox(width: 10),
-      IconButton(
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        onPressed: () => _keluar(context),
-        icon: const Icon(Icons.logout, size: 26, color: darkGreen),
-      ),
-    ],
-  );
 
   // ====== KARTU PROFIL (GRADASI HIJAU) ======
   Widget _profileCard() => Container(
@@ -144,7 +127,7 @@ class ProfilWargaScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Color.fromARGB(255, 0, 0, 0),
                           ),
                         ),
                       ),
@@ -635,73 +618,42 @@ class ProfilWargaScreen extends StatelessWidget {
   );
 
   // ====== BOTTOM NAV ======
-  Widget _bottomNav(BuildContext context) => Container(
-    decoration: BoxDecoration(
-      color: background,
-      border: Border(
-        top: BorderSide(color: Colors.black.withValues(alpha: 0.06)),
-      ),
-    ),
-    child: SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _navItem(
-              icon: Icons.home_outlined,
-              label: 'Beranda',
-              onTap: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BerandaWargaScreen(),
-                  ),
-                  (route) => false,
-                );
-              },
+  Widget _bottomNav(BuildContext context) {
+    return BottomNavigationBar(
+      currentIndex: 2,
+      backgroundColor: background,
+      selectedItemColor: darkGreen,
+      unselectedItemColor: Colors.black38,
+      type: BottomNavigationBarType.fixed,
+      onTap: (index) {
+        if (index == 0) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const BerandaWargaScreen(),
             ),
-            _navItem(
-              icon: Icons.account_balance_wallet_outlined,
-              label: 'Dompet',
-              onTap: () {
-                // TODO: navigasi ke halaman Dompet
-              },
-            ),
-            _navItem(icon: Icons.person_outline, label: 'Warga', onTap: () {}),
-          ],
+          );
+        } else if (index == 1) {
+          // TODO: navigasi ke halaman Dompet
+        }
+      },
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          label: 'Beranda',
         ),
-      ),
-    ),
-  );
+        BottomNavigationBarItem(
+          icon: Icon(Icons.account_balance_wallet_outlined),
+          label: 'Dompet',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          label: 'Warga',
+        ),
+      ],
+    );
+  }
 
-  Widget _navItem({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) => InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(12),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 38, color: darkGreen),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: darkGreen,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 // ====== KOTAK STATISTIK (ORANYE) ======
