@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'profil_UBS.dart';
 import 'login_warga_screen.dart';
 import 'verifikasi_warga_screen.dart';
 
@@ -34,7 +35,7 @@ class _LoginScreenPengurusState extends State<LoginScreenPengurus> {
   // =====================================================
 
   void _handleLogin() {
-    final username = _usernameController.text.trim();
+    final username = _usernameController.text.trim().toLowerCase();
     final password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
@@ -45,15 +46,24 @@ class _LoginScreenPengurusState extends State<LoginScreenPengurus> {
     }
 
     // TODO: Hubungkan ke Firebase Authentication
-    // (username + password untuk Pengurus / UBS)
 
-    debugPrint('Login pengurus/UBS attempt: $username');
-
-    // Sementara (tahap front-end): langsung masuk ke halaman verifikasi
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const VerifikasiWargaScreen()),
-    );
+    if (username == 'pengurus' && password == '123') {
+      // Pengurus -> kode 2
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const VerifikasiWargaScreen()),
+      );
+    } else if (username == 'ubs' && password == '555') {
+      // UBS -> kode 3
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileUbs()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username atau kata sandi salah')),
+      );
+    }
   }
 
   // =====================================================
