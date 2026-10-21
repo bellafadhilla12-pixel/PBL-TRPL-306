@@ -1,35 +1,31 @@
 import 'package:flutter/material.dart';
-import 'registrasi_warga_screen.dart';
-import 'login_pengurus_screen.dart';
-import 'whatsapp_gate_page.dart';
 
-class LoginScreenWarga extends StatefulWidget {
-  const LoginScreenWarga({super.key});
+import '../ubs/profil_ubs.dart';
+import '../warga/login_warga_screen.dart';
+import 'verifikasi_warga_screen.dart';
+
+class LoginScreenPengurus extends StatefulWidget {
+  const LoginScreenPengurus({super.key});
 
   @override
-  State<LoginScreenWarga> createState() =>
-      _LoginScreenWargaState();
+  State<LoginScreenPengurus> createState() => _LoginScreenPengurusState();
 }
 
-class _LoginScreenWargaState
-    extends State<LoginScreenWarga> {
-  final _waController = TextEditingController();
+class _LoginScreenPengurusState extends State<LoginScreenPengurus> {
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
 
-  static const Color darkGreen =
-      Color(0xFF0F6E56);
+  static const Color darkGreen = Color(0xFF0F6E56);
 
-  static const Color lightMint =
-      Color(0xFFB8E0D2);
+  static const Color lightMint = Color(0xFFB8E0D2);
 
-  static const Color creamBg =
-      Color(0xFFF3F1E9);
+  static const Color creamBg = Color(0xFFF3F1E9);
 
   @override
   void dispose() {
-    _waController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -39,49 +35,51 @@ class _LoginScreenWargaState
   // =====================================================
 
   void _handleLogin() {
-  final wa = _waController.text.trim();
-  final password = _passwordController.text.trim();
+    final username = _usernameController.text.trim().toLowerCase();
+    final password = _passwordController.text.trim();
 
-  if (wa.isEmpty || password.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Nomor WhatsApp dan kata sandi wajib diisi',
-        ),
-      ),
-    );
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username dan kata sandi wajib diisi')),
+      );
+      return;
+    }
 
-    return;
+    // TODO: Hubungkan ke Firebase Authentication
+
+    if (username == 'pengurus' && password == '123') {
+      // Pengurus -> kode 2
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const VerifikasiWargaScreen()),
+      );
+    } else if (username == 'ubs' && password == '555') {
+      // UBS -> kode 3
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfileUbs()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username atau kata sandi salah')),
+      );
+    }
   }
 
-  debugPrint('Login attempt: $wa');
-
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const WhatsAppGatePage(),
-    ),
-  );
-}
   // =====================================================
-  // KE REGISTRASI
+  // KE LOGIN WARGA
   // =====================================================
 
-  void _goToRegister() {
-    Navigator.push(
+  void _goToLoginWarga() {
+    Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) =>
-            const RegistrasiWargaScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const LoginScreenWarga()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Membuat body dapat berada di belakang
-      // navigation bar
       extendBody: true,
 
       body: Container(
@@ -92,24 +90,16 @@ class _LoginScreenWargaState
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              lightMint,
-              creamBg,
-            ],
+            colors: [lightMint, creamBg],
           ),
         ),
 
         child: SafeArea(
           child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 16,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
 
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
 
               children: [
                 const SizedBox(height: 8),
@@ -117,7 +107,6 @@ class _LoginScreenWargaState
                 // =================================================
                 // WELCOME
                 // =================================================
-
                 const Text(
                   'Welcome\nBack!',
                   textAlign: TextAlign.center,
@@ -134,7 +123,6 @@ class _LoginScreenWargaState
                 // =================================================
                 // ICON
                 // =================================================
-
                 const SizedBox(
                   height: 180,
                   child: Center(
@@ -151,27 +139,20 @@ class _LoginScreenWargaState
                 // =================================================
                 // LOGIN HEADER
                 // =================================================
-
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     vertical: 14,
                     horizontal: 20,
                   ),
 
-                  decoration:
-                      BoxDecoration(
+                  decoration: BoxDecoration(
                     color: darkGreen,
-                    borderRadius:
-                        BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(16),
                   ),
 
                   child: const Row(
                     children: [
-                      Icon(
-                        Icons.person_outline,
-                        color: Colors.white,
-                      ),
+                      Icon(Icons.person_outline, color: Colors.white),
 
                       SizedBox(width: 8),
 
@@ -179,8 +160,7 @@ class _LoginScreenWargaState
                         'Login',
                         style: TextStyle(
                           color: Colors.white,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
                       ),
@@ -191,16 +171,12 @@ class _LoginScreenWargaState
                 const SizedBox(height: 16),
 
                 // =================================================
-                // NOMOR WHATSAPP
+                // USERNAME
                 // =================================================
-
                 _buildInputField(
-                  controller: _waController,
-                  hint: 'Nomor Whatsapp',
-                  icon:
-                      Icons.smartphone_outlined,
-                  keyboardType:
-                      TextInputType.phone,
+                  controller: _usernameController,
+                  hint: 'Username',
+                  icon: Icons.person_outline,
                 ),
 
                 const SizedBox(height: 12),
@@ -208,29 +184,23 @@ class _LoginScreenWargaState
                 // =================================================
                 // PASSWORD
                 // =================================================
-
                 _buildInputField(
-                  controller:
-                      _passwordController,
+                  controller: _passwordController,
                   hint: 'Masukkan kata sandi',
                   icon: Icons.lock_outline,
-                  obscureText:
-                      _obscurePassword,
+                  obscureText: _obscurePassword,
 
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
-                          ? Icons
-                              .visibility_off_outlined
-                          : Icons
-                              .visibility_outlined,
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
                       color: darkGreen,
                     ),
 
                     onPressed: () {
                       setState(() {
-                        _obscurePassword =
-                            !_obscurePassword;
+                        _obscurePassword = !_obscurePassword;
                       });
                     },
                   ),
@@ -241,10 +211,8 @@ class _LoginScreenWargaState
                 // =================================================
                 // LUPA PASSWORD
                 // =================================================
-
                 Align(
-                  alignment:
-                      Alignment.centerRight,
+                  alignment: Alignment.centerRight,
 
                   child: TextButton(
                     onPressed: () {
@@ -254,9 +222,7 @@ class _LoginScreenWargaState
 
                     child: const Text(
                       'Lupa kata sandi?',
-                      style: TextStyle(
-                        color: Colors.blue,
-                      ),
+                      style: TextStyle(color: Colors.blue),
                     ),
                   ),
                 ),
@@ -266,7 +232,6 @@ class _LoginScreenWargaState
                 // =================================================
                 // LOGIN BUTTON
                 // =================================================
-
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -274,18 +239,12 @@ class _LoginScreenWargaState
                   child: ElevatedButton(
                     onPressed: _handleLogin,
 
-                    style:
-                        ElevatedButton.styleFrom(
+                    style: ElevatedButton.styleFrom(
                       backgroundColor: darkGreen,
-                      foregroundColor:
-                          Colors.white,
+                      foregroundColor: Colors.white,
 
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          16,
-                        ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
 
@@ -293,47 +252,7 @@ class _LoginScreenWargaState
                       'Log In',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight:
-                            FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // =================================================
-                // DAFTAR AKUN
-                // =================================================
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-
-                  child: ElevatedButton(
-                    onPressed: _goToRegister,
-
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor: darkGreen,
-                      foregroundColor:
-                          Colors.white,
-
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          16,
-                        ),
-                      ),
-                    ),
-
-                    child: const Text(
-                      'Daftar Akun',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight:
-                            FontWeight.w700,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -342,43 +261,28 @@ class _LoginScreenWargaState
                 const SizedBox(height: 16),
 
                 // =================================================
-                // LOGIN PENGURUS / UBS
+                // KE LOGIN WARGA
                 // =================================================
-
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
 
                   children: [
-                    const Text(
-                      'Apakah Anda Pengurus atau UBS? ',
-                    ),
+                    const Text('Apakah Anda Warga? '),
 
-                  GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const LoginScreenPengurus(),
-                      ),
-                    );
-                  },
+                    GestureDetector(
+                      onTap: _goToLoginWarga,
+
                       child: const Text(
                         'Login',
                         style: TextStyle(
                           color: Colors.blue,
-                          fontWeight:
-                              FontWeight.w600,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
                 ),
 
-                // Tambahan jarak bawah
-                // supaya konten tidak terlalu dekat
-                // dengan navigation bar
                 const SizedBox(height: 20),
               ],
             ),
@@ -397,8 +301,7 @@ class _LoginScreenWargaState
     required String hint,
     required IconData icon,
 
-    TextInputType keyboardType =
-        TextInputType.text,
+    TextInputType keyboardType = TextInputType.text,
 
     bool obscureText = false,
 
@@ -407,8 +310,7 @@ class _LoginScreenWargaState
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16),
       ),
 
       child: TextField(
@@ -422,37 +324,25 @@ class _LoginScreenWargaState
           prefixIcon: Container(
             margin: const EdgeInsets.all(8),
 
-            padding:
-                const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
 
             decoration: BoxDecoration(
               color: darkGreen,
-              borderRadius:
-                  BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10),
             ),
 
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 18,
-            ),
+            child: Icon(icon, color: Colors.white, size: 18),
           ),
 
           suffixIcon: suffixIcon,
 
           hintText: hint,
 
-          hintStyle:
-              const TextStyle(
-            color: Colors.grey,
-          ),
+          hintStyle: const TextStyle(color: Colors.grey),
 
           border: InputBorder.none,
 
-          contentPadding:
-              const EdgeInsets.symmetric(
-            vertical: 12,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );

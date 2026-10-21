@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'announcement_store.dart';
+import '../../services/announcement_store.dart';
 
 
 

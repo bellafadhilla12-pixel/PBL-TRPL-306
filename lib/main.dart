@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'screens/login_warga_screen.dart';
+import 'screens/warga/login_warga_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

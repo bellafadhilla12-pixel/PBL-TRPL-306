@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'profilWarga.dart';
+import 'profil_warga.dart';
 
 // ====== MODEL DATA ======
 class SampahItem {

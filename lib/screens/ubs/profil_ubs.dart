@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'login_pengurus_screen.dart';
+import '../pengurus/login_pengurus_screen.dart';
 
 class ProfileUbs extends StatefulWidget {
   const ProfileUbs({super.key});
@@ -11,7 +11,6 @@ class ProfileUbs extends StatefulWidget {
 
 class _ProfileUbsState extends State<ProfileUbs> {
   static const Color green = Color(0xFF08785F);
-  static const Color darkGreen = Color(0xFF075B49);
   static const Color background = Color(0xFFF1F0EA);
 
   final String nomorWhatsApp = '0845-7865-0934';
