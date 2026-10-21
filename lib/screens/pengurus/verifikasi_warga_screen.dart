@@ -160,29 +160,32 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
   // =====================================================
 
   Widget _buildBarisAtas() {
-    return Row(
-      children: [
-        const Spacer(),
-
-        GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ProfilPengurusScreen(),
-              ),
-            );
-          },
-          child: const Icon(
-            Icons.account_circle_outlined,
-            color: _hijau,
-            size: 32,
-          ),
+  return Row(
+    children: [
+      const Spacer(),
+      IconButton(
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProfilPengurusScreen(),
+            ),
+          );
+        },
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(
+          minWidth: 40,
+          minHeight: 40,
         ),
-      ],
-    );
-  }
-
+        icon: const Icon(
+          Icons.account_circle_outlined,
+          color: _hijau,
+          size: 32,
+        ),
+      ),
+    ],
+  );
+}
 
   // =====================================================
   // JUDUL HALAMAN

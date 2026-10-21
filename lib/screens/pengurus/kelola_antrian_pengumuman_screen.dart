@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'verifikasi_warga_screen.dart';
 import 'profil_pengurus.dart';
 import '../../services/announcement_store.dart';
+import 'katalog_pengurus.dart';
 
 class KelolaAntrianPengumumanScreen extends StatefulWidget {
   const KelolaAntrianPengumumanScreen({super.key});
@@ -255,28 +256,33 @@ class _KelolaAntrianPengumumanScreenState
   }
 
   Widget _header() => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 5, 10, 0),
-        child: Row(
-          children: [
-            const Spacer(),
-            IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilPengurusScreen(),
-                  ),
-                );
-              },
-              icon: const Icon(
-                Icons.account_circle_outlined,
-                color: green,
-                size: 30,
-              ),
+  padding: const EdgeInsets.fromLTRB(16, 5, 16, 0),
+  child: Row(
+    children: [
+      const Spacer(),
+      IconButton(
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProfilPengurusScreen(),
             ),
-          ],
+          );
+        },
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(
+          minWidth: 40,
+          minHeight: 40,
         ),
-      );
+        icon: const Icon(
+          Icons.account_circle_outlined,
+          color: Color(0xFF0F6E56),
+          size: 32,
+        ),
+      ),
+    ],
+  ),
+);
 
   Widget _title() => Row(
         children: [
@@ -769,24 +775,36 @@ class _KelolaAntrianPengumumanScreenState
           ),
         ],
         onTap: (i) {
-          Widget? tujuan;
-          switch (i) {
-            case 0:
-              tujuan = const VerifikasiWargaScreen();
-              break;
-            case 4:
-              tujuan = const ProfilPengurusScreen();
-              break;
-            default:
-              _message('Menu ini belum dihubungkan.');
-              return;
-          }
+        Widget? tujuan;
 
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => tujuan!),
-          );
-        },
+        switch (i) {
+          case 0:
+            tujuan = const VerifikasiWargaScreen();
+            break;
+
+          case 1:
+            tujuan = const KatalogPengurusScreen();
+            break;
+
+          case 2:
+            return;
+
+          case 4:
+            tujuan = const ProfilPengurusScreen();
+            break;
+
+          default:
+            _message('Menu ini belum dihubungkan.');
+            return;
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => tujuan!,
+          ),
+        );
+      },
       );
 
   void _kirimSesi() {

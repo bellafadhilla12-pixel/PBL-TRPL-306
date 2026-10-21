@@ -370,20 +370,25 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
             ),
           ),
           IconButton(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilPengurusScreen(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.account_circle_outlined,
-              color: _hijau,
-              size: 32,
-            ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfilPengurusScreen(),
+              ),
+            );
+          },
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(
+            minWidth: 40,
+            minHeight: 40,
           ),
+          icon: const Icon(
+            Icons.account_circle_outlined,
+            color: _hijau,
+            size: 32,
+          ),
+        ),
         ],
       ),
       const SizedBox(height: 8),
