@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'verifikasi_warga_screen.dart';
 import 'profil_pengurus.dart';
 import '../../services/announcement_store.dart';
-import 'katalog_pengurus.dart';
+import 'kelola_edukasi_screen.dart';
+
 
 class KelolaAntrianPengumumanScreen extends StatefulWidget {
   const KelolaAntrianPengumumanScreen({super.key});
@@ -759,7 +760,7 @@ class _KelolaAntrianPengumumanScreenState
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
-            label: 'Katalog',
+            label: 'Kelola',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.groups_outlined),
@@ -783,7 +784,7 @@ class _KelolaAntrianPengumumanScreenState
             break;
 
           case 1:
-            tujuan = const KatalogPengurusScreen();
+            tujuan = const KelolaEdukasiPengurusScreen();
             break;
 
           case 2:

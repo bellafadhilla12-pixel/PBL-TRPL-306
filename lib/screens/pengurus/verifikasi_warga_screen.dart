@@ -754,7 +754,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
 
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_outlined),
-          label: 'Katalog',
+          label: 'Kelola',
         ),
 
         BottomNavigationBarItem(

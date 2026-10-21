@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+
+import 'katalog_pengurus.dart';
 import 'verifikasi_warga_screen.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
 import 'profil_pengurus.dart';
-import 'package:flutter/material.dart';
-
-import 'katalog_pengurus.dart';
 
 /// Halaman Pengurus untuk mengelola materi edukasi TRIM.
 /// Data pada contoh ini masih disimpan sementara di memori aplikasi.
@@ -267,7 +266,7 @@ class _KelolaEdukasiPengurusScreenState
       backgroundColor: pageColor,
       appBar: AppBar(
         backgroundColor: pageColor,
-        foregroundColor: const Color.fromARGB(255, 3, 3, 3),
+        foregroundColor: const Color.fromARGB(255, 12, 12, 12),
         elevation: 0,
         title: const Text(
           'Kelola Edukasi',
@@ -276,7 +275,18 @@ class _KelolaEdukasiPengurusScreenState
         leading: IconButton(
           tooltip: 'Kembali',
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.maybePop(context),
+          onPressed: () {
+            final navigator = Navigator.of(context);
+            if (navigator.canPop()) {
+              navigator.pop();
+            } else {
+              navigator.pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => const ProfilPengurusScreen(),
+                ),
+              );
+            }
+          },
         ),
       ),
       body: SafeArea(
@@ -290,7 +300,7 @@ class _KelolaEdukasiPengurusScreenState
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF19B993), Color(0xFF08765F)],
+                        colors: [(Color.fromARGB(255, 35, 106, 62)), (Color.fromARGB(255, 30, 117, 43))],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -302,7 +312,7 @@ class _KelolaEdukasiPengurusScreenState
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: .18),
+                            color: const Color.fromARGB(255, 159, 161, 105).withValues(alpha: .18),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: const Icon(Icons.menu_book_rounded,
@@ -323,7 +333,7 @@ class _KelolaEdukasiPengurusScreenState
                               SizedBox(height: 4),
                               Text('Edukasi & Panduan Lingkungan',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: (Colors.yellow),
                                     fontSize: 18,
                                     fontWeight: FontWeight.w800,
                                   )),
@@ -605,6 +615,48 @@ class _KelolaEdukasiPengurusScreenState
           ],
         ),
       ),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildBottomNav() {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      currentIndex: 1,
+      selectedItemColor: green,
+      unselectedItemColor: Colors.black45,
+      selectedFontSize: 9.5,
+      unselectedFontSize: 9.5,
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+      onTap: (index) {
+        if (index == 1) return;
+        Widget? tujuan;
+        switch (index) {
+          case 0:
+            tujuan = const VerifikasiWargaScreen();
+            break;
+          case 2:
+            tujuan = const KelolaAntrianPengumumanScreen();
+            break;
+          case 4:
+            tujuan = const ProfilPengurusScreen();
+            break;
+        }
+        if (tujuan == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Halaman ini belum tersedia (tahap front-end).')),
+          );
+          return;
+        }
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => tujuan!));
+      },
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.check_circle_outline), label: 'Verifikasi'),
+        BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: 'Kelola'),
+        BottomNavigationBarItem(icon: Icon(Icons.groups_outlined), label: 'Antrean Warga'),
+        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
+        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Pengurus'),
+      ],
     );
   }
 
