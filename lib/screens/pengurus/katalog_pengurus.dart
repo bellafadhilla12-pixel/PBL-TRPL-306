@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'verifikasi_warga_screen.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
-import 'kelola_edukasi_screen.dart';
 import 'profil_pengurus.dart';
+import 'kelola_edukasi_screen.dart';
 
 // ====== MODEL DATA ======
 class SampahItem {
   final String kode;
-  final String kategori; // PLASTIK, LOGAM, KERTAS/KARDUS, LIMBAH, LAINNYA
+  final String kategori;
   final String nama;
   final String harga;
   final String badge;
@@ -23,6 +23,26 @@ class SampahItem {
     required this.catatan,
     this.berbahaya = false,
   });
+
+  SampahItem copyWith({
+    String? kode,
+    String? kategori,
+    String? nama,
+    String? harga,
+    String? badge,
+    String? catatan,
+    bool? berbahaya,
+  }) {
+    return SampahItem(
+      kode: kode ?? this.kode,
+      kategori: kategori ?? this.kategori,
+      nama: nama ?? this.nama,
+      harga: harga ?? this.harga,
+      badge: badge ?? this.badge,
+      catatan: catatan ?? this.catatan,
+      berbahaya: berbahaya ?? this.berbahaya,
+    );
+  }
 }
 
 const _hijau = Color(0xFF0F6E56);
@@ -30,7 +50,7 @@ const _bg = Color(0xFFF4F1E8);
 const _merah = Color(0xFFD32F2F);
 
 Color _warnaKategori(String k) {
-  switch (k) {
+  switch (k.toUpperCase()) {
     case 'LOGAM':
       return const Color(0xFFE6A23C);
     case 'KERTAS/KARDUS':
@@ -44,185 +64,30 @@ Color _warnaKategori(String k) {
   }
 }
 
-// ====== DATA ======
-const List<SampahItem> daftarSampah = [
-  SampahItem(
-    kode: 'P1',
-    kategori: 'PLASTIK',
-    nama: 'Gelas cup bening bersih',
-    harga: 'Rp 4.500/kg',
-    badge: 'Cup Plastik',
-    catatan: 'Label dan tutup dibuang',
-  ),
-  SampahItem(
-    kode: 'P2',
-    kategori: 'PLASTIK',
-    nama: 'Gelas cup bening kotor',
-    harga: 'Rp 2.200/kg',
-    badge: 'Cup Plastik',
-    catatan: 'Label & tutup dibuang',
-  ),
-  SampahItem(
-    kode: 'P3',
-    kategori: 'PLASTIK',
-    nama: 'Botol plastik bersih',
-    harga: 'Rp 3.800/kg',
-    badge: 'Prioritas Tinggi',
-    catatan: 'Label & tutup dilepas',
-  ),
-  SampahItem(
-    kode: 'P4',
-    kategori: 'PLASTIK',
-    nama: 'Botol plastik kotor',
-    harga: 'Rp 1.600/kg',
-    badge: 'Botol Plastik',
-    catatan: 'Nilai lebih rendah dari P3',
-  ),
-  SampahItem(
-    kode: 'P7',
-    kategori: 'PLASTIK',
-    nama: 'Ember',
-    harga: 'Rp 2.500/kg',
-    badge: 'Plastik Keras',
-    catatan: 'Barang plastik keras/tebal',
-  ),
-  SampahItem(
-    kode: 'P8',
-    kategori: 'PLASTIK',
-    nama: 'Tutup galon',
-    harga: 'Rp 3.500/kg',
-    badge: 'Aksesoris Galon',
-    catatan: 'Dipisah tersendiri',
-  ),
-  SampahItem(
-    kode: 'P9',
-    kategori: 'PLASTIK',
-    nama: 'Tutup botol',
-    harga: 'Rp 3.000/kg',
-    badge: 'Aksesoris Botol',
-    catatan: 'Dipisah tersendiri',
-  ),
-  SampahItem(
-    kode: 'P10',
-    kategori: 'PLASTIK',
-    nama: 'Kresek/kantong asoy warna-warni',
-    harga: 'Rp 800/kg',
-    badge: 'Kantong Film',
-    catatan: 'Kering dan bersih',
-  ),
-  SampahItem(
-    kode: 'P18',
-    kategori: 'PLASTIK',
-    nama: 'Ember hitam',
-    harga: 'Rp 1.500/kg',
-    badge: 'Plastik Hitam',
-    catatan: 'Dipisah dari ember warna (P7)',
-  ),
-  SampahItem(
-    kode: 'P20',
-    kategori: 'LIMBAH',
-    nama: 'Aki bekas',
-    harga: 'Rp 12.000/kg',
-    badge: 'Limbah',
-    catatan: 'Sisa air aki wajib dibuang dahulu',
-    berbahaya: true,
-  ),
-  SampahItem(
-    kode: 'P21',
-    kategori: 'PLASTIK',
-    nama: 'Kaset CD',
-    harga: 'Rp 3.500/kg',
-    badge: 'Polikarbonat',
-    catatan: '-',
-  ),
-  SampahItem(
-    kode: 'P23',
-    kategori: 'PLASTIK',
-    nama: 'HDPE',
-    harga: 'Rp 4.000/kg',
-    badge: 'HDPE Tebal',
-    catatan: 'Plastik jenis tebal (galon, botol tebal, dll)',
-  ),
-  SampahItem(
-    kode: 'P24',
-    kategori: 'PLASTIK',
-    nama: 'Gelas cup warna',
-    harga: 'Rp 2.000/kg',
-    badge: 'Cup Berwarna',
-    catatan: 'Dipisah dari cup bening (P1/P2)',
-  ),
-  SampahItem(
-    kode: 'C1',
-    kategori: 'LOGAM',
-    nama: 'Kaleng alka (aluminium)',
-    harga: 'Rp 13.000/kg',
-    badge: 'Aluminium Ringan',
-    catatan: 'Kaleng minuman',
-  ),
-  SampahItem(
-    kode: 'C2',
-    kategori: 'LOGAM',
-    nama: 'Besi kropos',
-    harga: 'Rp 3.200/kg',
-    badge: 'Besi Tua',
-    catatan: 'Besi tua/berkarat',
-  ),
-  SampahItem(
-    kode: 'C3',
-    kategori: 'LOGAM',
-    nama: 'ALMA (aluminium)',
-    harga: 'Rp 15.000/kg',
-    badge: 'Perabot Dapur',
-    catatan: 'Panci/wajan aluminium bekas',
-  ),
-  SampahItem(
-    kode: 'K1',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Karton/kardus',
-    harga: 'Rp 1.800/kg',
-    badge: 'Populer',
-    catatan: 'Dilipat, dipisah dari lakban plastik',
-  ),
-  SampahItem(
-    kode: 'K2',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Buku paket pelajaran',
-    harga: 'Rp 1.500/kg',
-    badge: 'Buku Sekolah',
-    catatan: 'Sampul/cover harus dilepas dulu',
-  ),
-  SampahItem(
-    kode: 'K3',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'HVS (kertas putih)',
-    harga: 'Rp 2.400/kg',
-    badge: 'Dokumen Kantor',
-    catatan: 'Kering dan tanpa klip/staples',
-  ),
-  SampahItem(
-    kode: 'K4',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Kertas padat',
-    harga: 'Rp 1.200/kg',
-    badge: 'Campuran',
-    catatan: 'Kertas campuran/tebal',
-  ),
-  SampahItem(
-    kode: 'K5',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Koran bekas',
-    harga: 'Rp 1.600/kg',
-    badge: 'Koran/Media',
-    catatan: 'Kering dan rapi',
-  ),
-  SampahItem(
-    kode: 'MJ',
-    kategori: 'LAINNYA',
-    nama: 'Minyak jelantah',
-    harga: 'Rp 6.500/kg',
-    badge: 'Cair/Liter',
-    catatan: 'Ditampung dalam jerigen/botol tertutup rapat',
-  ),
+// ====== DATA KATALOG AWAL ======
+final List<SampahItem> daftarSampah = [
+  const SampahItem(kode: 'P1', kategori: 'PLASTIK', nama: 'Gelas cup bening bersih', harga: 'Rp 4.500/kg', badge: 'Cup Plastik', catatan: 'Label dan tutup dibuang'),
+  const SampahItem(kode: 'P2', kategori: 'PLASTIK', nama: 'Gelas cup bening kotor', harga: 'Rp 2.200/kg', badge: 'Cup Plastik', catatan: 'Label & tutup dibuang'),
+  const SampahItem(kode: 'P3', kategori: 'PLASTIK', nama: 'Botol plastik bersih', harga: 'Rp 3.800/kg', badge: 'Prioritas Tinggi', catatan: 'Label & tutup dilepas'),
+  const SampahItem(kode: 'P4', kategori: 'PLASTIK', nama: 'Botol plastik kotor', harga: 'Rp 1.600/kg', badge: 'Botol Plastik', catatan: 'Nilai lebih rendah dari P3'),
+  const SampahItem(kode: 'P7', kategori: 'PLASTIK', nama: 'Ember', harga: 'Rp 2.500/kg', badge: 'Plastik Keras', catatan: 'Barang plastik keras/tebal'),
+  const SampahItem(kode: 'P8', kategori: 'PLASTIK', nama: 'Tutup galon', harga: 'Rp 3.500/kg', badge: 'Aksesoris Galon', catatan: 'Dipisah tersendiri'),
+  const SampahItem(kode: 'P9', kategori: 'PLASTIK', nama: 'Tutup botol', harga: 'Rp 3.000/kg', badge: 'Aksesoris Botol', catatan: 'Dipisah tersendiri'),
+  const SampahItem(kode: 'P10', kategori: 'PLASTIK', nama: 'Kresek/kantong asoy warna-warni', harga: 'Rp 800/kg', badge: 'Kantong Film', catatan: 'Kering dan bersih'),
+  const SampahItem(kode: 'P18', kategori: 'PLASTIK', nama: 'Ember hitam', harga: 'Rp 1.500/kg', badge: 'Plastik Hitam', catatan: 'Dipisah dari ember warna (P7)'),
+  const SampahItem(kode: 'P20', kategori: 'LIMBAH', nama: 'Aki bekas', harga: 'Rp 12.000/kg', badge: 'Limbah', catatan: 'Sisa air aki wajib dibuang dahulu', berbahaya: true),
+  const SampahItem(kode: 'P21', kategori: 'PLASTIK', nama: 'Kaset CD', harga: 'Rp 3.500/kg', badge: 'Polikarbonat', catatan: '-'),
+  const SampahItem(kode: 'P23', kategori: 'PLASTIK', nama: 'HDPE', harga: 'Rp 4.000/kg', badge: 'HDPE Tebal', catatan: 'Plastik jenis tebal (galon, botol tebal, dll)'),
+  const SampahItem(kode: 'P24', kategori: 'PLASTIK', nama: 'Gelas cup warna', harga: 'Rp 2.000/kg', badge: 'Cup Berwarna', catatan: 'Dipisah dari cup bening (P1/P2)'),
+  const SampahItem(kode: 'C1', kategori: 'LOGAM', nama: 'Kaleng alka (aluminium)', harga: 'Rp 13.000/kg', badge: 'Aluminium Ringan', catatan: 'Kaleng minuman'),
+  const SampahItem(kode: 'C2', kategori: 'LOGAM', nama: 'Besi kropos', harga: 'Rp 3.200/kg', badge: 'Besi Tua', catatan: 'Besi tua/berkarat'),
+  const SampahItem(kode: 'C3', kategori: 'LOGAM', nama: 'ALMA (aluminium)', harga: 'Rp 15.000/kg', badge: 'Perabot Dapur', catatan: 'Panci/wajan aluminium bekas'),
+  const SampahItem(kode: 'K1', kategori: 'KERTAS/KARDUS', nama: 'Karton/kardus', harga: 'Rp 1.800/kg', badge: 'Populer', catatan: 'Dilipat, dipisah dari lakban plastik'),
+  const SampahItem(kode: 'K2', kategori: 'KERTAS/KARDUS', nama: 'Buku paket pelajaran', harga: 'Rp 1.500/kg', badge: 'Buku Sekolah', catatan: 'Sampul/cover harus dilepas dulu'),
+  const SampahItem(kode: 'K3', kategori: 'KERTAS/KARDUS', nama: 'HVS (kertas putih)', harga: 'Rp 2.400/kg', badge: 'Dokumen Kantor', catatan: 'Kering dan tanpa klip/staples'),
+  const SampahItem(kode: 'K4', kategori: 'KERTAS/KARDUS', nama: 'Kertas padat', harga: 'Rp 1.200/kg', badge: 'Campuran', catatan: 'Kertas campuran/tebal'),
+  const SampahItem(kode: 'K5', kategori: 'KERTAS/KARDUS', nama: 'Koran bekas', harga: 'Rp 1.600/kg', badge: 'Koran/Media', catatan: 'Kering dan rapi'),
+  const SampahItem(kode: 'MJ', kategori: 'LAINNYA', nama: 'Minyak jelantah', harga: 'Rp 6.500/kg', badge: 'Cair/Liter', catatan: 'Ditampung dalam jerigen/botol tertutup rapat'),
 ];
 
 // ====== HALAMAN ======
@@ -236,108 +101,562 @@ class KatalogPengurusScreen extends StatefulWidget {
 class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
   String _filter = 'Semua';
   String _query = '';
+  final List<String> _kategori = [
+    'PLASTIK',
+    'LIMBAH',
+    'LOGAM',
+    'KERTAS/KARDUS',
+    'LAINNYA',
+  ];
 
-  bool _cocokKategori(SampahItem s, String f) {
-    switch (f) {
-      case 'Plastik':
-        return s.kategori == 'PLASTIK';
-      case 'Limbah':
-        return s.kategori == 'LIMBAH';
-      case 'Logam':
-        return s.kategori == 'LOGAM';
-      case 'Kertas & Kardus':
-        return s.kategori == 'KERTAS/KARDUS';
+  List<String> get _semuaKategori => List<String>.from(_kategori)..sort();
+
+  String _labelKategori(String kategori) {
+    switch (kategori) {
+      case 'PLASTIK':
+        return 'Plastik';
+      case 'LIMBAH':
+        return 'Limbah';
+      case 'LOGAM':
+        return 'Logam';
+      case 'KERTAS/KARDUS':
+        return 'Kertas & Kardus';
       default:
-        return true;
+        return kategori;
     }
   }
 
-  int _jumlah(String f) =>
-      daftarSampah.where((s) => _cocokKategori(s, f)).length;
+  bool _cocokKategori(SampahItem s, String f) => f == 'Semua' || s.kategori == f;
+
+  int _jumlah(String f) => f == 'Semua'
+      ? daftarSampah.length
+      : daftarSampah.where((s) => _cocokKategori(s, f)).length;
 
   @override
   Widget build(BuildContext context) {
     final hasil = daftarSampah.where((s) {
       final cocokFilter = _cocokKategori(s, _filter);
-      final q = _query.toLowerCase();
-      final cocokCari =
-          s.nama.toLowerCase().contains(q) ||
+      final q = _query.toLowerCase().trim();
+      final cocokCari = s.nama.toLowerCase().contains(q) ||
           s.kode.toLowerCase().contains(q) ||
-          s.badge.toLowerCase().contains(q);
+          s.badge.toLowerCase().contains(q) ||
+          s.kategori.toLowerCase().contains(q);
       return cocokFilter && cocokCari;
     }).toList();
 
     return Scaffold(
-  backgroundColor: _bg,
-  body: SafeArea(
-    child: Column(
-      children: [
-        // HEADER ATAS DENGAN PANAH KEMBALI
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-          child: Row(
-            children: [
-              IconButton(
-                tooltip: 'Kembali',
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: _hijau,
+      backgroundColor: _bg,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _header(),
+            const SizedBox(height: 12),
+            _menuPengelolaan(),
+            const SizedBox(height: 12),
+            _tipsCard(),
+            const SizedBox(height: 12),
+            _searchBar(),
+            const SizedBox(height: 10),
+            _filterChips(),
+            const SizedBox(height: 8),
+            _estimasiNote(),
+            const SizedBox(height: 12),
+            if (hasil.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                child: const Column(
+                  children: [
+                    Icon(Icons.search_off_rounded, size: 38, color: _hijau),
+                    SizedBox(height: 8),
+                    Text('Data katalog tidak ditemukan.'),
+                  ],
                 ),
-                onPressed: () => Navigator.maybePop(context),
+              )
+            else
+              ...hasil.map((s) => SampahCard(
+                    item: s,
+                    onEdit: () => _dialogSampah(index: daftarSampah.indexOf(s)),
+                    onDelete: () => _hapusSampah(daftarSampah.indexOf(s)),
+                  )),
+          ],
+        ),
+      ),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  // ====== HEADER + PANAH KEMBALI ======
+  Widget _header() => Row(
+        children: [
+          IconButton(
+            tooltip: 'Kembali',
+            onPressed: () {
+              final navigator = Navigator.of(context);
+              if (navigator.canPop()) {
+                navigator.pop();
+              } else {
+                navigator.pushReplacement(
+                  MaterialPageRoute(
+                    builder: (_) => const KelolaEdukasiPengurusScreen(),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.arrow_back_rounded, color: _hijau),
+          ),
+          const Expanded(
+            child: Text(
+              'Katalog & Kategori Sampah',
+              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Colors.black87),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Profil Pengurus',
+            onPressed: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilPengurusScreen()),
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            icon: const Icon(Icons.account_circle_outlined, color: _hijau, size: 30),
+          ),
+        ],
+      );
+
+  Widget _menuPengelolaan() => Row(
+        children: [
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: () => _dialogSampah(),
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Tambah Katalog', textAlign: TextAlign.center),
+              style: FilledButton.styleFrom(
+                backgroundColor: _hijau,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
               ),
-              const Expanded(
-                child: Text(
-                  'Katalog & Kategori Sampah',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: _kelolaKategori,
+              icon: const Icon(Icons.category_outlined, size: 18),
+              label: const Text('Kelola Kategori', textAlign: TextAlign.center),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _hijau,
+                side: const BorderSide(color: _hijau),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      );
+
+  Widget _tipsCard() => Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF2E7D4F), Color(0xFF1FA67A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.lightbulb_outline, color: Colors.amber),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Tips Sukses Setor Sampah', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 13)),
+                  SizedBox(height: 4),
+                  Text.rich(
+                    TextSpan(children: [
+                      TextSpan(text: 'Kenapa Harus Dipilah Sesuai Kode? ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      TextSpan(text: 'Sampah yang bersih dan dipilah tepat sesuai kode mempermudah timbang posko dan mendapatkan estimasi nilai Rupiah terbaik!', style: TextStyle(color: Colors.white)),
+                    ]),
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _searchBar() => Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 8, offset: const Offset(0, 3))],
+        ),
+        child: TextField(
+          onChanged: (v) => setState(() => _query = v),
+          decoration: InputDecoration(
+            hintText: 'Cari kode atau nama sampah, contoh: botol, P3',
+            hintStyle: const TextStyle(fontSize: 13),
+            prefixIcon: const Icon(Icons.search, color: _hijau),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+          ),
+        ),
+      );
+
+  Widget _filterChips() {
+    final filters = ['Semua', ..._semuaKategori];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.map((f) {
+          final aktif = _filter == f;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ChoiceChip(
+              label: Text(f == 'Semua' ? 'Semua (${_jumlah(f)})' : '${_labelKategori(f)} (${_jumlah(f)})'),
+              selected: aktif,
+              selectedColor: _hijau,
+              showCheckmark: false,
+              labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: aktif ? Colors.white : _hijau),
+              onSelected: (_) => setState(() => _filter = f),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _estimasiNote() => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(color: const Color(0xFFFFE9B8), borderRadius: BorderRadius.circular(10)),
+        child: const Text.rich(
+          TextSpan(children: [
+            TextSpan(text: 'Estimasi Nilai Setor: '),
+            TextSpan(text: 'Harga dapat berubah sewaktu-waktu mengikuti kondisi pengepul mitra Posko RT/RW.', style: TextStyle(fontWeight: FontWeight.bold)),
+          ]),
+          style: TextStyle(fontSize: 11, color: Colors.black87),
+        ),
+      );
+
+  // ====== TAMBAH / EDIT KATALOG ======
+  Future<void> _dialogSampah({int? index}) async {
+    final isEdit = index != null;
+    final item = isEdit ? daftarSampah[index] : null;
+    final kodeController = TextEditingController(text: item?.kode ?? '');
+    final namaController = TextEditingController(text: item?.nama ?? '');
+    final hargaController = TextEditingController(text: item?.harga.replaceFirst('Rp ', '') ?? '');
+    final badgeController = TextEditingController(text: item?.badge ?? '');
+    final catatanController = TextEditingController(text: item?.catatan ?? '');
+    String kategori = item?.kategori ?? (_semuaKategori.isNotEmpty ? _semuaKategori.first : 'PLASTIK');
+    bool berbahaya = item?.berbahaya ?? false;
+    final formKey = GlobalKey<FormState>();
+
+    final simpan = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(isEdit ? 'Edit Katalog Sampah' : 'Tambah Katalog Sampah'),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _input(kodeController, 'Kode sampah', validator: _wajib),
+                    const SizedBox(height: 10),
+                    _input(namaController, 'Nama sampah', validator: _wajib),
+                    const SizedBox(height: 10),
+                    DropdownButtonFormField<String>(
+                      value: _semuaKategori.contains(kategori) ? kategori : _semuaKategori.first,
+                      decoration: const InputDecoration(labelText: 'Kategori', border: OutlineInputBorder()),
+                      items: _semuaKategori.map((k) => DropdownMenuItem(value: k, child: Text(_labelKategori(k)))).toList(),
+                      onChanged: (v) { if (v != null) setDialogState(() => kategori = v); },
+                    ),
+                    const SizedBox(height: 10),
+                    _input(hargaController, 'Harga (contoh: 4.500/kg)', validator: _wajib),
+                    const SizedBox(height: 10),
+                    _input(badgeController, 'Label / badge', validator: _wajib),
+                    const SizedBox(height: 10),
+                    _input(catatanController, 'Catatan pemilahan', validator: _wajib, maxLines: 2),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: berbahaya,
+                      title: const Text('Termasuk limbah B3 / berbahaya', style: TextStyle(fontSize: 13)),
+                      onChanged: (v) => setDialogState(() => berbahaya = v ?? false),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Batal')),
+            FilledButton(onPressed: () { if (formKey.currentState!.validate()) Navigator.pop(dialogContext, true); }, child: const Text('Simpan')),
+          ],
+        ),
+      ),
+    );
+
+    if (simpan == true) {
+      final kode = kodeController.text.trim().toUpperCase();
+      final duplikat = daftarSampah.asMap().entries.any((entry) => entry.value.kode.toUpperCase() == kode && entry.key != index);
+      if (duplikat) {
+        _pesan('Kode sampah sudah digunakan. Gunakan kode lain.');
+      } else {
+        final harga = hargaController.text.trim().replaceFirst(RegExp(r'^Rp\s*', caseSensitive: false), '');
+        final dataBaru = SampahItem(
+          kode: kode,
+          kategori: kategori,
+          nama: namaController.text.trim(),
+          harga: 'Rp $harga',
+          badge: badgeController.text.trim(),
+          catatan: catatanController.text.trim(),
+          berbahaya: berbahaya,
+        );
+        setState(() {
+          if (isEdit) {
+            daftarSampah[index] = dataBaru;
+          } else {
+            daftarSampah.add(dataBaru);
+          }
+          if (!_semuaKategori.contains(_filter)) _filter = 'Semua';
+        });
+        _pesan(isEdit ? 'Katalog berhasil diubah.' : 'Katalog berhasil ditambahkan.');
+      }
+    }
+
+    kodeController.dispose();
+    namaController.dispose();
+    hargaController.dispose();
+    badgeController.dispose();
+    catatanController.dispose();
+  }
+
+  Future<void> _hapusSampah(int index) async {
+    final item = daftarSampah[index];
+    final yakin = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Katalog'),
+        content: Text('Hapus katalog "${item.nama}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), style: FilledButton.styleFrom(backgroundColor: _merah), child: const Text('Hapus')),
+        ],
+      ),
+    );
+    if (yakin == true) {
+      setState(() {
+        daftarSampah.removeAt(index);
+        if (_filter != 'Semua' && !_semuaKategori.contains(_filter)) _filter = 'Semua';
+      });
+      _pesan('Katalog berhasil dihapus.');
+    }
+  }
+
+  // ====== TAMBAH / EDIT / HAPUS KATEGORI ======
+  Future<void> _kelolaKategori() async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Kelola Kategori Sampah'),
+          content: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      await _formKategori();
+                      setDialogState(() {});
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Tambah Kategori'),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: _semuaKategori.map((kategori) => ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(backgroundColor: _warnaKategori(kategori).withValues(alpha: .15), child: Icon(Icons.category_outlined, color: _warnaKategori(kategori))),
+                      title: Text(_labelKategori(kategori)),
+                      subtitle: Text('${_jumlah(kategori)} katalog'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Edit kategori',
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.edit_outlined, color: _hijau),
+                            onPressed: () async {
+                              await _formKategori(kategoriLama: kategori);
+                              setDialogState(() {});
+                            },
+                          ),
+                          IconButton(
+                            tooltip: 'Hapus kategori',
+                            visualDensity: VisualDensity.compact,
+                            icon: const Icon(Icons.delete_outline, color: _merah),
+                            onPressed: () async {
+                              await _hapusKategori(kategori);
+                              setDialogState(() {});
+                            },
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                  ),
+                ),
+              ],
+            ),
           ),
+          actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Tutup'))],
         ),
+      ),
+    );
+  }
 
-        // ISI KATALOG YANG SUDAH ADA
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _header(),
-              const SizedBox(height: 12),
-              _tipsCard(),
-              const SizedBox(height: 12),
-              _searchBar(),
-              const SizedBox(height: 10),
-              _filterChips(),
-              const SizedBox(height: 8),
-              _estimasiNote(),
-              const SizedBox(height: 12),
-              ...hasil.map((s) => SampahCard(item: s)),
-            ],
+  Future<void> _formKategori({String? kategoriLama}) async {
+    final controller = TextEditingController(text: kategoriLama == null ? '' : _labelKategori(kategoriLama));
+    final formKey = GlobalKey<FormState>();
+    final namaBaru = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(kategoriLama == null ? 'Tambah Kategori' : 'Edit Kategori'),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Nama kategori', border: OutlineInputBorder()),
+            validator: (value) => (value == null || value.trim().isEmpty) ? 'Nama kategori wajib diisi.' : null,
           ),
         ),
-      ],
-    ),
-  ),
-  bottomNavigationBar: _buildBottomNav(),
-);
-  } 
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          FilledButton(onPressed: () { if (formKey.currentState!.validate()) Navigator.pop(context, controller.text.trim()); }, child: const Text('Simpan')),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (namaBaru == null) return;
+
+    final normalized = _normalisasiKategori(namaBaru);
+    final bentrok = _semuaKategori.any((k) => k.toLowerCase() == normalized.toLowerCase() && k != kategoriLama);
+    if (bentrok) {
+      _pesan('Kategori tersebut sudah ada.');
+      return;
+    }
+
+    setState(() {
+      if (kategoriLama == null) {
+        _kategori.add(normalized);
+      } else {
+        for (var i = 0; i < daftarSampah.length; i++) {
+          if (daftarSampah[i].kategori == kategoriLama) {
+            daftarSampah[i] = daftarSampah[i].copyWith(kategori: normalized);
+          }
+        }
+        final kategoriIndex = _kategori.indexOf(kategoriLama);
+        if (kategoriIndex >= 0) _kategori[kategoriIndex] = normalized;
+        if (_filter == kategoriLama) _filter = normalized;
+      }
+    });
+    _pesan(kategoriLama == null ? 'Kategori berhasil ditambahkan.' : 'Kategori berhasil diubah.');
+  }
+
+  String _normalisasiKategori(String nama) {
+    final trimmed = nama.trim();
+    switch (trimmed.toLowerCase()) {
+      case 'plastik': return 'PLASTIK';
+      case 'logam': return 'LOGAM';
+      case 'limbah': return 'LIMBAH';
+      case 'kertas & kardus':
+      case 'kertas/kardus': return 'KERTAS/KARDUS';
+      default: return trimmed.toUpperCase();
+    }
+  }
+
+  Future<void> _hapusKategori(String kategori) async {
+    final jumlahItem = daftarSampah.where((s) => s.kategori == kategori).length;
+    if (jumlahItem > 0) {
+      _pesan('Kategori masih digunakan oleh $jumlahItem katalog. Edit atau hapus katalog tersebut terlebih dahulu.');
+      return;
+    }
+    final yakin = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Kategori'),
+        content: Text('Hapus kategori "${_labelKategori(kategori)}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), style: FilledButton.styleFrom(backgroundColor: _merah), child: const Text('Hapus')),
+        ],
+      ),
+    );
+    if (yakin == true) {
+      setState(() {
+        _kategori.remove(kategori);
+        if (_filter == kategori) _filter = 'Semua';
+      });
+      _pesan('Kategori berhasil dihapus.');
+    }
+  }
+
+  Widget _input(TextEditingController controller, String label, {String? Function(String?)? validator, int maxLines = 1}) => TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        validator: validator,
+        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder(), isDense: true),
+      );
+
+  String? _wajib(String? value) => (value == null || value.trim().isEmpty) ? 'Bagian ini wajib diisi.' : null;
+
+  void _pesan(String pesan) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(pesan)));
+  }
 
   // ====== FOOTER PENGURUS ======
   Widget _buildBottomNav() {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: 1,
-      selectedItemColor: const Color(0xFF0F6E56),
+      selectedItemColor: _hijau,
       unselectedItemColor: Colors.black45,
       selectedFontSize: 9.5,
       unselectedFontSize: 9.5,
       selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
       onTap: (index) {
-        if (index == 1) return;
-
+        if (index == 1) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const KelolaEdukasiPengurusScreen(),
+            ),
+          );
+          return;
+        }
         Widget? tujuan;
         switch (index) {
           case 0:
@@ -350,230 +669,30 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
             tujuan = const ProfilPengurusScreen();
             break;
         }
-
         if (tujuan == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Halaman ini belum tersedia (tahap front-end)'),
-            ),
-          );
+          _pesan('Halaman ini belum tersedia (tahap front-end).');
           return;
         }
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => tujuan!),
-        );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => tujuan!));
       },
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.check_circle_outline),
-          label: 'Verifikasi',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.assignment_outlined),
-          label: 'Katalog',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.groups_outlined),
-          label: 'Antrean Warga',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.check_circle_outline), label: 'Verifikasi'),
+        BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: 'Kelola'),
+        BottomNavigationBarItem(icon: Icon(Icons.groups_outlined), label: 'Antrean Warga'),
         BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: 'Pengurus',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Pengurus'),
       ],
     );
   }
-
-  // ====== HEADER ======
-  Widget _header() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              'Katalog & Panduan Pilah',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-          IconButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ProfilPengurusScreen(),
-              ),
-            );
-          },
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(
-            minWidth: 40,
-            minHeight: 40,
-          ),
-          icon: const Icon(
-            Icons.account_circle_outlined,
-            color: _hijau,
-            size: 32,
-          ),
-        ),
-        ],
-      ),
-      const SizedBox(height: 8),
-      const Text(
-        'Daftar kode resmi jenis sampah & panduan pemilahan nilai setor maksimal di Posko RT/RW Plamo Garden.',
-        style: TextStyle(fontSize: 12, color: Colors.black87),
-      ),
-    ],
-  );
-
-  Widget _tipsCard() => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [Color(0xFF2E7D4F), Color(0xFF1FA67A)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      borderRadius: BorderRadius.circular(16),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(Icons.lightbulb_outline, color: Colors.amber),
-        ),
-        const SizedBox(width: 12),
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Tips Sukses Setor Sampah',
-                style: TextStyle(
-                  color: Colors.amber,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Kenapa Harus Dipilah Sesuai Kode? ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: 'Sampah yang bersih dan dipilah tepat sesuai kode mempermudah timbang posko dan mendapatkan estimasi saldo Rupiah terbaik!',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _searchBar() => Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(30),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.08),
-          blurRadius: 8,
-          offset: const Offset(0, 3),
-        ),
-      ],
-    ),
-    child: TextField(
-      onChanged: (v) => setState(() => _query = v),
-      decoration: InputDecoration(
-        hintText: 'Cari kode atau nama sampah, contoh: botol, P3',
-        hintStyle: const TextStyle(fontSize: 13),
-        prefixIcon: const Icon(Icons.search, color: _hijau),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    ),
-  );
-
-  Widget _filterChips() {
-    const filters = ['Semua', 'Plastik', 'Logam', 'Kertas & Kardus', 'Limbah'];
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: filters.map((f) {
-          final aktif = _filter == f;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text('$f(${_jumlah(f)})'),
-              selected: aktif,
-              selectedColor: _hijau,
-              showCheckmark: false,
-              labelStyle: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: aktif ? Colors.white : _hijau,
-              ),
-              onSelected: (_) => setState(() => _filter = f),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _estimasiNote() => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFE9B8),
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: const Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(text: 'Estimasi Nilai Setor: '),
-          TextSpan(
-            text: 'Harga dapat berubah sewaktu-waktu mengikuti kondisi pengepul mitra Posko RT/RW',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-      style: TextStyle(fontSize: 11, color: Colors.black87),
-    ),
-  );
 }
 
 // ====== KARTU ITEM ======
 class SampahCard extends StatelessWidget {
   final SampahItem item;
-  const SampahCard({super.key, required this.item});
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const SampahCard({super.key, required this.item, required this.onEdit, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -585,148 +704,71 @@ class SampahCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: item.berbahaya ? Border.all(color: _merah, width: 1.2) : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Column(
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Kode
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: warna.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  item.kode,
-                  style: TextStyle(fontWeight: FontWeight.bold, color: warna),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                decoration: BoxDecoration(color: warna.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                child: Text(item.kode, style: TextStyle(fontWeight: FontWeight.bold, color: warna)),
               ),
               const SizedBox(width: 10),
-
-              // Kategori + nama
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'KATEGORI ${item.kategori}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: warna,
-                      ),
-                    ),
+                    Text('KATEGORI ${item.kategori}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: warna)),
                     const SizedBox(height: 2),
-                    Text(
-                      item.nama,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text(item.nama, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
-
-              // Harga (+ badge B3 di sampingnya) dan badge
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (item.berbahaya) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _merah,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Text(
-                            'B3 BERBAHAYA',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                      ],
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFE0A3),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          item.harga,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    tooltip: 'Edit katalog',
+                    onPressed: onEdit,
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.edit_outlined, color: _hijau, size: 21),
                   ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      item.badge,
-                      style: const TextStyle(fontSize: 9),
-                    ),
+                  IconButton(
+                    tooltip: 'Hapus katalog',
+                    onPressed: onDelete,
+                    visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.delete_outline, color: _merah, size: 21),
                   ),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 8),
-
-          // Catatan pemilahan (merah pekat + teks putih untuk limbah B3)
+          Row(
+            children: [
+              if (item.berbahaya) ...[
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), decoration: BoxDecoration(color: _merah, borderRadius: BorderRadius.circular(10)), child: const Text('B3 BERBAHAYA', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold))),
+                const SizedBox(width: 6),
+              ],
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(8)), child: Text(item.badge, style: const TextStyle(fontSize: 9))),
+                ),
+              ),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5), decoration: BoxDecoration(color: const Color(0xFFFFE0A3), borderRadius: BorderRadius.circular(10)), child: Text(item.harga, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+            ],
+          ),
+          const SizedBox(height: 8),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: item.berbahaya ? _merah : const Color(0xFFEFEFEF),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'Catatan Pemilahan: ${item.catatan}',
-              style: TextStyle(
-                fontSize: 11,
-                color: item.berbahaya ? Colors.white : Colors.black54,
-                fontWeight: item.berbahaya
-                    ? FontWeight.bold
-                    : FontWeight.normal,
-              ),
-            ),
+            decoration: BoxDecoration(color: item.berbahaya ? _merah : const Color(0xFFEFEFEF), borderRadius: BorderRadius.circular(8)),
+            child: Text('Catatan Pemilahan: ${item.catatan}', style: TextStyle(fontSize: 11, color: item.berbahaya ? Colors.white : Colors.black54, fontWeight: item.berbahaya ? FontWeight.bold : FontWeight.normal)),
           ),
         ],
       ),

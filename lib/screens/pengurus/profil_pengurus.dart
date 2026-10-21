@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'katalog_pengurus.dart';
+import 'kelola_edukasi_screen.dart';
 import 'login_pengurus_screen.dart';
 import 'verifikasi_warga_screen.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
@@ -20,7 +20,7 @@ class ProfilPengurusScreen extends StatelessWidget {
 
   static const List<String> _labelNav = [
     'Verifikasi Warga',
-    'Kelola Katalog',
+    'Kelola',
     'Antrean Warga',
     'Rekap',
     'Pengurus',
@@ -579,7 +579,7 @@ class ProfilPengurusScreen extends StatelessWidget {
             tujuan = const VerifikasiWargaScreen();
             break;
           case 1:
-            tujuan = const KatalogPengurusScreen();
+            tujuan = const KelolaEdukasiPengurusScreen();
             break;
           case 2:
             tujuan = const KelolaAntrianPengumumanScreen();
@@ -609,7 +609,7 @@ class ProfilPengurusScreen extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.assignment_outlined),
-          label: 'Katalog',
+          label: 'Kelola',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.groups_outlined),
