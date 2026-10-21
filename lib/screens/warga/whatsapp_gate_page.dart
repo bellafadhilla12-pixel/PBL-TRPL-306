@@ -277,7 +277,7 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
 
                 BoxShadow(
 
-                  color: Colors.black.withOpacity(0.18),
+                  color: Colors.black.withValues(alpha: 0.18),
 
                   blurRadius: 7,
 
@@ -379,7 +379,7 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
 
                 BoxShadow(
 
-                  color: Colors.black.withOpacity(0.12),
+                  color: Colors.black.withValues(alpha: 0.12),
 
                   blurRadius: 7,
 
@@ -447,7 +447,7 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
 
           BoxShadow(
 
-            color: Colors.black.withOpacity(0.18),
+            color: Colors.black.withValues(alpha: 0.18),
 
             blurRadius: 8,
 
@@ -523,7 +523,7 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
 
           BoxShadow(
 
-            color: Colors.black.withOpacity(0.16),
+            color: Colors.black.withValues(alpha: 0.16),
 
             blurRadius: 10,
 
@@ -873,7 +873,7 @@ class _WhatsAppGatePageState extends State<WhatsAppGatePage> {
 
           BoxShadow(
 
-            color: Colors.black.withOpacity(0.18),
+            color: Colors.black.withValues(alpha: 0.18),
 
             blurRadius: 10,
 

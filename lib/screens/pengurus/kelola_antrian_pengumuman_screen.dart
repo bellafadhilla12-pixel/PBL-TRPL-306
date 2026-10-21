@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'verifikasi_warga_screen.dart';
 import 'profil_pengurus.dart';
-import 'announcement_store.dart';
+import '../../services/announcement_store.dart';
 
 class KelolaAntrianPengumumanScreen extends StatefulWidget {
   const KelolaAntrianPengumumanScreen({super.key});

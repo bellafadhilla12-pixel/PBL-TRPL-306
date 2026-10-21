@@ -246,7 +246,7 @@ class ProfilWargaScreen extends StatelessWidget {
           ],
         ),
       ),
-      if (trailing != null) trailing,
+       ?trailing,    
     ],
   );
 

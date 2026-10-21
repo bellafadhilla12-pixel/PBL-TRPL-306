@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'profilWarga.dart';
-
+import 'profil_warga.dart';
 import 'antrean_timbang_screen.dart';
-import 'announcement_store.dart';
+import '../../services/announcement_store.dart';
 
 
 
