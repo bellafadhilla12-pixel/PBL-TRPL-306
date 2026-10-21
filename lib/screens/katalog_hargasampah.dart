@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'login_warga_screen.dart';
-
 import 'profilWarga.dart';
 
 // ====== MODEL DATA ======
@@ -25,7 +22,7 @@ class SampahItem {
   });
 }
 
-const _hijau = Color(0xFF2E7D4F);
+const _hijau = Color(0xFF0F6E56);
 const _bg = Color(0xFFF4F1E8);
 const _merah = Color(0xFFD32F2F);
 
@@ -357,18 +354,6 @@ class _KatalogPageState extends State<KatalogPage> {
               color: _hijau,
               size: 32,
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginScreenWarga(),
-                ),
-                (route) => false,
-              );
-            },
-            icon: const Icon(Icons.logout, color: _hijau),
           ),
         ],
       ),

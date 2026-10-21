@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'announcement_store.dart';
+
 
 
 class AntreanTimbangScreen extends StatefulWidget {
@@ -36,7 +38,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
   String? nomorAntrean;
 
-  String selectedDate = '17 September 2026';
+  String selectedDate = '';
 
 
 
@@ -58,166 +60,173 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
 
 
-  final List<Map<String, dynamic>> timeSlots = [
+  // Slot dibuat mengikuti jam mulai dan selesai dari pengumuman pengurus.
+  // Untuk sementara jumlah pendaftar dimulai dari 0 pada setiap slot.
+  List<Map<String, dynamic>> _buildTimeSlots(AnnouncementData sesi) {
+    final start = _parseClock(sesi.mulai);
+    final end = _parseClock(sesi.selesai);
+    if (end <= start) return [];
 
-    {'time': '09:00 - 09:30 WIB', 'quota': '4/5 Warga', 'available': true},
+    final slots = <Map<String, dynamic>>[];
+    for (var minute = start; minute + 30 <= end; minute += 30) {
+      final slotStart = _formatClock(minute);
+      final slotEnd = _formatClock(minute + 30);
+      slots.add({
+        'time': '$slotStart - $slotEnd WIB',
+        'registered': 0,
+        'quota': 5,
+        'available': true,
+      });
+    }
+    return slots;
+  }
 
-    {'time': '09:30 - 10:00 WIB', 'quota': '5/5 Warga', 'available': false},
+  int _parseClock(String value) {
+    final clean = value.replaceAll(' WIB', '').trim();
+    final parts = clean.split(':');
+    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+  }
 
-    {'time': '10:00 - 10:30 WIB', 'quota': '1/5 Warga', 'available': true},
+  String _formatClock(int minutes) {
+    final hour = (minutes ~/ 60).toString().padLeft(2, '0');
+    final minute = (minutes % 60).toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
 
-    {'time': '10:30 - 11:00 WIB', 'quota': '2/5 Warga', 'available': true},
+  String _formatDate(DateTime date) {
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
 
-    {'time': '11:00 - 11:30 WIB', 'quota': '5/5 Warga', 'available': false},
-
-    {'time': '11:30 - 12:00 WIB', 'quota': '4/5 Warga', 'available': true},
-
-  ];
+  String _formatWeekdayDate(DateTime date) {
+    const weekdays = [
+      'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu',
+    ];
+    return '${weekdays[date.weekday - 1]}, ${_formatDate(date)}';
+  }
 
 
 
   @override
-
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       backgroundColor: background,
-
       body: SafeArea(
+        child: ValueListenableBuilder<Map<String, AnnouncementData>>(
+          valueListenable: AnnouncementStore.announcements,
+          builder: (context, announcements, _) {
+            final sesiTimbangan = announcements['timbangan'];
 
-        child: SingleChildScrollView(
+            // Jadwal dan pilihan slot hanya ditampilkan setelah pengurus
+            // mengirim pengumuman sesi penimbangan.
+            if (sesiTimbangan == null) {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+                child: Column(
+                  children: [
+                    _buildHeader(),
+                    const Expanded(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.event_busy_outlined,
+                                size: 54,
+                                color: darkGreen,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Sesi penimbangan sampah belum dibuka',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: darkGreen,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
 
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 16),
+                  _buildProfileCard(),
+                  const SizedBox(height: 14),
+                  _buildInfoCard(),
 
-          child: Column(
+                  if (sudahAmbilAntrean) ...[
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Sudah Ambil Antrean Timbang',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.black38,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildActiveQueueCard(_formatDate(sesiTimbangan.tanggal)),
+                  ],
 
-            crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 20),
+                  _buildSectionTitle(number: '1', title: 'Jadwal Timbang'),
+                  const SizedBox(height: 10),
+                  _buildDateCard(_formatDate(sesiTimbangan.tanggal)),
 
-            children: [
-
-              _buildHeader(),
-
-              const SizedBox(height: 16),
-
-              _buildProfileCard(),
-
-              const SizedBox(height: 14),
-
-              _buildInfoCard(),
-
-
-
-              if (sudahAmbilAntrean) ...[
-
-                const SizedBox(height: 20),
-
-                const Text(
-
-                  'Sudah Ambil Antrean Timbang',
-
-                  style: TextStyle(
-
-                    fontSize: 12,
-
-                    color: Colors.black38,
-
-                    fontWeight: FontWeight.w500,
-
+                  const SizedBox(height: 20),
+                  _buildSectionTitle(number: '2', title: 'Pilih Slot Waktu'),
+                  const SizedBox(height: 10),
+                  ..._buildTimeSlots(sesiTimbangan).map(
+                    (slot) => Padding(
+                      padding: const EdgeInsets.only(bottom: 9),
+                      child: _buildTimeSlot(slot),
+                    ),
                   ),
 
-                ),
-
-                const SizedBox(height: 10),
-
-                _buildActiveQueueCard(),
-
-              ],
-
-
-
-              const SizedBox(height: 20),
-
-              _buildSectionTitle(number: '1', title: 'Jadwal Timbang'),
-
-              const SizedBox(height: 10),
-
-              _buildDateCard(),
-
-
-
-              const SizedBox(height: 20),
-
-              _buildSectionTitle(number: '2', title: 'Pilih Slot Waktu'),
-
-              const SizedBox(height: 10),
-
-              ...timeSlots.map(
-
-                (slot) => Padding(
-
-                  padding: const EdgeInsets.only(bottom: 9),
-
-                  child: _buildTimeSlot(slot),
-
-                ),
-
-              ),
-
-
-
-              const SizedBox(height: 14),
-
-              _buildSectionTitle(number: '3', title: 'Bocoran Jenis Sampah'),
-
-              const SizedBox(height: 8),
-
-              const Padding(
-
-                padding: EdgeInsets.symmetric(horizontal: 4),
-
-                child: Text(
-
-                  'Bantu timbangan RT menyiapkan wadah karung yang sesuai',
-
-                  style: TextStyle(
-
-                    fontSize: 11,
-
-                    fontWeight: FontWeight.bold,
-
-                    color: Colors.black87,
-
+                  const SizedBox(height: 14),
+                  _buildSectionTitle(number: '3', title: 'Bocoran Jenis Sampah'),
+                  const SizedBox(height: 8),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      'Bantu timbangan RT menyiapkan wadah karung yang sesuai',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 10),
+                  _buildWasteTypes(),
 
-                ),
-
+                  const SizedBox(height: 16),
+                  _buildSummaryCard(sesiTimbangan.tanggal),
+                ],
               ),
-
-              const SizedBox(height: 10),
-
-              _buildWasteTypes(),
-
-
-
-              const SizedBox(height: 16),
-
-              _buildSummaryCard(),
-
-            ],
-
-          ),
-
+            );
+          },
         ),
-
       ),
-
-      bottomNavigationBar: _buildBottomNav(),
-
-    );
-
+);
   }
-
 
 
   Widget _buildHeader() {
@@ -606,7 +615,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
 
 
-  Widget _buildActiveQueueCard() {
+  Widget _buildActiveQueueCard(String sessionDate) {
 
     return Container(
 
@@ -708,7 +717,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
             children: [
 
-              _buildTicketChip(selectedDate),
+              _buildTicketChip(sessionDate),
 
               const SizedBox(height: 6),
 
@@ -840,7 +849,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
 
 
-  Widget _buildDateCard() {
+  Widget _buildDateCard(String tanggal) {
 
     return Container(
 
@@ -870,24 +879,15 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
       ),
 
-      child: const Row(
-
+      child: Row(
         children: [
-
-          Icon(Icons.calendar_month, color: darkGreen, size: 26),
-
-          SizedBox(width: 12),
-
+          const Icon(Icons.calendar_month, color: darkGreen, size: 26),
+          const SizedBox(width: 12),
           Text(
-
-            '17 September 2026',
-
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-
+            tanggal,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
-
         ],
-
       ),
 
     );
@@ -898,8 +898,9 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
   Widget _buildTimeSlot(Map<String, dynamic> slot) {
 
-    final bool available = slot['available'] as bool;
-
+    final int registered = slot['registered'] as int;
+    final int quota = slot['quota'] as int;
+    final bool available = registered < quota;
     final bool selected = selectedTime == slot['time'];
 
 
@@ -984,7 +985,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
                   Text(
 
-                    slot['quota'] as String,
+                    '$registered/$quota Warga',
 
                     style: TextStyle(
 
@@ -1160,7 +1161,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
 
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(DateTime sessionDate) {
 
     return Container(
 
@@ -1226,7 +1227,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
                       ? 'Belum memilih waktu'
 
-                      : 'Minggu, 17 September\n$selectedTime',
+                      : '${_formatWeekdayDate(sessionDate)}\n$selectedTime',
 
                   textAlign: TextAlign.right,
 
@@ -1313,6 +1314,14 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
 
   void _buatAntrean() {
+    final sesi = AnnouncementStore.announcements.value['timbangan'];
+    if (sesi == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sesi penimbangan sampah belum dibuka.')),
+      );
+      return;
+    }
+    selectedDate = _formatDate(sesi.tanggal);
 
     if (selectedTime == null) {
 
@@ -1388,52 +1397,6 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
     }
 
     Navigator.pop(context);
-  }
-
-
-
-  Widget _buildBottomNav() {
-
-    return BottomNavigationBar(
-
-      currentIndex: 0,
-
-      selectedItemColor: darkGreen,
-
-      unselectedItemColor: darkGreen,
-
-      type: BottomNavigationBarType.fixed,
-
-      items: const [
-
-        BottomNavigationBarItem(
-
-          icon: Icon(Icons.home_outlined),
-
-          label: 'Beranda',
-
-        ),
-
-        BottomNavigationBarItem(
-
-          icon: Icon(Icons.account_balance_wallet_outlined),
-
-          label: 'Dompet',
-
-        ),
-
-        BottomNavigationBarItem(
-
-          icon: Icon(Icons.person_outline),
-
-          label: 'Warga',
-
-        ),
-
-      ],
-
-    );
-
   }
 
 }

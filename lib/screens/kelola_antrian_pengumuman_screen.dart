@@ -2,6 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'verifikasi_warga_screen.dart';
+import 'profil_pengurus.dart';
+import 'announcement_store.dart';
+
 class KelolaAntrianPengumumanScreen extends StatefulWidget {
   const KelolaAntrianPengumumanScreen({super.key});
 
@@ -255,15 +259,19 @@ class _KelolaAntrianPengumumanScreenState
         child: Row(
           children: [
             const Spacer(),
-            IconButton(onPressed: () => _message('Profil belum dihubungkan.'), icon: const Icon(Icons.account_circle_outlined, color: green, size: 30)),
             IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilPengurusScreen(),
+                  ),
+                );
               },
               icon: const Icon(
-                Icons.logout,
+                Icons.account_circle_outlined,
                 color: green,
-                size: 27,
+                size: 30,
               ),
             ),
           ],
@@ -731,19 +739,54 @@ class _KelolaAntrianPengumumanScreenState
   Widget _bottomNav() => BottomNavigationBar(
         currentIndex: 2,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: bg,
+        backgroundColor: const Color(0xFFF4FBF7),
         selectedItemColor: green,
-        unselectedItemColor: green,
-        selectedLabelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700),
-        unselectedLabelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600),
+        unselectedItemColor: Colors.black45,
+        selectedFontSize: 9.5,
+        unselectedFontSize: 9.5,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.verified_user_outlined), label: 'Verifikasi Warga'),
-          BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: 'Kelola Katalog'),
-          BottomNavigationBarItem(icon: Icon(Icons.groups_outlined), label: 'Antrean Warga'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_outlined), label: 'Rekap'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Pengurus'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline),
+            label: 'Verifikasi',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_outlined),
+            label: 'Katalog',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.groups_outlined),
+            label: 'Antrean Warga',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Rekap',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Pengurus',
+          ),
         ],
-        onTap: (i) { if (i != 2) _message('Menu ini belum dihubungkan.'); },
+        onTap: (i) {
+          Widget? tujuan;
+          switch (i) {
+            case 0:
+              tujuan = const VerifikasiWargaScreen();
+              break;
+            case 4:
+              tujuan = const ProfilPengurusScreen();
+              break;
+            default:
+              _message('Menu ini belum dihubungkan.');
+              return;
+          }
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => tujuan!),
+          );
+        },
       );
 
   void _kirimSesi() {
@@ -765,14 +808,26 @@ class _KelolaAntrianPengumumanScreenState
       return;
     }
 
+    final pengumuman = AnnouncementData(
+      jenis: timbangan ? 'timbangan' : 'pencairan',
+      tanggal: tanggal,
+      mulai: mulai,
+      selesai: selesai,
+      kuota: timbangan ? kapasitasWarga : kuotaPencairan,
+      diterbitkanPada: DateTime.now(),
+    );
+
+    // Publikasikan ke state bersama agar banner beranda warga langsung diperbarui.
+    AnnouncementStore.publish(pengumuman);
+
     setState(() {
       pengumumanDikirim = true;
     });
 
     _message(
       'Pengumuman ${timbangan ? 'penimbangan sampah' : 'pencairan dana'} '
-      'dijadwalkan pada ${_formatTanggal(tanggal)}, pukul $mulai–$selesai. '
-      'Status sesi akan berubah otomatis sesuai jadwal.',
+      'berhasil dikirim untuk ${_formatTanggal(tanggal)}, '
+      'pukul $mulai–$selesai. Banner beranda warga telah diperbarui.',
     );
   }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'katalog_pengurus.dart';
-import 'login_pengurus_screen.dart';
+import 'kelola_antrian_pengumuman_screen.dart';
 import 'profil_pengurus.dart';
 
 // =====================================================
@@ -174,21 +173,10 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
               ),
             );
           },
-
-          child: Container(
-            width: 38,
-            height: 38,
-
-            decoration: const BoxDecoration(
-              color: _hijau,
-              shape: BoxShape.circle,
-            ),
-
-            child: const Icon(
-              Icons.person_outline,
-              color: Colors.white,
-              size: 22,
-            ),
+          child: const Icon(
+            Icons.account_circle_outlined,
+            color: _hijau,
+            size: 32,
           ),
         ),
       ],
@@ -728,6 +716,9 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
         switch (index) {
           case 1:
             tujuan = const KatalogPengurusScreen();
+            break;
+          case 2:
+            tujuan = const KelolaAntrianPengumumanScreen();
             break;
           case 4:
             tujuan = const ProfilPengurusScreen();
