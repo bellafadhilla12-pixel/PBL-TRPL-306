@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'kelola_edukasi_screen.dart';
 import 'katalog_pengurus.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
 import 'profil_pengurus.dart';
@@ -718,7 +719,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
         Widget? tujuan;
         switch (index) {
           case 1:
-            tujuan = const KatalogPengurusScreen();
+            tujuan = const KelolaEdukasiPengurusScreen();
             break;
           case 2:
             tujuan = const KelolaAntrianPengumumanScreen();

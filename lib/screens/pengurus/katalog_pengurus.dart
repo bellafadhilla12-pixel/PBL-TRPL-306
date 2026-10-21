@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'verifikasi_warga_screen.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
+import 'kelola_edukasi_screen.dart';
 import 'profil_pengurus.dart';
 
 // ====== MODEL DATA ======
@@ -267,28 +268,62 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: _bg,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _header(),
-            const SizedBox(height: 12),
-            _tipsCard(),
-            const SizedBox(height: 12),
-            _searchBar(),
-            const SizedBox(height: 10),
-            _filterChips(),
-            const SizedBox(height: 8),
-            _estimasiNote(),
-            const SizedBox(height: 12),
-            ...hasil.map((s) => SampahCard(item: s)),
-          ],
+  backgroundColor: _bg,
+  body: SafeArea(
+    child: Column(
+      children: [
+        // HEADER ATAS DENGAN PANAH KEMBALI
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
+          child: Row(
+            children: [
+              IconButton(
+                tooltip: 'Kembali',
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: _hijau,
+                ),
+                onPressed: () => Navigator.maybePop(context),
+              ),
+              const Expanded(
+                child: Text(
+                  'Katalog & Kategori Sampah',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: _buildBottomNav(),
-    );
-  }
+
+        // ISI KATALOG YANG SUDAH ADA
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _header(),
+              const SizedBox(height: 12),
+              _tipsCard(),
+              const SizedBox(height: 12),
+              _searchBar(),
+              const SizedBox(height: 10),
+              _filterChips(),
+              const SizedBox(height: 8),
+              _estimasiNote(),
+              const SizedBox(height: 12),
+              ...hasil.map((s) => SampahCard(item: s)),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+  bottomNavigationBar: _buildBottomNav(),
+);
+  } 
 
   // ====== FOOTER PENGURUS ======
   Widget _buildBottomNav() {
