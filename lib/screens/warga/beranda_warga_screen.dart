@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'profil_warga.dart';
 import 'antrean_timbang_screen.dart';
+import 'edukasi_warga_screen.dart';
+import 'katalog_hargasampah.dart';
 import '../../services/announcement_store.dart';
 
 
@@ -1801,21 +1803,19 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
       Expanded(
 
         child: _quickActionItem(
-
           icon: Icons.school_outlined,
-
           label: 'Edukasi',
-
           onTap: () {
-
-            // TODO: navigasi ke halaman edukasi
-
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    const EdukasiPage(),
+              ),
+            );
           },
-
           imagePath: 'assets/images/mortarboard.png',
-
         ),
-
       ),
 
       const SizedBox(width: 12),
@@ -1823,15 +1823,16 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
       Expanded(
 
         child: _quickActionItem(
-
           icon: Icons.menu_book_outlined,
-
           label: 'Katalog',
-
           onTap: () {
-
-            // TODO: navigasi ke halaman katalog
-
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                  const KatalogPage(),
+              ),
+            );
           },
 
           imagePath: 'assets/images/catalog.png',
