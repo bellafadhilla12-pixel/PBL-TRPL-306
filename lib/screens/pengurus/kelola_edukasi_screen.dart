@@ -1,13 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'katalog_pengurus.dart';
-import 'verifikasi_warga_screen.dart';
-import 'kelola_antrian_pengumuman_screen.dart';
-import 'profil_pengurus.dart';
-
-/// Halaman Pengurus untuk mengelola materi edukasi TRIM.
-/// Data pada contoh ini masih disimpan sementara di memori aplikasi.
-/// Hubungkan ke database/API agar perubahan tersimpan permanen.
 class KelolaEdukasiPengurusScreen extends StatefulWidget {
   const KelolaEdukasiPengurusScreen({super.key});
 
@@ -18,228 +10,701 @@ class KelolaEdukasiPengurusScreen extends StatefulWidget {
 
 class _KelolaEdukasiPengurusScreenState
     extends State<KelolaEdukasiPengurusScreen> {
-  static const Color green = Color(0xFF08765F);
-  static const Color mint = Color(0xFF5BCBAA);
-  static const Color pageColor = Color(0xFFF1F0E8);
-  static const Color cardColor = Color(0xFFFFFCFC);
+  static const Color _bg = Color(0xFFF0F0E8);
+  static const Color _green = Color(0xFF41644A);
+  static const Color _darkGreen = Color(0xFF263D2D);
+  static const Color _border = Color(0xFFE1E5DD);
 
-  String selectedFilter = 'Semua Materi';
-  final List<Map<String, String>> materi = [
+  String _filter = 'Semua';
+
+  final List<Map<String, dynamic>> _edukasi = [
     {
-      'kategori': 'Pilah Anorganik',
-      'judul': 'Plastik (Botol P3 & Cup P1/P2)',
-      'label': 'Tinggi',
-      'deskripsi':
-          'Bilas sisa minuman manis, lepaskan label luar dan cincin leher botol, lalu remas atau injak hingga pipih agar kantong tampung muat lebih banyak.',
+      'judul': 'Pilah Sampah dari Rumah',
+      'kategori': 'Anorganik',
+      'deskripsi': 'Kenali cara memisahkan sampah organik dan anorganik sebelum disetorkan.',
+      'icon': Icons.delete_sweep_rounded,
     },
     {
-      'kategori': 'Pilah Anorganik',
-      'judul': 'Kertas & Kardus (K1 - K5)',
-      'label': 'Prioritas',
+      'judul': 'Manfaat Bank Sampah',
+      'kategori': 'Anorganik',
       'deskripsi':
-          'Kelupas lakban atau selotip, lipat kardus hingga rata, serta pisahkan kertas yang berminyak atau bekas kemasan makanan.',
+          'Pelajari manfaat menabung sampah dan menjaga lingkungan sekitar.',
+      'icon': Icons.account_balance_wallet_rounded,
     },
     {
-      'kategori': 'Pilah Anorganik',
-      'judul': 'Logam & Kaleng (C1 - C3)',
-      'label': 'Rutin',
+      'judul': 'Daur Ulang Plastik',
+      'kategori': 'Anorganik',
       'deskripsi':
-          'Cuci bersih kaleng susu atau sarden. Pastikan tidak ada sisa saus atau minyak agar tidak memicu karat atau mengundang lalat.',
+          'Ketahui jenis plastik yang dapat dikumpulkan dan didaur ulang.',
+      'icon': Icons.recycling_rounded,
     },
     {
-      'kategori': 'Pilah Anorganik',
-      'judul': 'Minyak Jelantah (MJ)',
-      'label': 'Bernilai Tinggi',
+      'judul': 'Membuat Kompos di Rumah',
+      'kategori': 'Organik',
       'deskripsi':
-          'Saring remah atau kotoran, dinginkan, lalu tuang ke jeriken atau botol plastik tertutup. Jangan membuangnya ke saluran air.',
-    },
-    {
-      'kategori': 'Pilah Anorganik',
-      'judul': 'B3 Rumah Tangga',
-      'label': 'Wadah Khusus',
-      'deskripsi':
-          'Kumpulkan terpisah di wadah khusus untuk diserahkan ke drop-point B3. Jangan mencampurnya dengan sampah umum.',
-    },
-    {
-      'kategori': 'Pembuatan Kompos',
-      'judul': 'Metode Kompos Rumahan',
-      'label': 'Panduan',
-      'deskripsi':
-          'Pilih metode yang sesuai dengan kondisi rumah, seperti Takakura, ember tumpuk, atau lubang biopori.',
-    },
-    {
-      'kategori': 'Pembuatan Kompos',
-      'judul': 'Keseimbangan Bahan Kompos (1:2)',
-      'label': 'Penting',
-      'deskripsi':
-          'Seimbangkan bahan hijau yang cenderung basah dengan bahan cokelat yang kering. Hindari daging, tulang besar, dan makanan bersantan pekat.',
-    },
-    {
-      'kategori': 'Pembuatan Kompos',
-      'judul': 'Langkah Praktis Membuat Kompos',
-      'label': 'Langkah-langkah',
-      'deskripsi':
-          'Siapkan wadah berventilasi, buat lapisan dasar, masukkan sampah dapur yang dicacah, lalu aduk dan jaga kelembapan secara berkala.',
+          'Pelajari cara mengolah sisa makanan dan daun menjadi pupuk kompos.',
+      'icon': Icons.eco_rounded,
     },
   ];
 
-  List<Map<String, String>> get materiTampil {
-    if (selectedFilter == 'Semua Materi') return materi;
-    return materi.where((m) => m['kategori'] == selectedFilter).toList();
+  List<Map<String, dynamic>> get _filteredEdukasi {
+    if (_filter == 'Semua') return _edukasi;
+
+    return _edukasi.where((item) => item['kategori'] == _filter).toList();
   }
 
-  Future<void> _formMateri({int? index}) async {
-    final isEdit = index != null;
-    final data = isEdit ? materi[index] : <String, String>{};
-    final judulController =
-        TextEditingController(text: data['judul'] ?? '');
-    final deskripsiController =
-        TextEditingController(text: data['deskripsi'] ?? '');
-    final labelController = TextEditingController(text: data['label'] ?? '');
-    String kategori = data['kategori'] ?? 'Pilah Anorganik';
-    final formKey = GlobalKey<FormState>();
+  int get _jumlahKategori =>
+      _edukasi.map((item) => item['kategori']).toSet().length;
 
-    final hasil = await showDialog<Map<String, String>>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: cardColor,
-          title: Text(isEdit ? 'Edit Materi Edukasi' : 'Tambah Materi Edukasi',
-              style: const TextStyle(fontWeight: FontWeight.w800)),
-          content: SizedBox(
-            width: 420,
-            child: SingleChildScrollView(
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+  @override
+  Widget build(BuildContext context) {
+    // Scaffold, header, tab katalog, dan bottom nav
+    // tetap dikelola oleh KelolaGabunganScreen.
+    return Material(
+      color: _bg,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _banner(),
+          const SizedBox(height: 16),
+          _summary(),
+          const SizedBox(height: 22),
+
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Daftar Edukasi',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _darkGreen,
+                  ),
+                ),
+              ),
+              FilledButton.icon(
+                onPressed: _tambahEdukasi,
+                style: FilledButton.styleFrom(
+                  backgroundColor: _green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Tambah'),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+          _filterButtons(),
+          const SizedBox(height: 14),
+
+          if (_filteredEdukasi.isEmpty)
+            _emptyState()
+          else
+            ..._filteredEdukasi.map(_edukasiCard),
+
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // ==================== BANNER ====================
+
+  Widget _banner() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: _green,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Edukasi Bank Sampah',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Kelola informasi dan materi edukasi untuk warga.',
+                  style: TextStyle(
+                    color: Colors.white,
+                    height: 1.4,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 12),
+          Icon(Icons.menu_book_rounded, size: 46, color: Colors.white),
+        ],
+      ),
+    );
+  }
+
+  // ==================== RINGKASAN ====================
+
+  Widget _summary() {
+    return Row(
+      children: [
+        Expanded(
+          child: _summaryCard(
+            icon: Icons.menu_book_rounded,
+            title: 'Total Edukasi',
+            value: '${_edukasi.length}',
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _summaryCard(
+            icon: Icons.category_rounded,
+            title: 'Kategori',
+            value: '$_jumlahKategori',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _summaryCard({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: _border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: _green, size: 25),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: const TextStyle(
+              color: _darkGreen,
+              fontSize: 23,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.black54, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==================== FILTER KATEGORI ====================
+
+  Widget _filterButtons() {
+    const filters = ['Semua', 'Organik', 'Anorganik'];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: filters.map((filter) {
+        final selected = _filter == filter;
+
+        return ChoiceChip(
+          label: Text(filter),
+          selected: selected,
+          selectedColor: _green,
+          backgroundColor: Colors.white,
+          side: BorderSide(color: selected ? _green : _border),
+          labelStyle: TextStyle(
+            color: selected ? Colors.white : _darkGreen,
+            fontWeight: FontWeight.w600,
+          ),
+          onSelected: (_) {
+            setState(() => _filter = filter);
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  // ==================== KARTU EDUKASI ====================
+
+  Widget _edukasiCard(Map<String, dynamic> item) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: _border),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: _bg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(item['icon'] as IconData, color: _green),
+          ),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['judul'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: _darkGreen,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  item['deskripsi'] as String,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 9),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8EFE5),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    item['kategori'] as String,
+                    style: const TextStyle(
+                      color: _green,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          PopupMenuButton<String>(
+            tooltip: 'Kelola edukasi',
+            icon: const Icon(Icons.more_vert_rounded, color: _green),
+            onSelected: (value) {
+              switch (value) {
+                case 'detail':
+                  _detailEdukasi(item);
+                  break;
+                case 'edit':
+                  _editEdukasi(item);
+                  break;
+                case 'hapus':
+                  _hapusEdukasi(item);
+                  break;
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'detail',
+                child: Row(
                   children: [
-                    const Text('Kategori',
-                        style: TextStyle(fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 6),
-                    DropdownButtonFormField<String>(
-                      value: kategori,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                            value: 'Pilah Anorganik',
-                            child: Text('Pilah Anorganik')),
-                        DropdownMenuItem(
-                            value: 'Pembuatan Kompos',
-                            child: Text('Pembuatan Kompos')),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setDialogState(() => kategori = value);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: judulController,
-                      decoration: const InputDecoration(
-                        labelText: 'Judul materi',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) => value == null || value.trim().isEmpty
-                          ? 'Judul materi wajib diisi'
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: labelController,
-                      decoration: const InputDecoration(
-                        labelText: 'Label (contoh: Panduan)',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: deskripsiController,
-                      minLines: 3,
-                      maxLines: 5,
-                      decoration: const InputDecoration(
-                        labelText: 'Deskripsi / isi materi',
-                        alignLabelWithHint: true,
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) =>
-                          value == null || value.trim().isEmpty
-                              ? 'Deskripsi materi wajib diisi'
-                              : null,
-                    ),
+                    Icon(Icons.info_outline, size: 20),
+                    SizedBox(width: 10),
+                    Text('Detail'),
                   ],
                 ),
               ),
+              PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_outlined, size: 20),
+                    SizedBox(width: 10),
+                    Text('Edit'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'hapus',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                    SizedBox(width: 10),
+                    Text('Hapus', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyState() {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: _border),
+      ),
+      child: const Column(
+        children: [
+          Icon(Icons.menu_book_outlined, size: 44, color: _green),
+          SizedBox(height: 12),
+          Text(
+            'Belum ada edukasi',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: _darkGreen,
+              fontSize: 15,
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Batal'),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: green),
-              onPressed: () {
-                if (!formKey.currentState!.validate()) return;
-                Navigator.pop(dialogContext, {
-                  'kategori': kategori,
-                  'judul': judulController.text.trim(),
-                  'label': labelController.text.trim().isEmpty
-                      ? 'Materi'
-                      : labelController.text.trim(),
-                  'deskripsi': deskripsiController.text.trim(),
-                });
-              },
-              child: Text(isEdit ? 'Simpan Perubahan' : 'Tambah Materi'),
-            ),
-          ],
-        ),
+          SizedBox(height: 6),
+          Text(
+            'Belum ada materi untuk kategori ini. '
+            'Coba kategori lain atau tambahkan materi baru.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.black54, fontSize: 12, height: 1.5),
+          ),
+        ],
       ),
+    );
+  }
+
+  // ==================== TAMBAH EDUKASI ====================
+
+  Future<void> _tambahEdukasi() async {
+    final hasil = await _formEdukasi();
+
+    if (!mounted || hasil == null) return;
+
+    setState(() {
+      _edukasi.add(hasil);
+    });
+
+    _pesan('Materi edukasi berhasil ditambahkan.');
+  }
+
+  // ==================== EDIT EDUKASI ====================
+
+  Future<void> _editEdukasi(Map<String, dynamic> item) async {
+    final hasil = await _formEdukasi(item: item);
+
+    if (!mounted || hasil == null) return;
+
+    setState(() {
+      item['judul'] = hasil['judul'];
+      item['kategori'] = hasil['kategori'];
+      item['deskripsi'] = hasil['deskripsi'];
+    });
+
+    _pesan('Materi edukasi berhasil diperbarui.');
+  }
+
+  // ==================== FORM TAMBAH / EDIT ====================
+
+  Future<Map<String, dynamic>?> _formEdukasi({
+    Map<String, dynamic>? item,
+  }) async {
+    final formKey = GlobalKey<FormState>();
+
+    final judulController = TextEditingController(
+      text: item?['judul'] as String? ?? '',
+    );
+
+    final deskripsiController = TextEditingController(
+      text: item?['deskripsi'] as String? ?? '',
+    );
+
+    String kategori = item?['kategori'] as String? ?? 'Organik';
+
+    final hasil = await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: _bg,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Text(
+                item == null ? 'Tambah Edukasi' : 'Edit Edukasi',
+                style: const TextStyle(
+                  color: _darkGreen,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Judul Materi',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: judulController,
+                        maxLength: 100,
+                        decoration: _inputDecoration(
+                          'Masukkan judul materi',
+                          Icons.title_rounded,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Judul materi wajib diisi.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Kategori',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<String>(
+                        value: kategori,
+                        decoration: _inputDecoration(
+                          'Pilih kategori',
+                          Icons.category_outlined,
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'Organik',
+                            child: Text('Organik'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Anorganik',
+                            child: Text('Anorganik'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() => kategori = value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Deskripsi Materi',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: deskripsiController,
+                        maxLines: 4,
+                        maxLength: 500,
+                        decoration: _inputDecoration(
+                          'Jelaskan isi materi edukasi',
+                          Icons.description_outlined,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Deskripsi materi wajib diisi.';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text(
+                    'Batal',
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _green,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (!formKey.currentState!.validate()) return;
+
+                    Navigator.pop(dialogContext, <String, dynamic>{
+                      'judul': judulController.text.trim(),
+                      'kategori': kategori,
+                      'deskripsi': deskripsiController.text.trim(),
+                      'icon':
+                          item?['icon'] as IconData? ??
+                          (kategori == 'Organik'
+                              ? Icons.eco_rounded
+                              : Icons.recycling_rounded),
+                    });
+                  },
+                  child: Text(item == null ? 'Simpan' : 'Perbarui'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
 
     judulController.dispose();
     deskripsiController.dispose();
-    labelController.dispose();
 
-    if (hasil == null || !mounted) return;
-    setState(() {
-      if (isEdit) {
-        materi[index] = hasil;
-      } else {
-        materi.insert(0, hasil);
-        selectedFilter = 'Semua Materi';
-      }
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(isEdit
-            ? 'Materi edukasi berhasil diperbarui.'
-            : 'Materi edukasi berhasil ditambahkan.'),
+    return hasil;
+  }
+
+  InputDecoration _inputDecoration(String hint, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      prefixIcon: Icon(icon, color: _green, size: 20),
+      filled: true,
+      fillColor: Colors.white,
+      counterStyle: const TextStyle(fontSize: 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: _border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: _border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: _green, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red),
       ),
     );
   }
 
-  Future<void> _hapusMateri(int index) async {
-    final judul = materi[index]['judul'] ?? 'materi ini';
+  // ==================== DETAIL EDUKASI ====================
+
+  void _detailEdukasi(Map<String, dynamic> item) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Row(
+          children: [
+            const Icon(Icons.menu_book_rounded, color: _green),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                item['judul'] as String,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: _darkGreen,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EFE5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  item['kategori'] as String,
+                  style: const TextStyle(
+                    color: _green,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Deskripsi Materi',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: _darkGreen,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                item['deskripsi'] as String,
+                style: const TextStyle(height: 1.6, color: Colors.black87),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Tutup', style: TextStyle(color: _green)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==================== HAPUS EDUKASI ====================
+
+  Future<void> _hapusEdukasi(Map<String, dynamic> item) async {
     final konfirmasi = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Hapus materi?'),
-        content: Text('Kamu yakin ingin menghapus "$judul"?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: const Text('Hapus Materi?'),
+        content: Text(
+          'Apakah kamu yakin ingin menghapus '
+          '"${item['judul']}" dari daftar edukasi?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Batal'),
+            child: const Text('Batal', style: TextStyle(color: Colors.black54)),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red.shade700),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text('Hapus'),
           ),
@@ -247,498 +712,27 @@ class _KelolaEdukasiPengurusScreenState
       ),
     );
 
-    if (konfirmasi != true || !mounted) return;
-    setState(() => materi.removeAt(index));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Materi edukasi berhasil dihapus.')),
-    );
+    if (!mounted || konfirmasi != true) return;
+
+    setState(() {
+      _edukasi.remove(item);
+    });
+
+    _pesan('Materi edukasi berhasil dihapus.');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final filters = [
-      'Semua Materi',
-      'Pilah Anorganik',
-      'Pembuatan Kompos',
-    ];
+  // ==================== NOTIFIKASI ====================
 
-    return Scaffold(
-      backgroundColor: pageColor,
-      appBar: AppBar(
-        backgroundColor: pageColor,
-        foregroundColor: const Color.fromARGB(255, 12, 12, 12),
-        elevation: 0,
-        title: const Text(
-          'Kelola Edukasi',
-          style: TextStyle(fontWeight: FontWeight.w800),
+  void _pesan(String pesan) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(pesan),
+          backgroundColor: _green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
         ),
-        leading: IconButton(
-          tooltip: 'Kembali',
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            final navigator = Navigator.of(context);
-            if (navigator.canPop()) {
-              navigator.pop();
-            } else {
-              navigator.pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => const ProfilPengurusScreen(),
-                ),
-              );
-            }
-          },
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [(Color.fromARGB(255, 35, 106, 62)), (Color.fromARGB(255, 30, 117, 43))],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 159, 161, 105).withValues(alpha: .18),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Icon(Icons.menu_book_rounded,
-                              color: Colors.white, size: 30),
-                        ),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('MATERI WARGA HIJAU',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: .6,
-                                  )),
-                              SizedBox(height: 4),
-                              Text('Edukasi & Panduan Lingkungan',
-                                  style: TextStyle(
-                                    color: (Colors.yellow),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  )),
-                              SizedBox(height: 4),
-                              Text(
-                                'Atur materi pemilahan sampah dan pembuatan kompos.',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 11.5),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _menuKelola(
-                          icon: Icons.menu_book_rounded,
-                          label: 'Kelola Edukasi',
-                          selected: true,
-                          onTap: () {},
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _menuKelola(
-                          icon: Icons.recycling_rounded,
-                          label: 'Katalog & Kategori Sampah',
-                          selected: false,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const KatalogPengurusScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _summaryCard(
-                          icon: Icons.library_books_outlined,
-                          label: 'Total Materi',
-                          value: '${materi.length}',
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _summaryCard(
-                          icon: Icons.recycling_outlined,
-                          label: 'Kategori',
-                          value: '2',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'Daftar Materi',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                      FilledButton.icon(
-                        onPressed: () => _formMateri(),
-                        icon: const Icon(Icons.add, size: 19),
-                        label: const Text('Tambah'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: green,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 11),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: filters.map((filter) {
-                        final selected = selectedFilter == filter;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            label: Text(filter),
-                            selected: selected,
-                            showCheckmark: false,
-                            onSelected: (_) =>
-                                setState(() => selectedFilter = filter),
-                            selectedColor: green,
-                            backgroundColor: const Color(0xFFE6E4DE),
-                            labelStyle: TextStyle(
-                              color: selected ? Colors.white : Colors.black87,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            side: BorderSide.none,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (materiTampil.isEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Column(
-                        children: [
-                          Icon(Icons.menu_book_outlined,
-                              size: 42, color: green),
-                          SizedBox(height: 8),
-                          Text('Belum ada materi pada kategori ini.'),
-                        ],
-                      ),
-                    )
-                  else
-                    ...materiTampil.map((item) {
-                      final index = materi.indexOf(item);
-                      final isKompos =
-                          item['kategori'] == 'Pembuatan Kompos';
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 11),
-                        padding: const EdgeInsets.all(13),
-                        decoration: BoxDecoration(
-                          color: cardColor,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x1A000000),
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: isKompos
-                                        ? const Color(0xFFDDF1C9)
-                                        : const Color(0xFFD8F3E9),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    isKompos
-                                        ? Icons.eco_outlined
-                                        : Icons.recycling_outlined,
-                                    color: green,
-                                    size: 26,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item['kategori'] ?? '',
-                                        style: const TextStyle(
-                                          color: green,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        item['judul'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w800,
-                                          height: 1.2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuButton<String>(
-                                  tooltip: 'Aksi materi',
-                                  onSelected: (aksi) {
-                                    if (aksi == 'edit') {
-                                      _formMateri(index: index);
-                                    } else if (aksi == 'hapus') {
-                                      _hapusMateri(index);
-                                    }
-                                  },
-                                  itemBuilder: (context) => const [
-                                    PopupMenuItem(
-                                      value: 'edit',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.edit_outlined, size: 19),
-                                          SizedBox(width: 8),
-                                          Text('Edit'),
-                                        ],
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 'hapus',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.delete_outline,
-                                              color: Colors.red, size: 19),
-                                          SizedBox(width: 8),
-                                          Text('Hapus',
-                                              style:
-                                                  TextStyle(color: Colors.red)),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              item['deskripsi'] ?? '',
-                              style: const TextStyle(
-                                  fontSize: 12, height: 1.35),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFE6E4DE),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    item['label'] ?? 'Materi',
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                TextButton.icon(
-                                  onPressed: () => _formMateri(index: index),
-                                  icon: const Icon(Icons.edit_outlined,
-                                      size: 16),
-                                  label: const Text('Edit materi'),
-                                  style: TextButton.styleFrom(
-                                      foregroundColor: green),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNav(),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: 1,
-      selectedItemColor: green,
-      unselectedItemColor: Colors.black45,
-      selectedFontSize: 9.5,
-      unselectedFontSize: 9.5,
-      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
-      onTap: (index) {
-        if (index == 1) return;
-        Widget? tujuan;
-        switch (index) {
-          case 0:
-            tujuan = const VerifikasiWargaScreen();
-            break;
-          case 2:
-            tujuan = const KelolaAntrianPengumumanScreen();
-            break;
-          case 4:
-            tujuan = const ProfilPengurusScreen();
-            break;
-        }
-        if (tujuan == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Halaman ini belum tersedia (tahap front-end).')),
-          );
-          return;
-        }
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => tujuan!));
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.check_circle_outline), label: 'Verifikasi'),
-        BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: 'Kelola'),
-        BottomNavigationBarItem(icon: Icon(Icons.groups_outlined), label: 'Antrean Warga'),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Pengurus'),
-      ],
-    );
-  }
-
-  Widget _menuKelola({
-    required IconData icon,
-    required String label,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: selected ? green : cardColor,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 82),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: selected ? green : const Color(0xFFD8DED8),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                icon,
-                color: selected ? Colors.white : green,
-                size: 24,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: selected ? Colors.white : green,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _summaryCard({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x16000000), blurRadius: 6, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: green, size: 27),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: const TextStyle(fontSize: 10, color: Colors.black54)),
-                const SizedBox(height: 3),
-                Text(value,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w800)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+      );
   }
 }
