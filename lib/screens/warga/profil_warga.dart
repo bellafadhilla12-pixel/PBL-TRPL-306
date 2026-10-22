@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'login_warga_screen.dart';
+import 'dompet_warga.dart' show DompetPage;
 
 import 'beranda_warga_screen.dart';
 
@@ -633,8 +634,11 @@ class ProfilWargaScreen extends StatelessWidget {
               builder: (context) => const BerandaWargaScreen(),
             ),
           );
-        } else if (index == 1) {
-          // TODO: navigasi ke halaman Dompet
+                } else if (index == 1) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => DompetPage()),
+          );
         }
       },
       items: const [

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'profil_warga.dart';
 
 // ====== MODEL DATA ======
 class SampahItem {
@@ -287,46 +286,17 @@ class _KatalogPageState extends State<KatalogPage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: _hijau,
-        unselectedItemColor: Colors.black38,
-        onTap: (i) {
-          if (i == 0) Navigator.pop(context);
-          if (i == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ProfilWargaScreen(),
-              ),
-            );
-          }
-          // TODO: Dompet (1)
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            label: 'Dompet',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Warga',
-          ),
-        ],
-      ),
     );
   }
 
+  // Header: hanya panah kembali (kiri atas) ke Beranda + judul.
   Widget _header() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Row(
         children: [
           IconButton(
+            tooltip: 'Kembali ke Beranda',
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back, color: _hijau),
           ),
@@ -338,21 +308,6 @@ class _KatalogPageState extends State<KatalogPage> {
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilWargaScreen(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.account_circle_outlined,
-              color: _hijau,
-              size: 32,
             ),
           ),
         ],
