@@ -635,7 +635,7 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _NavItem(this.icon, this.label, {super.key});
+  const _NavItem(this.icon, this.label);
 
   @override
   Widget build(BuildContext context) {
