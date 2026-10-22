@@ -205,45 +205,44 @@ class _ProfileUbsState extends State<ProfileUbs> {
     return Scaffold(
       backgroundColor: background,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    headerBankSampah(),
-                    const SizedBox(height: 12),
-                    profilPetugas(),
-                    const SizedBox(height: 14),
-                    judulSection(Icons.history, 'Pemulihan Sandi Akun UBS'),
-                    const SizedBox(height: 9),
-                    cardVerifikasi(),
-                    const SizedBox(height: 10),
-                    cardCakupan(),
-                    const SizedBox(height: 32),
-                    tombolLogout(),
-                    const SizedBox(height: 10),
-                    const Center(
-                      child: Text(
-                        'Dinas Lingkungan Hidup & Kebersihan Kota Batam',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 9, color: Colors.grey),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                  ],
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 15,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              headerBankSampah(),
+              const SizedBox(height: 12),
+              profilPetugas(),
+              const SizedBox(height: 14),
+              judulSection(Icons.history, 'Pemulihan Sandi Akun UBS'),
+              const SizedBox(height: 9),
+              cardVerifikasi(),
+              const SizedBox(height: 10),
+              cardCakupan(),
+              const SizedBox(height: 32),
+              tombolLogout(),
+              const SizedBox(height: 10),
+              const Center(
+                child: Text(
+                  'Dinas Lingkungan Hidup & Kebersihan Kota Batam',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 9,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
-            ),
-            bottomNavigation(),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
+
+      bottomNavigationBar: bottomNavigation(),
     );
   }
 
@@ -636,27 +635,43 @@ class _ProfileUbsState extends State<ProfileUbs> {
     );
   }
 
-  Widget bottomNavigation() {
-    return BottomNavigationBar(
-      currentIndex: 1,
-      backgroundColor: const Color(0xFFDDF5E8),
-      selectedItemColor: green,
-      unselectedItemColor: Colors.grey,
-      type: BottomNavigationBarType.fixed,
-      onTap: (index) {
-        if (index == 0) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const RekapUbsScreen()),
-          );
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Rekap'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Pengurus'),
-      ],
-    );
-  }
+ Widget bottomNavigation() {
+  return BottomNavigationBar(
+    currentIndex: 1,
+    type: BottomNavigationBarType.fixed,
+    backgroundColor: const Color(0xFFF8FCFA),
+    selectedItemColor: const Color(0xFF0F6E56),
+    unselectedItemColor: Colors.black45,
+    selectedFontSize: 9.5,
+    unselectedFontSize: 9.5,
+    selectedLabelStyle: const TextStyle(
+      fontWeight: FontWeight.w700,
+    ),
+    elevation: 8,
+    onTap: (index) {
+      if (index == 0) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const RekapUbsScreen(),
+          ),
+        );
+      }
+    },
+    items: const [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.receipt_long_outlined),
+        activeIcon: Icon(Icons.receipt_long),
+        label: 'Rekap',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.person_outline),
+        activeIcon: Icon(Icons.person),
+        label: 'UBS',
+      ),
+    ],
+  );
+}
 
   Widget navigationItem(IconData icon, String label, VoidCallback onTap) {
     return InkWell(

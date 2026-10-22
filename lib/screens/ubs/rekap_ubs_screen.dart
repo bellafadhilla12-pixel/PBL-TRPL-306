@@ -1009,21 +1009,41 @@ class _RekapUbsScreenState extends State<RekapUbsScreen> {
   }
 
   Widget bottomBar() {
-    return BottomNavigationBar(
-      currentIndex: 0,
-      backgroundColor: const Color(0xFFDDF5E8),
-      selectedItemColor: const Color(0xFF08785F),
-      unselectedItemColor: Colors.grey,
-      type: BottomNavigationBarType.fixed,
-      onTap: (index) {
-        if (index == 1) {
-          bukaProfil();
-        }
-      },
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Rekap'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Pengurus'),
-      ],
-    );
-  }
+  return BottomNavigationBar(
+    currentIndex: 0,
+    type: BottomNavigationBarType.fixed,
+    backgroundColor: const Color(0xFFF8FCFA),
+
+    selectedItemColor: const Color(0xFF0F6E56),
+    unselectedItemColor: Colors.black45,
+
+    selectedFontSize: 9.5,
+    unselectedFontSize: 9.5,
+
+    selectedLabelStyle: const TextStyle(
+      fontWeight: FontWeight.w700,
+    ),
+
+    elevation: 8,
+
+    onTap: (index) {
+      if (index == 1) {
+        bukaProfil();
+      }
+    },
+
+    items: const [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.receipt_long_outlined),
+        activeIcon: Icon(Icons.receipt_long),
+        label: 'Rekap',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.person_outline),
+        activeIcon: Icon(Icons.person),
+        label: 'UBS',
+      ),
+    ],
+  );
+}
 }
