@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 const sampahGreen = Color(0xFF0D735B);
@@ -12,6 +11,7 @@ String rupiahSampah(int value) {
   for (int i = 0; i < text.length; i++) {
     result.write(text[i]);
     final remaining = text.length - i - 1;
+
     if (remaining > 0 && remaining % 3 == 0) {
       result.write('.');
     }
@@ -35,8 +35,7 @@ class KategoriSampah {
   final int hargaPerKg;
   int nilai;
 
-  double persentase(int total) =>
-      total == 0 ? 0 : nilai / total * 100;
+  double persentase(int total) => total == 0 ? 0 : nilai / total * 100;
 }
 
 class SetoranSampah {
@@ -54,7 +53,9 @@ class SetoranSampah {
 }
 
 class RekapSampahPage extends StatefulWidget {
-  const RekapSampahPage({super.key});
+  final bool showBottomBar;
+
+  const RekapSampahPage({super.key, this.showBottomBar = true});
 
   @override
   State<RekapSampahPage> createState() => _RekapSampahPageState();
@@ -119,8 +120,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
     ),
   ];
 
-  int get totalNilai =>
-      kategori.fold(0, (total, item) => total + item.nilai);
+  int get totalNilai => kategori.fold(0, (total, item) => total + item.nilai);
 
   @override
   Widget build(BuildContext context) {
@@ -131,12 +131,10 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    header(),
-                    const SizedBox(height: 22),
                     saldoCard(),
                     const SizedBox(height: 20),
                     panelBarKategori(),
@@ -151,6 +149,9 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
                           backgroundColor: sampahGreen,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         child: const Text(
                           'Buat PDF',
@@ -165,59 +166,14 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
                 ),
               ),
             ),
-            bottomBar(),
+            if (widget.showBottomBar) bottomBar(),
           ],
         ),
       ),
     );
   }
 
-  Widget header() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Row(
-          children: [
-            Spacer(),
-            Icon(Icons.account_circle_outlined,
-                color: sampahGreen, size: 32),
-            SizedBox(width: 12),
-            Icon(Icons.logout, color: sampahGreen, size: 27),
-          ],
-        ),
-        const SizedBox(height: 22),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: sampahMint,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Text(
-            '● PANEL BENDAHARA RT 04 PLAMO',
-            style: TextStyle(
-              fontSize: 10,
-              color: sampahGreen,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(height: 14),
-        const Text(
-          'Rekap Bank Sampah',
-          style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 5),
-        const Text(
-          'Laporan tabungan warga dan rekap sampah yang masuk ke bank sampah',
-          style: TextStyle(fontSize: 12, height: 1.4),
-        ),
-      ],
-    );
-  }
-
+  // Kartu saldo kas
   Widget saldoCard() {
     return Container(
       width: double.infinity,
@@ -228,11 +184,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
         ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 7,
-            offset: Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 7, offset: Offset(0, 4)),
         ],
       ),
       child: const Column(
@@ -271,6 +223,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
     );
   }
 
+  // Rekap penjualan berdasarkan kategori sampah
   Widget panelBarKategori() {
     return panel(
       child: Column(
@@ -287,10 +240,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
               Expanded(
                 child: Text(
                   'Penjualan per Kategori Sampah',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
               Text('Bulan Ini', style: TextStyle(fontSize: 10)),
@@ -298,15 +248,12 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
           ),
           const SizedBox(height: 16),
 
-          // Segmen bar menggunakan nilai rupiah setiap kategori.
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: SizedBox(
               height: 19,
               child: Row(
-                children: kategori
-                    .where((item) => item.nilai > 0)
-                    .map((item) {
+                children: kategori.where((item) => item.nilai > 0).map((item) {
                   return Expanded(
                     flex: item.nilai,
                     child: Tooltip(
@@ -320,6 +267,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
               ),
             ),
           ),
+
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
@@ -333,6 +281,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
             ),
           ),
           const SizedBox(height: 8),
+
           ...kategori.map(kartuKategori),
         ],
       ),
@@ -349,11 +298,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
         color: const Color(0xFFE1E0DA),
         borderRadius: BorderRadius.circular(13),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -381,10 +326,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
                 const SizedBox(height: 4),
                 Text(
                   '${persen.toStringAsFixed(1)}% dari total',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.black54,
-                  ),
+                  style: const TextStyle(fontSize: 10, color: Colors.black54),
                 ),
               ],
             ),
@@ -416,6 +358,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
     );
   }
 
+  // Riwayat setoran sampah
   Widget panelSetoran() {
     return panel(
       child: Column(
@@ -432,10 +375,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
               Expanded(
                 child: Text(
                   'Rekap Setor Sampah',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
               Text('Bulan Ini', style: TextStyle(fontSize: 11)),
@@ -463,11 +403,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
         color: const Color(0xFFE1E0DA),
         borderRadius: BorderRadius.circular(13),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -475,10 +411,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
           Container(
             width: 17,
             height: 17,
-            decoration: BoxDecoration(
-              color: warna,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: warna, shape: BoxShape.circle),
           ),
           const SizedBox(width: 9),
           Expanded(
@@ -495,10 +428,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
                 const SizedBox(height: 4),
                 Text(
                   '${item.berat} • ${item.kategori}',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.black54,
-                  ),
+                  style: const TextStyle(fontSize: 10, color: Colors.black54),
                 ),
               ],
             ),
@@ -538,11 +468,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFE1DCD8)),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 3)),
         ],
       ),
       child: child,
@@ -552,9 +478,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
   void buatPdf() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Fitur PDF perlu dihubungkan ke paket generator PDF.',
-        ),
+        content: Text('Fitur PDF perlu dihubungkan ke paket generator PDF.'),
       ),
     );
   }

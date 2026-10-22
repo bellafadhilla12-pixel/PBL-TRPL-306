@@ -1585,26 +1585,33 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
 
   Widget _buildBottomNav() {
     return BottomNavigationBar(
-      currentIndex: _selectedNavIndex,
-      backgroundColor: const Color(0xFFEFEDE3), // sama dengan profil_warga.dart
-      selectedItemColor: darkGreen,
-      unselectedItemColor: Colors.black38,
       type: BottomNavigationBarType.fixed,
+      currentIndex: _selectedNavIndex,
+
+      // Background mengikuti warna default footer pengurus
+      selectedItemColor: const Color(0xFF0F6E56),
+      unselectedItemColor: Colors.black45,
+
+      selectedFontSize: 9.5,
+      unselectedFontSize: 9.5,
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+
       onTap: (index) {
         if (index == 0) {
           setState(() => _selectedNavIndex = 0);
+        } else if (index == 1) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => DompetPage()),
+          );
         } else if (index == 2) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const ProfilWargaScreen()),
           );
-        } else if (index == 1) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const DompetPage()),
-          );
         }
       },
+
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),

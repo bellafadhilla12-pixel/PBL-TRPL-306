@@ -50,7 +50,7 @@ class DompetPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _header(),
+              _header(context),
               const SizedBox(height: 16),
               _saldoCard(),
               const SizedBox(height: 20),
@@ -63,7 +63,7 @@ class DompetPage extends StatelessWidget {
     );
   }
 
-  Widget _header() => Row(
+  Widget _header(BuildContext context) => Row(
     children: [
       Container(
         width: 36,
@@ -79,6 +79,23 @@ class DompetPage extends StatelessWidget {
       const Text(
         'Dompet',
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      const Spacer(),
+      IconButton(
+        tooltip: 'Profil Warga',
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilWargaScreen()),
+          );
+        },
+        icon: const Icon(
+          Icons.account_circle_outlined,
+          size: 32,
+          color: darkGreen,
+        ),
       ),
     ],
   );
@@ -228,17 +245,18 @@ class DompetPage extends StatelessWidget {
   Widget _bottomNav(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: 1,
-      backgroundColor: background,
-      selectedItemColor: darkGreen,
-      unselectedItemColor: Colors.black38,
+      // Background mengikuti tema, sama seperti Beranda
+      selectedItemColor: const Color(0xFF0F6E56),
+      unselectedItemColor: Colors.black45,
       type: BottomNavigationBarType.fixed,
+      selectedFontSize: 9.5,
+      unselectedFontSize: 9.5,
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
       onTap: (index) {
         if (index == 0) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const BerandaWargaScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const BerandaWargaScreen()),
           );
         } else if (index == 2) {
           Navigator.pushReplacement(

@@ -27,19 +27,17 @@ class _EdukasiPageState extends State<EdukasiPage> {
       // Tanpa AppBar/header profil-logout dan tanpa bottomNavigationBar.
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBackButton(),
-              const SizedBox(height: 6),
+              const SizedBox(height: 18),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeading(),
-                    const SizedBox(height: 18),
                     _buildFilters(),
                     const SizedBox(height: 14),
                     if (showAnorganik) ...[
@@ -127,72 +125,28 @@ class _EdukasiPageState extends State<EdukasiPage> {
   }
 
   // Panah kembali (kiri atas) menuju halaman Beranda.
-  Widget _buildBackButton() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: IconButton(
-        tooltip: 'Kembali ke Beranda',
-        onPressed: () => Navigator.pop(context),
-        icon: const Icon(Icons.arrow_back, color: green, size: 28),
-      ),
-    );
-  }
 
-  Widget _buildHeading() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildBackButton() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: mint,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x33000000),
-                    blurRadius: 7,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.menu_book_rounded,
-                color: green,
-                size: 26,
-              ),
-            ),
-            const SizedBox(width: 10),
-            const Flexible(
-              child: Text(
-                'MODUL WARGA HIJAU',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: green,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 11,
-                  letterSpacing: .2,
-                ),
-              ),
-            ),
-          ],
+        IconButton(
+          tooltip: 'Kembali ke Beranda',
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: green, size: 24),
         ),
-        const SizedBox(height: 10),
-        const Text(
-          'Edukasi & Panduan Lingkungan',
-          style: TextStyle(
-            fontSize: 22,
-            height: 1.15,
-            fontWeight: FontWeight.w800,
-            color: Colors.black,
+        const SizedBox(width: 10),
+        const Expanded(
+          child: Text(
+            'Edukasi & Panduan Lingkungan',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
-        ),
-        const SizedBox(height: 7),
-        const Text(
-          'Panduan praktis warga Plamo Garden untuk memilah sampah dari rumah dan mengolah kompos mandiri bernilai guna.',
-          style: TextStyle(fontSize: 12, height: 1.25, color: Colors.black87),
         ),
       ],
     );

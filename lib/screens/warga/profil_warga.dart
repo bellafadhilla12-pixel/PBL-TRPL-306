@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'login_warga_screen.dart';
 import 'dompet_warga.dart' show DompetPage;
@@ -26,11 +27,161 @@ class ProfilWargaScreen extends StatelessWidget {
     ),
   ];
 
+  static final ValueNotifier<String> _nomorWa = ValueNotifier<String>(
+    '0812-7654-3210',
+  );
+
+  Future<void> _gantiNomor(BuildContext context) async {
+    final hasil = await showDialog<String>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => _GantiNomorDialog(nomorAwal: _nomorWa.value),
+    );
+
+    if (hasil == null) return;
+
+    // TODO: Kirim kode OTP ke nomor baru & simpan ke Firebase bila sudah dipakai.
+    _nomorWa.value = hasil;
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nomor WhatsApp berhasil diganti')),
+      );
+    }
+  }
+
   void _keluar(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreenWarga()),
       (route) => false,
+    );
+  }
+
+  void _konfirmasiLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (dialogContext) => Dialog(
+        backgroundColor: const Color(0xFFFFFBFA),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 30),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 26),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Ikon logout dalam lingkaran pink
+              Container(
+                width: 54,
+                height: 54,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF9A9A3),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Color(0xFFE53935),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                'Apakah Anda yakin ingin keluar?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Teks dengan nama dicetak tebal
+              const Text.rich(
+                TextSpan(
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: Colors.black87,
+                  ),
+                  children: [
+                    TextSpan(text: 'Sesi akun nasabah '),
+                    TextSpan(
+                      text: 'Ibu Siti Aminah',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: ' akan diakhiri. Anda perlu masuk kembali untuk mengakses beranda dan dompet.',
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 26),
+
+              Row(
+                children: [
+                  // Tombol Tidak
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE0E0E0),
+                        foregroundColor: Colors.black,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Tidak',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 50),
+
+                  // Tombol Ya
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+
+                        // TODO: Tambahkan proses sign out Firebase di sini bila sudah dipakai.
+
+                        _keluar(context);
+                      },
+                      icon: const Icon(Icons.check, size: 14),
+                      label: const Text(
+                        'Ya',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF04B42),
+                        foregroundColor: Colors.white,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -46,7 +197,7 @@ class ProfilWargaScreen extends StatelessWidget {
             children: [
               _profileCard(),
               const SizedBox(height: 20),
-              _aksesCard(),
+              _aksesCard(context),
               const SizedBox(height: 20),
               _domisiliCard(),
               const SizedBox(height: 20),
@@ -247,7 +398,7 @@ class ProfilWargaScreen extends StatelessWidget {
           ],
         ),
       ),
-       ?trailing,    
+      if (trailing != null) ...[const SizedBox(width: 8), trailing],
     ],
   );
 
@@ -263,7 +414,7 @@ class ProfilWargaScreen extends StatelessWidget {
   );
 
   // ====== AKSES LOGIN & KEAMANAN ======
-  Widget _aksesCard() => _whiteCard(
+  Widget _aksesCard(BuildContext context) => _whiteCard(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -358,13 +509,16 @@ class ProfilWargaScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 3),
-                        const Text(
-                          '0812-7654-3210',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'monospace',
-                            letterSpacing: 0.5,
+                        ValueListenableBuilder<String>(
+                          valueListenable: _nomorWa,
+                          builder: (_, nomor, __) => Text(
+                            nomor,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'monospace',
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ],
@@ -372,9 +526,7 @@ class ProfilWargaScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: () {
-                      // TODO: ganti nomor WhatsApp
-                    },
+                    onPressed: () => _gantiNomor(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black87,
@@ -596,7 +748,7 @@ class ProfilWargaScreen extends StatelessWidget {
     borderRadius: BorderRadius.circular(16),
     child: InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () => _keluar(context),
+      onTap: () => _konfirmasiLogout(context),
       child: const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
         child: Row(
@@ -619,25 +771,27 @@ class ProfilWargaScreen extends StatelessWidget {
   );
 
   // ====== BOTTOM NAV ======
+
+  // ====== BOTTOM NAV ======
   Widget _bottomNav(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: 2,
-      backgroundColor: background,
-      selectedItemColor: darkGreen,
-      unselectedItemColor: Colors.black38,
+      selectedItemColor: const Color(0xFF0F6E56),
+      unselectedItemColor: Colors.black45,
       type: BottomNavigationBarType.fixed,
+      selectedFontSize: 9.5,
+      unselectedFontSize: 9.5,
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
       onTap: (index) {
         if (index == 0) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const BerandaWargaScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const BerandaWargaScreen()),
           );
-                } else if (index == 1) {
+        } else if (index == 1) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => DompetPage()),
+            MaterialPageRoute(builder: (context) => const DompetPage()),
           );
         }
       },
@@ -657,7 +811,6 @@ class ProfilWargaScreen extends StatelessWidget {
       ],
     );
   }
-
 }
 
 // ====== KOTAK STATISTIK (ORANYE) ======
@@ -701,6 +854,236 @@ class _StatBox extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ====== DIALOG GANTI NOMOR WHATSAPP ======
+class _GantiNomorDialog extends StatefulWidget {
+  final String nomorAwal;
+  const _GantiNomorDialog({required this.nomorAwal});
+
+  @override
+  State<_GantiNomorDialog> createState() => _GantiNomorDialogState();
+}
+
+class _GantiNomorDialogState extends State<_GantiNomorDialog> {
+  final TextEditingController _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // 081276543210 -> 0812-7654-3210
+  String _format(String digits) {
+    final bagian = <String>[];
+    for (var i = 0; i < digits.length; i += 4) {
+      final akhir = (i + 4 > digits.length) ? digits.length : i + 4;
+      bagian.add(digits.substring(i, akhir));
+    }
+    return bagian.join('-');
+  }
+
+  void _simpan() {
+    final digits = _controller.text.replaceAll(RegExp(r'\D'), '');
+
+    if (digits.isEmpty) {
+      setState(() => _error = 'Nomor WhatsApp wajib diisi');
+      return;
+    }
+    if (!digits.startsWith('0')) {
+      setState(() => _error = 'Nomor harus diawali angka 0');
+      return;
+    }
+    if (digits.length < 10 || digits.length > 13) {
+      setState(() => _error = 'Nomor harus 10–13 digit');
+      return;
+    }
+
+    final nomorBaru = _format(digits);
+    if (nomorBaru == widget.nomorAwal) {
+      setState(() => _error = 'Nomor sama dengan nomor saat ini');
+      return;
+    }
+
+    Navigator.pop(context, nomorBaru);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFFFFFBFA),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 30),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 26),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Ikon dalam lingkaran mint
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: ProfilWargaScreen.mint.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.phone_iphone,
+                  color: ProfilWargaScreen.darkGreen,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                'Ganti Nomor WhatsApp',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              Text.rich(
+                TextSpan(
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: Colors.black87,
+                  ),
+                  children: [
+                    const TextSpan(text: 'Nomor saat ini: '),
+                    TextSpan(
+                      text: widget.nomorAwal,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(
+                      text: '\nMasukkan nomor baru untuk login instan & pemberitahuan timbangan.',
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 18),
+
+              TextField(
+                controller: _controller,
+                autofocus: true,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(13),
+                ],
+                onChanged: (_) {
+                  if (_error != null) setState(() => _error = null);
+                },
+                onSubmitted: (_) => _simpan(),
+                style: const TextStyle(fontSize: 14, letterSpacing: 0.5),
+                decoration: InputDecoration(
+                  hintText: 'Contoh: 081234567890',
+                  hintStyle: const TextStyle(
+                    fontSize: 13,
+                    color: ProfilWargaScreen.greyText,
+                  ),
+                  errorText: _error,
+                  prefixIcon: const Icon(
+                    Icons.phone_outlined,
+                    color: ProfilWargaScreen.darkGreen,
+                    size: 20,
+                  ),
+                  filled: true,
+                  fillColor: ProfilWargaScreen.greyTile,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ProfilWargaScreen.darkGreen,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ProfilWargaScreen.merah,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ProfilWargaScreen.merah,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE0E0E0),
+                        foregroundColor: Colors.black,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _simpan,
+                      icon: const Icon(Icons.check, size: 14),
+                      label: const Text(
+                        'Simpan',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ProfilWargaScreen.darkGreen,
+                        foregroundColor: Colors.white,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'kelola_edukasi_screen.dart';
+import 'rekap_gabungan_screen.dart';
+import 'kelola_gabungan_screen.dart';
 import 'login_pengurus_screen.dart';
 import 'verifikasi_warga_screen.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
@@ -26,6 +28,11 @@ class ProfilPengurusScreen extends StatelessWidget {
     'Pengurus',
   ];
 
+  // Nomor WhatsApp pengurus (disimpan di memori selama aplikasi berjalan)
+  static final ValueNotifier<String> _nomorWa = ValueNotifier<String>(
+    '0834-0968-5634',
+  );
+
   List<BoxShadow> _shadow([double alpha = 0.12]) => [
     BoxShadow(
       color: Colors.black.withValues(alpha: alpha),
@@ -34,11 +41,160 @@ class ProfilPengurusScreen extends StatelessWidget {
     ),
   ];
 
+  // ====== UBAH NOMOR WHATSAPP ======
+  Future<void> _ubahNomor(BuildContext context) async {
+    final hasil = await showDialog<String>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (_) => _UbahNomorDialog(nomorAwal: _nomorWa.value),
+    );
+
+    if (hasil == null) return;
+
+    // TODO: Kirim kode OTP ke nomor baru & simpan ke Firebase bila sudah dipakai.
+    _nomorWa.value = hasil;
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nomor WhatsApp berhasil diubah')),
+      );
+    }
+  }
+
+  // ====== LOGOUT ======
   void _keluar(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreenPengurus()),
       (route) => false,
+    );
+  }
+
+  void _konfirmasiLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      builder: (dialogContext) => Dialog(
+        backgroundColor: const Color(0xFFFFFBFA),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 30),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 26),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Ikon logout dalam lingkaran pink
+              Container(
+                width: 54,
+                height: 54,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF9A9A3),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Color(0xFFE53935),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                'Apakah Anda yakin ingin keluar?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Teks dengan nama dicetak tebal
+              const Text.rich(
+                TextSpan(
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: Colors.black87,
+                  ),
+                  children: [
+                    TextSpan(text: 'Sesi akun pengurus '),
+                    TextSpan(
+                      text: 'Gunawan Santoso',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text:
+                          ' akan diakhiri. Anda perlu masuk kembali untuk mengelola bank sampah.',
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 26),
+
+              Row(
+                children: [
+                  // Tombol Tidak
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE0E0E0),
+                        foregroundColor: Colors.black,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Tidak',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 50),
+
+                  // Tombol Ya
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+
+                        // TODO: Tambahkan proses sign out Firebase di sini bila sudah dipakai.
+
+                        _keluar(context);
+                      },
+                      icon: const Icon(Icons.check, size: 14),
+                      label: const Text(
+                        'Ya',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF04B42),
+                        foregroundColor: Colors.white,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -265,14 +421,14 @@ class ProfilPengurusScreen extends StatelessWidget {
         const SizedBox(height: 14),
 
         // Label nomor
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Nomor WhatsApp Terdaftar',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
-            const Text(
+            Text(
               'Aktif & Terverifikasi',
               style: TextStyle(
                 fontSize: 10,
@@ -296,28 +452,30 @@ class ProfilPengurusScreen extends StatelessWidget {
             children: [
               const Icon(Icons.contacts_outlined, color: darkGreen, size: 26),
               const SizedBox(width: 14),
-              const Expanded(
-                child: Text(
-                  '0834-0968-5634',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              Expanded(
+                child: ValueListenableBuilder<String>(
+                  valueListenable: _nomorWa,
+                  builder: (context, nomor, child) => Text(
+                    nomor,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ),
               GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Ubah nomor belum tersedia (tahap front-end)',
-                      ),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _ubahNomor(context),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  child: Text(
+                    'Ubah',
+                    style: TextStyle(
+                      color: darkGreen,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
                     ),
-                  );
-                },
-                child: const Text(
-                  'Ubah',
-                  style: TextStyle(
-                    color: darkGreen,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
                   ),
                 ),
               ),
@@ -390,17 +548,17 @@ class ProfilPengurusScreen extends StatelessWidget {
   );
 
   // ====== KINERJA POSKO ======
-  Widget _kinerjaHeader() => Row(
+  Widget _kinerjaHeader() => const Row(
     children: [
-      const Icon(Icons.bar_chart, color: Colors.black87, size: 26),
-      const SizedBox(width: 10),
-      const Expanded(
+      Icon(Icons.bar_chart, color: Colors.black87, size: 26),
+      SizedBox(width: 10),
+      Expanded(
         child: Text(
           'Kinerja Posko Hari Ini',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
-      const Text(
+      Text(
         'Sabtu, 26 Sept 2026',
         style: TextStyle(
           fontSize: 10.5,
@@ -538,7 +696,7 @@ class ProfilPengurusScreen extends StatelessWidget {
     borderRadius: BorderRadius.circular(16),
     child: InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () => _keluar(context),
+      onTap: () => _konfirmasiLogout(context),
       child: const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
         child: Row(
@@ -579,10 +737,13 @@ class ProfilPengurusScreen extends StatelessWidget {
             tujuan = const VerifikasiWargaScreen();
             break;
           case 1:
-            tujuan = const KelolaEdukasiPengurusScreen();
+            tujuan = const KelolaGabunganScreen();
             break;
           case 2:
             tujuan = const KelolaAntrianPengumumanScreen();
+            break;
+          case 3:
+            tujuan = const RekapGabunganScreen();
             break;
         }
 
@@ -692,6 +853,237 @@ class _KinerjaCard extends StatelessWidget {
             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ====== DIALOG UBAH NOMOR WHATSAPP ======
+class _UbahNomorDialog extends StatefulWidget {
+  final String nomorAwal;
+  const _UbahNomorDialog({required this.nomorAwal});
+
+  @override
+  State<_UbahNomorDialog> createState() => _UbahNomorDialogState();
+}
+
+class _UbahNomorDialogState extends State<_UbahNomorDialog> {
+  final TextEditingController _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // 083409685634 -> 0834-0968-5634
+  String _format(String digits) {
+    final bagian = <String>[];
+    for (var i = 0; i < digits.length; i += 4) {
+      final akhir = (i + 4 > digits.length) ? digits.length : i + 4;
+      bagian.add(digits.substring(i, akhir));
+    }
+    return bagian.join('-');
+  }
+
+  void _simpan() {
+    final digits = _controller.text.replaceAll(RegExp(r'\D'), '');
+
+    if (digits.isEmpty) {
+      setState(() => _error = 'Nomor WhatsApp wajib diisi');
+      return;
+    }
+    if (!digits.startsWith('0')) {
+      setState(() => _error = 'Nomor harus diawali angka 0');
+      return;
+    }
+    if (digits.length < 10 || digits.length > 13) {
+      setState(() => _error = 'Nomor harus 10–13 digit');
+      return;
+    }
+
+    final nomorBaru = _format(digits);
+    if (nomorBaru == widget.nomorAwal) {
+      setState(() => _error = 'Nomor sama dengan nomor saat ini');
+      return;
+    }
+
+    Navigator.pop(context, nomorBaru);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFFFFFBFA),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 30),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 26),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Ikon dalam lingkaran mint
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: ProfilPengurusScreen.mint.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.phone_iphone,
+                  color: ProfilPengurusScreen.darkGreen,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const Text(
+                'Ubah Nomor WhatsApp',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              Text.rich(
+                TextSpan(
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: Colors.black87,
+                  ),
+                  children: [
+                    const TextSpan(text: 'Nomor saat ini: '),
+                    TextSpan(
+                      text: widget.nomorAwal,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const TextSpan(
+                      text:
+                          '\nMasukkan nomor baru untuk pemulihan sandi pengurus.',
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 18),
+
+              TextField(
+                controller: _controller,
+                autofocus: true,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(13),
+                ],
+                onChanged: (_) {
+                  if (_error != null) setState(() => _error = null);
+                },
+                onSubmitted: (_) => _simpan(),
+                style: const TextStyle(fontSize: 14, letterSpacing: 0.5),
+                decoration: InputDecoration(
+                  hintText: 'Contoh: 081234567890',
+                  hintStyle: const TextStyle(
+                    fontSize: 13,
+                    color: ProfilPengurusScreen.greyText,
+                  ),
+                  errorText: _error,
+                  prefixIcon: const Icon(
+                    Icons.phone_outlined,
+                    color: ProfilPengurusScreen.darkGreen,
+                    size: 20,
+                  ),
+                  filled: true,
+                  fillColor: ProfilPengurusScreen.greyTile,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ProfilPengurusScreen.darkGreen,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ProfilPengurusScreen.merah,
+                    ),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ProfilPengurusScreen.merah,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE0E0E0),
+                        foregroundColor: Colors.black,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _simpan,
+                      icon: const Icon(Icons.check, size: 14),
+                      label: const Text(
+                        'Simpan',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ProfilPengurusScreen.darkGreen,
+                        foregroundColor: Colors.white,
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

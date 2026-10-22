@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'kelola_edukasi_screen.dart';
-import 'katalog_pengurus.dart';
+
+import 'kelola_gabungan_screen.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
 import 'profil_pengurus.dart';
+import 'rekap_gabungan_screen.dart';
 
 // =====================================================
 // =====================================================
@@ -21,6 +22,8 @@ const _teksGelap = Color(0xFF1F1F1F);
 const _teksAbu = Color(0xFF6F6F6F);
 const _teksHijauMuda = Color(0xFFBFE3D7);
 const _oranyePill = Color(0xFFF7DCA0);
+const _hijauHeader = Color(0xFF0D735B);
+const _mintHeader = Color(0xFF59CBA9);
 
 // =====================================================
 // MODEL DATA
@@ -102,23 +105,13 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
-
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
-              _buildBarisAtas(),
-
-              const SizedBox(height: 8),
-
-              _buildJudul(),
-
+              _buildHeader(),
               const SizedBox(height: 18),
-
               _buildRingkasan(),
-
               _buildDaftarWarga(),
             ],
           ),
@@ -155,70 +148,75 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
     );
   }
 
-
   // =====================================================
   // BARIS ATAS (PROFIL & KELUAR)
   // =====================================================
 
-  Widget _buildBarisAtas() {
-  return Row(
-    children: [
-      const Spacer(),
-      IconButton(
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ProfilPengurusScreen(),
-            ),
-          );
-        },
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(
-          minWidth: 40,
-          minHeight: 40,
-        ),
-        icon: const Icon(
-          Icons.account_circle_outlined,
-          color: _hijau,
-          size: 32,
-        ),
-      ),
-    ],
-  );
-}
-
   // =====================================================
-  // JUDUL HALAMAN
+  // HEADER (sama dengan Rekap)
   // =====================================================
 
-  Widget _buildJudul() {
-    return Row(
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 44,
-          height: 44,
-
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: _hijau, width: 2),
-          ),
-
-          child: const Icon(Icons.verified_outlined, color: _hijau, size: 22),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: _mintHeader,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                '● PANEL BENDAHARA RT 04 PLAMO',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: _hijauHeader,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Spacer(),
+            IconButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ProfilPengurusScreen(),
+                  ),
+                );
+              },
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+              icon: const Icon(
+                Icons.account_circle_outlined,
+                color: _hijauHeader,
+                size: 32,
+              ),
+            ),
+          ],
         ),
 
-        const SizedBox(width: 12),
+        const SizedBox(height: 14),
 
-        const Expanded(
-          child: Text(
-            'Verifikasi Warga',
-
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: _teksGelap,
-            ),
+        const Text(
+          'Verifikasi Warga',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
+        ),
+
+        const SizedBox(height: 6),
+
+        const Text(
+          'Verifikasi pendaftaran warga baru yang ingin '
+          'bergabung ke bank sampah.',
+          style: TextStyle(fontSize: 13, height: 1.4),
         ),
       ],
     );
@@ -719,10 +717,13 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
         Widget? tujuan;
         switch (index) {
           case 1:
-            tujuan = const KelolaEdukasiPengurusScreen();
+            tujuan = const KelolaGabunganScreen();
             break;
           case 2:
             tujuan = const KelolaAntrianPengumumanScreen();
+            break;
+          case 3:
+            tujuan = const RekapGabunganScreen();
             break;
           case 4:
             tujuan = const ProfilPengurusScreen();

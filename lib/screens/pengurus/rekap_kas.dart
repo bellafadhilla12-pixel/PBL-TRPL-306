@@ -39,7 +39,12 @@ class TransaksiKas {
 }
 
 class RekapKasPage extends StatefulWidget {
-  const RekapKasPage({super.key});
+  final bool showBottomBar;
+
+  const RekapKasPage({
+    super.key,
+    this.showBottomBar = true,
+  });
 
   @override
   State<RekapKasPage> createState() => _RekapKasPageState();
@@ -92,7 +97,6 @@ class _RekapKasPageState extends State<RekapKasPage> {
       nominal: 35000,
       disetujui: true,
     ),
-    // Contoh pengajuan belum disetujui.
     TransaksiKas(
       nama: 'Rudi Hartono',
       bulan: 'Oktober',
@@ -146,8 +150,6 @@ class _RekapKasPageState extends State<RekapKasPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    header(),
-                    const SizedBox(height: 22),
                     kartuSaldo(),
                     const SizedBox(height: 20),
                     pemilihBulan(),
@@ -156,11 +158,14 @@ class _RekapKasPageState extends State<RekapKasPage> {
                     const SizedBox(height: 20),
                     judulRiwayat(),
                     const SizedBox(height: 8),
+
                     if (transaksiDisetujui.isEmpty)
                       const Center(
                         child: Padding(
                           padding: EdgeInsets.all(24),
-                          child: Text('Belum ada pencairan pada bulan ini.'),
+                          child: Text(
+                            'Belum ada pencairan pada bulan ini.',
+                          ),
                         ),
                       )
                     else
@@ -168,89 +173,59 @@ class _RekapKasPageState extends State<RekapKasPage> {
                               ? transaksiDisetujui
                               : transaksiDisetujui.take(5))
                           .map(kartuTransaksi)),
+
                     const SizedBox(height: 12),
+
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: tambahPencairan,
                         icon: const Icon(Icons.add),
-                        label: const Text('Simulasi Persetujuan Pencairan'),
+                        label: const Text(
+                          'Simulasi Persetujuan Pencairan',
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: kasGreen,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 15,
+                          ),
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 10),
+
                     const Text(
                       'Data contoh tersimpan sementara selama aplikasi berjalan.',
-                      style: TextStyle(fontSize: 11, color: Colors.black54),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.black54,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            bottomBar(),
+
+            if (widget.showBottomBar) bottomBar(),
           ],
         ),
       ),
     );
   }
 
-  Widget header() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Row(
-          children: [
-            Spacer(),
-            Icon(Icons.account_circle_outlined,
-                color: kasGreen, size: 32),
-            SizedBox(width: 12),
-            Icon(Icons.logout, color: kasGreen, size: 27),
-          ],
-        ),
-        const SizedBox(height: 22),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: kasMint,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Text(
-            '● PANEL BENDAHARA RT 04 PLAMO',
-            style: TextStyle(
-              fontSize: 10,
-              color: kasGreen,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(height: 14),
-        const Text(
-          'Rekap Bank Sampah',
-          style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 5),
-        const Text(
-          'Laporan tabungan warga dan rekap sampah yang masuk ke bank sampah',
-          style: TextStyle(fontSize: 12, height: 1.4),
-        ),
-      ],
-    );
-  }
-
+  // Kartu total tabungan kas
   Widget kartuSaldo() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0C725B), Color(0xFF19B88E)],
+          colors: [
+            Color(0xFF0C725B),
+            Color(0xFF19B88E),
+          ],
         ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: const [
@@ -266,8 +241,10 @@ class _RekapKasPageState extends State<RekapKasPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.account_balance_outlined,
-                  color: Colors.white),
+              Icon(
+                Icons.account_balance_outlined,
+                color: Colors.white,
+              ),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -291,13 +268,17 @@ class _RekapKasPageState extends State<RekapKasPage> {
           ),
           Text(
             'Kas fisik bendahara + rekening penampung',
-            style: TextStyle(color: Colors.white, fontSize: 12),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+            ),
           ),
         ],
       ),
     );
   }
 
+  // Filter berdasarkan bulan
   Widget pemilihBulan() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -305,7 +286,10 @@ class _RekapKasPageState extends State<RekapKasPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 5),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+          ),
         ],
       ),
       child: DropdownButtonHideUnderline(
@@ -320,7 +304,10 @@ class _RekapKasPageState extends State<RekapKasPage> {
           }).toList(),
           onChanged: (value) {
             if (value != null) {
-              setState(() => bulanDipilih = value);
+              setState(() {
+                bulanDipilih = value;
+                tampilSemua = false;
+              });
             }
           },
         ),
@@ -328,6 +315,7 @@ class _RekapKasPageState extends State<RekapKasPage> {
     );
   }
 
+  // Total pencairan sesuai bulan yang dipilih
   Widget kartuTotal() {
     return Container(
       width: double.infinity,
@@ -336,7 +324,11 @@ class _RekapKasPageState extends State<RekapKasPage> {
         color: const Color(0xFFFFFBFA),
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 3)),
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          ),
         ],
       ),
       child: Column(
@@ -356,7 +348,10 @@ class _RekapKasPageState extends State<RekapKasPage> {
               ),
               Text(
                 '${transaksiDisetujui.length} pencairan cash',
-                style: const TextStyle(fontSize: 11, color: Colors.black54),
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: Colors.black54,
+                ),
               ),
             ],
           ),
@@ -374,38 +369,60 @@ class _RekapKasPageState extends State<RekapKasPage> {
     );
   }
 
+  // Judul riwayat pencairan
   Widget judulRiwayat() {
     return Row(
       children: [
         const CircleAvatar(
           radius: 17,
           backgroundColor: Color(0xFFB7E8D8),
-          child: Icon(Icons.receipt_long, color: kasGreen, size: 20),
+          child: Icon(
+            Icons.receipt_long,
+            color: kasGreen,
+            size: 20,
+          ),
         ),
         const SizedBox(width: 9),
         const Expanded(
           child: Text(
             'Riwayat Pencairan Dana',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
           ),
         ),
         TextButton(
-          onPressed: () => setState(() => tampilSemua = !tampilSemua),
-          child: Text(tampilSemua ? 'Lebih Sedikit' : 'Lihat Semua'),
+          onPressed: () {
+            setState(() {
+              tampilSemua = !tampilSemua;
+            });
+          },
+          child: Text(
+            tampilSemua ? 'Lebih Sedikit' : 'Lihat Semua',
+          ),
         ),
       ],
     );
   }
 
+  // Kartu transaksi pencairan
   Widget kartuTransaksi(TransaksiKas item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 11),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 10,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFBFA),
         borderRadius: BorderRadius.circular(13),
         boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3)),
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
         ],
       ),
       child: Row(
@@ -413,8 +430,11 @@ class _RekapKasPageState extends State<RekapKasPage> {
           const CircleAvatar(
             radius: 21,
             backgroundColor: Color(0xFFFFCB69),
-            child: Icon(Icons.check_circle_outline,
-                color: kasGreen, size: 29),
+            child: Icon(
+              Icons.check_circle_outline,
+              color: kasGreen,
+              size: 29,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -432,13 +452,19 @@ class _RekapKasPageState extends State<RekapKasPage> {
                 const SizedBox(height: 4),
                 Text(
                   item.waktu,
-                  style: const TextStyle(fontSize: 11, color: Colors.black54),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Colors.black54,
+                  ),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
             decoration: BoxDecoration(
               color: kasLime,
               borderRadius: BorderRadius.circular(12),
@@ -457,9 +483,11 @@ class _RekapKasPageState extends State<RekapKasPage> {
     );
   }
 
+  // Dialog simulasi persetujuan pencairan
   void tambahPencairan() {
     final namaController = TextEditingController();
     final nominalController = TextEditingController();
+
     String bulan = bulanDipilih == 'Semua Bulan'
         ? 'Oktober'
         : bulanDipilih;
@@ -502,14 +530,18 @@ class _RekapKasPageState extends State<RekapKasPage> {
                   ),
                   items: daftarBulan
                       .where((item) => item != 'Semua Bulan')
-                      .map((item) => DropdownMenuItem(
-                            value: item,
-                            child: Text(item),
-                          ))
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(item),
+                        ),
+                      )
                       .toList(),
                   onChanged: (value) {
                     if (value != null) {
-                      refreshDialog(() => bulan = value);
+                      refreshDialog(() {
+                        bulan = value;
+                      });
                     }
                   },
                 ),
@@ -524,13 +556,18 @@ class _RekapKasPageState extends State<RekapKasPage> {
             FilledButton(
               onPressed: () {
                 final nama = namaController.text.trim();
-                final nominal =
-                    int.tryParse(nominalController.text.trim());
+                final nominal = int.tryParse(
+                  nominalController.text.trim(),
+                );
 
-                if (nama.isEmpty || nominal == null || nominal <= 0) {
+                if (nama.isEmpty ||
+                    nominal == null ||
+                    nominal <= 0) {
                   ScaffoldMessenger.of(this.context).showSnackBar(
                     const SnackBar(
-                      content: Text('Masukkan nama dan nominal yang valid.'),
+                      content: Text(
+                        'Masukkan nama dan nominal yang valid.',
+                      ),
                     ),
                   );
                   return;
@@ -550,9 +587,12 @@ class _RekapKasPageState extends State<RekapKasPage> {
                 });
 
                 Navigator.pop(dialogContext);
+
                 ScaffoldMessenger.of(this.context).showSnackBar(
                   const SnackBar(
-                    content: Text('Pencairan disetujui. Total diperbarui.'),
+                    content: Text(
+                      'Pencairan disetujui. Total diperbarui.',
+                    ),
                   ),
                 );
               },
@@ -561,15 +601,21 @@ class _RekapKasPageState extends State<RekapKasPage> {
           ],
         ),
       ),
-    );
+    ).then((_) {
+      namaController.dispose();
+      nominalController.dispose();
+    });
   }
 
+  // Navigasi bawah jika halaman dibuka secara mandiri
   Widget bottomBar() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: const BoxDecoration(
         color: kasCream,
-        border: Border(top: BorderSide(color: Color(0xFFE5E4DC))),
+        border: Border(
+          top: BorderSide(color: Color(0xFFE5E4DC)),
+        ),
       ),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -589,14 +635,18 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _NavItem(this.icon, this.label);
+  const _NavItem(this.icon, this.label, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: kasGreen, size: 24),
+        Icon(
+          icon,
+          color: kasGreen,
+          size: 24,
+        ),
         const SizedBox(height: 4),
         Text(
           label,

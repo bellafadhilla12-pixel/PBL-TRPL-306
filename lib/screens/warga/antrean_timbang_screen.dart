@@ -260,7 +260,6 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
         ),
 
-        const Icon(Icons.account_circle_outlined, color: darkGreen, size: 31),
 
       ],
 
