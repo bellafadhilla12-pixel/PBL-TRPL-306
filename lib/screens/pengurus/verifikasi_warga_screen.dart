@@ -17,13 +17,11 @@ const _bg = Color(0xFFF5F3EA);
 const _cardGrey = Color(0xFFE5E1D7);
 const _avatarBg = Color(0xFFF3E2B4);
 const _merah = Color(0xFFE8412F);
-const _hitam = Color(0xFF111111);
 const _teksGelap = Color(0xFF1F1F1F);
 const _teksAbu = Color(0xFF6F6F6F);
 const _teksHijauMuda = Color(0xFFBFE3D7);
 const _oranyePill = Color(0xFFF7DCA0);
 const _hijauHeader = Color(0xFF0D735B);
-const _mintHeader = Color(0xFF59CBA9);
 
 // =====================================================
 // MODEL DATA
@@ -36,6 +34,12 @@ class WargaMenunggu {
   final String jam;
   final String telepon;
   final String alamat;
+  final String statusTempatTinggal;
+  final String blokRumah;
+  final String nomorRumah;
+  final String rw;
+  final String keteranganTempatTinggal;
+  final String detailTempatTinggal;
 
   const WargaMenunggu({
     required this.nama,
@@ -43,6 +47,12 @@ class WargaMenunggu {
     required this.jam,
     required this.telepon,
     required this.alamat,
+    this.statusTempatTinggal = 'Rumah Pribadi',
+    this.blokRumah = 'D1',
+    this.nomorRumah = '04',
+    this.rw = '04',
+    this.keteranganTempatTinggal = '',
+    this.detailTempatTinggal = '',
   });
 
   /// Huruf pertama nama untuk avatar bulat.
@@ -72,6 +82,10 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
       jam: '10:20',
       telepon: '0821-0678-4545',
       alamat: 'Blok D1 No. 04, Plamo Garden',
+      statusTempatTinggal: 'Rumah Pribadi',
+      blokRumah: 'D1',
+      nomorRumah: '04',
+      rw: '04',
     ),
     const WargaMenunggu(
       nama: 'Susi Susanti',
@@ -79,6 +93,10 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
       jam: '10:20',
       telepon: '0821-0678-4545',
       alamat: 'Blok D1 No. 04, Plamo Garden',
+      statusTempatTinggal: 'Rumah Kontrakan',
+      blokRumah: 'D1',
+      nomorRumah: '04',
+      rw: '04',
     ),
     const WargaMenunggu(
       nama: 'Bagus Stan',
@@ -86,13 +104,19 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
       jam: '10:20',
       telepon: '0821-0678-4545',
       alamat: 'Blok D1 No. 04, Plamo Garden',
+      statusTempatTinggal: 'Lainnya',
+      blokRumah: 'D1',
+      nomorRumah: '04',
+      rw: '04',
+      keteranganTempatTinggal: 'Kost',
+      detailTempatTinggal: 'Kamar Kost No. 7',
     ),
   ];
 
   static const List<String> _labelNav = [
     'Verifikasi Warga',
     'Kelola Katalog',
-    'Antrean Warga',
+    'Antrian Warga',
     'Rekap',
     'Pengurus',
   ];
@@ -126,6 +150,90 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
   // AKSI
   // =====================================================
 
+  Future<void> _konfirmasiVerifikasi(WargaMenunggu w) async {
+    final yakin = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: _bg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        icon: const Icon(Icons.verified_user_outlined, color: _hijau, size: 34),
+        title: const Text(
+          'Konfirmasi Verifikasi',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold, color: _teksGelap),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menerima verifikasi warga ${w.nama}?',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14, color: _teksAbu),
+        ),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _hijau,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.check_circle_outline),
+            label: const Text('Ya, Verifikasi'),
+          ),
+        ],
+      ),
+    );
+
+    if (yakin == true && mounted) {
+      _verifikasi(w);
+    }
+  }
+
+  Future<void> _konfirmasiTolak(WargaMenunggu w) async {
+    final yakin = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: _bg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        icon: const Icon(Icons.warning_amber_rounded, color: _merah, size: 36),
+        title: const Text(
+          'Konfirmasi Penolakan',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold, color: _teksGelap),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menolak verifikasi warga ${w.nama}?',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14, color: _teksAbu),
+        ),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _merah,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.cancel_outlined),
+            label: const Text('Ya, Tolak'),
+          ),
+        ],
+      ),
+    );
+
+    if (yakin == true && mounted) {
+      _tolak(w);
+    }
+  }
+
   void _verifikasi(WargaMenunggu w) {
     setState(() => _menunggu.remove(w));
 
@@ -139,6 +247,147 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
 
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text('${w.nama} ditolak')));
+  }
+
+  void _lihatRincian(WargaMenunggu w) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: _bg,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440, maxHeight: 650),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: const BoxDecoration(
+                        color: _mint,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.person_outline, color: _hijau),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'Rincian Data Registrasi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: _teksGelap,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Tutup',
+                      onPressed: () => Navigator.pop(dialogContext),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Periksa data berikut sebelum memutuskan verifikasi.',
+                  style: TextStyle(fontSize: 12, color: _teksAbu),
+                ),
+                const SizedBox(height: 18),
+                _detailBaris('Nama lengkap', w.nama),
+                _detailBaris('Nomor WhatsApp', w.telepon),
+                _detailBaris('Status tempat tinggal', w.statusTempatTinggal),
+                if (w.keteranganTempatTinggal.isNotEmpty)
+                  _detailBaris(
+                    'Keterangan tempat tinggal',
+                    w.keteranganTempatTinggal,
+                  ),
+                _detailBaris('Blok rumah', w.blokRumah),
+                _detailBaris('Nomor rumah', w.nomorRumah),
+                _detailBaris('Rukun Tetangga (RT)', w.rt),
+                _detailBaris('Rukun Warga (RW)', w.rw),
+                if (w.detailTempatTinggal.isNotEmpty)
+                  _detailBaris(
+                    'Nomor kamar/keterangan lainnya',
+                    w.detailTempatTinggal,
+                  ),
+                _detailBaris('Alamat lengkap', w.alamat),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        icon: const Icon(Icons.close),
+                        label: const Text('Tutup'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _hijau,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                          Future<void>.delayed(Duration.zero, () {
+                            if (mounted) _konfirmasiVerifikasi(w);
+                          });
+                        },
+                        icon: const Icon(Icons.check_circle_outline),
+                        label: const Text('Verifikasi'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _detailBaris(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 11),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              color: _teksAbu,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              value.isEmpty ? '-' : value,
+              style: const TextStyle(
+                fontSize: 13,
+                color: _teksGelap,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _hubungiWa(WargaMenunggu w) {
@@ -160,63 +409,52 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilPengurusScreen()),
+              );
+            },
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            icon: const Icon(
+              Icons.account_circle_outlined,
+              color: _hijauHeader,
+              size: 32,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: _mintHeader,
-                borderRadius: BorderRadius.circular(20),
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
+                color: _mint,
+                shape: BoxShape.circle,
               ),
-              child: const Text(
-                '● PANEL BENDAHARA RT 04 PLAMO',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: const Icon(
+                Icons.check_circle_outline,
+                color: _hijau,
+                size: 25,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text(
+                'Verifikasi Warga',
                 style: TextStyle(
-                  color: _hijauHeader,
-                  fontSize: 10,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
             ),
-            const Spacer(),
-            IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ProfilPengurusScreen(),
-                  ),
-                );
-              },
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-              icon: const Icon(
-                Icons.account_circle_outlined,
-                color: _hijauHeader,
-                size: 32,
-              ),
-            ),
           ],
-        ),
-
-        const SizedBox(height: 14),
-
-        const Text(
-          'Verifikasi Warga',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-
-        const SizedBox(height: 6),
-
-        const Text(
-          'Verifikasi pendaftaran warga baru yang ingin '
-          'bergabung ke bank sampah.',
-          style: TextStyle(fontSize: 13, height: 1.4),
         ),
       ],
     );
@@ -368,7 +606,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
               const SizedBox(width: 8),
 
               _buildPill(
-                '${_menunggu.length} Antrean',
+                '${_menunggu.length} Antrian',
                 bg: _oranyePill,
                 fg: _teksGelap,
                 fontSize: 11,
@@ -504,8 +742,19 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
 
                     Text(
                       w.alamat,
-
                       style: const TextStyle(fontSize: 11.5, color: _teksAbu),
+                    ),
+                    const SizedBox(height: 5),
+                    InkWell(
+                      onTap: () => _lihatRincian(w),
+                      child: const Text(
+                        'Lihat Rincian Data',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -549,10 +798,10 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
                     _buildAksi(
                       label: 'Verifikasi Data',
                       icon: Icons.check_circle,
-                      bg: _hitam,
+                      bg: _hijau,
                       fg: Colors.white,
                       iconColor: _mint,
-                      onTap: () => _verifikasi(w),
+                      onTap: () => _konfirmasiVerifikasi(w),
                     ),
 
                     const SizedBox(height: 6),
@@ -562,7 +811,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
                       icon: Icons.cancel,
                       bg: _merah,
                       fg: Colors.white,
-                      onTap: () => _tolak(w),
+                      onTap: () => _konfirmasiTolak(w),
                     ),
                   ],
                 ),
@@ -760,7 +1009,7 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
 
         BottomNavigationBarItem(
           icon: Icon(Icons.groups_outlined),
-          label: 'Antrean Warga',
+          label: 'Antrian Warga',
         ),
 
         BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),

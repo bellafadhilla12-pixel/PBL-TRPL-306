@@ -11,8 +11,8 @@ class KelolaEdukasiPengurusScreen extends StatefulWidget {
 class _KelolaEdukasiPengurusScreenState
     extends State<KelolaEdukasiPengurusScreen> {
   static const Color _bg = Color(0xFFF0F0E8);
-  static const Color _green = Color(0xFF41644A);
-  static const Color _darkGreen = Color(0xFF263D2D);
+  static const Color _green = Color(0xFF1B8A6B);
+  static const Color _darkGreen = Color(0xFF0F6E56);
   static const Color _border = Color(0xFFE1E5DD);
 
   String _filter = 'Semua';

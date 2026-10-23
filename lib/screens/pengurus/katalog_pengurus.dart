@@ -1121,7 +1121,7 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.groups_outlined),
-          label: 'Antrean Warga',
+          label: 'Antrian Warga',
         ),
         BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
         BottomNavigationBarItem(

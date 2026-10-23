@@ -23,7 +23,7 @@ class ProfilPengurusScreen extends StatelessWidget {
   static const List<String> _labelNav = [
     'Verifikasi Warga',
     'Kelola',
-    'Antrean Warga',
+    'Antrian Warga',
     'Rekap',
     'Pengurus',
   ];
@@ -125,8 +125,7 @@ class ProfilPengurusScreen extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
-                      text:
-                          ' akan diakhiri. Anda perlu masuk kembali untuk mengelola bank sampah.',
+                      text: ' akan diakhiri. Anda perlu masuk kembali untuk mengelola bank sampah.',
                     ),
                   ],
                 ),
@@ -602,7 +601,7 @@ class ProfilPengurusScreen extends StatelessWidget {
             icon: Icons.payments_outlined,
             iconBg: Color(0xFFFFCA72),
             iconColor: Color(0xFF8B6508),
-            nilai: 'Rp486k',
+            nilai: 'Rp 486.000',
             nilaiColor: Colors.black,
             label: 'Kas Keluar',
             sub: 'Tunai',
@@ -774,7 +773,7 @@ class ProfilPengurusScreen extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.groups_outlined),
-          label: 'Antrean Warga',
+          label: 'Antrian Warga',
         ),
         BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
         BottomNavigationBarItem(
@@ -965,8 +964,7 @@ class _UbahNomorDialogState extends State<_UbahNomorDialog> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const TextSpan(
-                      text:
-                          '\nMasukkan nomor baru untuk pemulihan sandi pengurus.',
+                      text: '\nMasukkan nomor baru untuk pemulihan sandi pengurus.',
                     ),
                   ],
                 ),
