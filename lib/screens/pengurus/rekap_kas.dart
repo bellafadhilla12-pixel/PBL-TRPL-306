@@ -523,7 +523,7 @@ class _RekapKasPageState extends State<RekapKasPage> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: bulan,
+                  initialValue: bulan,
                   decoration: const InputDecoration(
                     labelText: 'Bulan',
                     border: OutlineInputBorder(),
@@ -635,7 +635,7 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _NavItem(this.icon, this.label, {super.key});
+  const _NavItem(this.icon, this.label);
 
   @override
   Widget build(BuildContext context) {

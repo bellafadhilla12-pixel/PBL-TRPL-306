@@ -638,7 +638,7 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
                     _input(namaController, 'Nama sampah', validator: _wajib),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<String>(
-                      value: _semuaKategori.contains(kategori)
+                      initialValue: _semuaKategori.contains(kategori)
                           ? kategori
                           : (_semuaKategori.isNotEmpty
                                 ? _semuaKategori.first
@@ -1247,7 +1247,7 @@ class _FormSampahDialogState extends State<_FormSampahDialog> {
                 _input(_namaC, 'Nama sampah'),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
-                  value: _kategori,
+                  initialValue: _kategori,
                   decoration: const InputDecoration(
                     labelText: 'Kategori',
                     border: OutlineInputBorder(),

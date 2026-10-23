@@ -495,7 +495,7 @@ class _KelolaEdukasiPengurusScreenState
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
-                        value: kategori,
+                        initialValue: kategori,
                         decoration: _inputDecoration(
                           'Pilih kategori',
                           Icons.category_outlined,
