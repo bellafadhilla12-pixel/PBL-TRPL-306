@@ -294,7 +294,7 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
                       child: Text(
                         jadwal.status == 'Sesi Ditutup'
                             ? 'Sesi Penimbangan Ditutup'
-                            : 'Ambil Antrean',
+                            : 'Ambil Antrian',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -468,7 +468,7 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'Data jumlah pendaftar akan tampil setelah fitur antrean terhubung.',
+                  'Data jumlah pendaftar akan tampil setelah fitur antrian terhubung.',
                   style: TextStyle(
                     fontSize: 10.5,
                     color: Color.fromARGB(196, 0, 0, 0),
@@ -940,7 +940,7 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
                         const SizedBox(height: 3),
 
                         const Text(
-                          'Pemberitahuan nomor antrean & status dikirim via WA',
+                          'Pemberitahuan nomor antrian & status dikirim via WA',
 
                           style: TextStyle(
                             fontSize: 10.5,
@@ -1365,7 +1365,7 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
           child: _quickActionItem(
             icon: Icons.event_busy_outlined,
 
-            label: 'Ambil Antrean',
+            label: 'Ambil Antrian',
 
             onTap: _bukaAntreanTimbang,
 

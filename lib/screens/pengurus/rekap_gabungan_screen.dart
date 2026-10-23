@@ -16,8 +16,7 @@ class RekapGabunganScreen extends StatefulWidget {
   const RekapGabunganScreen({super.key});
 
   @override
-  State<RekapGabunganScreen> createState() =>
-      _RekapGabunganScreenState();
+  State<RekapGabunganScreen> createState() => _RekapGabunganScreenState();
 }
 
 class _RekapGabunganScreenState extends State<RekapGabunganScreen>
@@ -76,8 +75,7 @@ class _RekapGabunganScreenState extends State<RekapGabunganScreen>
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  const ProfilPengurusScreen(),
+                              builder: (_) => const ProfilPengurusScreen(),
                             ),
                           );
                         },
@@ -111,10 +109,7 @@ class _RekapGabunganScreenState extends State<RekapGabunganScreen>
                   const Text(
                     'Laporan tabungan warga dan rekap sampah '
                     'yang masuk ke bank sampah.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
+                    style: TextStyle(fontSize: 13, height: 1.4),
                   ),
 
                   const SizedBox(height: 18),
@@ -176,7 +171,7 @@ class _RekapGabunganScreenState extends State<RekapGabunganScreen>
     );
   }
 
-    Widget _buildBottomNav() {
+  Widget _buildBottomNav() {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: 3,
@@ -184,9 +179,7 @@ class _RekapGabunganScreenState extends State<RekapGabunganScreen>
       unselectedItemColor: Colors.black45,
       selectedFontSize: 9.5,
       unselectedFontSize: 9.5,
-      selectedLabelStyle: const TextStyle(
-        fontWeight: FontWeight.w700,
-      ),
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
       onTap: (index) {
         // Sudah berada di halaman Rekap.
         if (index == 3) return;
@@ -216,9 +209,7 @@ class _RekapGabunganScreenState extends State<RekapGabunganScreen>
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => tujuan,
-          ),
+          MaterialPageRoute(builder: (_) => tujuan),
         );
       },
       items: const [
@@ -232,12 +223,9 @@ class _RekapGabunganScreenState extends State<RekapGabunganScreen>
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.groups_outlined),
-          label: 'Antrean Warga',
+          label: 'Antrian Warga',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart),
-          label: 'Rekap',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_outline),
           label: 'Pengurus',

@@ -22,6 +22,16 @@ class _RegistrasiWargaScreenState
   final nomorRumahController = TextEditingController();
   final rtController = TextEditingController();
   final rwController = TextEditingController();
+  final keteranganTempatTinggalController = TextEditingController();
+  final detailTempatTinggalController = TextEditingController();
+
+  String _statusTempatTinggal = 'Rumah Pribadi';
+
+  static const List<String> _pilihanTempatTinggal = [
+    'Rumah Pribadi',
+    'Rumah Kontrakan',
+    'Lainnya',
+  ];
 
 bool _obscurePassword = true;
 bool _isLoading = false;
@@ -47,6 +57,8 @@ static const Color background =
     nomorRumahController.dispose();
     rtController.dispose();
     rwController.dispose();
+    keteranganTempatTinggalController.dispose();
+    detailTempatTinggalController.dispose();
 
     super.dispose();
   }
@@ -67,6 +79,10 @@ static const Color background =
   final nomorRumah = nomorRumahController.text.trim();
   final rt = rtController.text.trim();
   final rw = rwController.text.trim();
+  final statusTempatTinggal = _statusTempatTinggal;
+  final keteranganTempatTinggal =
+      keteranganTempatTinggalController.text.trim();
+  final detailTempatTinggal = detailTempatTinggalController.text.trim();
 
   setState(() => _isLoading = true);
 
@@ -83,6 +99,15 @@ static const Color background =
         'nomor_rumah': nomorRumah,
         'rt': rt,
         'rw': rw,
+        'status_tempat_tinggal': statusTempatTinggal,
+        'keterangan_tempat_tinggal':
+            statusTempatTinggal == 'Lainnya'
+                ? keteranganTempatTinggal
+                : null,
+        'detail_tempat_tinggal':
+            statusTempatTinggal == 'Lainnya'
+                ? detailTempatTinggal
+                : null,
       }),
     );
 
@@ -639,73 +664,169 @@ static const Color background =
                 const SizedBox(height: 18),
 
                 // =================================================
+                // STATUS TEMPAT TINGGAL
+                // =================================================
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: mint,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.14),
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _statusTempatTinggal,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF252525),
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Status Tempat Tinggal',
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                      floatingLabelStyle: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF438B7A),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    items: _pilihanTempatTinggal
+                        .map(
+                          (status) => DropdownMenuItem<String>(
+                            value: status,
+                            child: Text(
+                              status,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() {
+                        _statusTempatTinggal = value;
+                        if (value != 'Lainnya') {
+                          keteranganTempatTinggalController.clear();
+                          detailTempatTinggalController.clear();
+                        }
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Pilih status tempat tinggal';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+
+                if (_statusTempatTinggal == 'Lainnya') ...[
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: keteranganTempatTinggalController,
+                    validator: (value) {
+                      if (_statusTempatTinggal == 'Lainnya' &&
+                          (value == null || value.trim().isEmpty)) {
+                        return 'Jelaskan tempat tinggal';
+                      }
+                      return null;
+                    },
+                    decoration: _inputDecoration(
+                      hint: 'Contoh: Kost',
+                      icon: Icons.home_work_outlined,
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 18),
+
+                // =================================================
                 // ALAMAT RUMAH
                 // =================================================
 
                 _sectionCard(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       const Text(
                         'Alamat Rumah',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight:
-                              FontWeight.bold,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 12,
-                      ),
+                      const SizedBox(height: 12),
 
                       Row(
                         children: [
                           _smallInput(
                             label: 'Blok Rumah',
-                            controller:
-                                blokController,
+                            controller: blokController,
                           ),
-
-                          const SizedBox(
-                            width: 28,
-                          ),
-
+                          const SizedBox(width: 28),
                           _smallInput(
                             label: 'Nomor Rumah',
-                            controller:
-                                nomorRumahController,
+                            controller: nomorRumahController,
                           ),
                         ],
                       ),
 
-                      const SizedBox(
-                        height: 18,
-                      ),
+                      const SizedBox(height: 18),
 
                       Row(
                         children: [
                           _smallInput(
-                            label:
-                                'Rukun Tetangga (RT)',
-                            controller:
-                                rtController,
+                            label: 'Rukun Tetangga (RT)',
+                            controller: rtController,
                           ),
-
-                          const SizedBox(
-                            width: 28,
-                          ),
-
+                          const SizedBox(width: 28),
                           _smallInput(
-                            label:
-                                'Rukun Warga (RW)',
-                            controller:
-                                rwController,
+                            label: 'Rukun Warga (RW)',
+                            controller: rwController,
                           ),
                         ],
                       ),
+
+                      if (_statusTempatTinggal == 'Lainnya') ...[
+                        const SizedBox(height: 18),
+                        const Text(
+                          'Nomor Kamar/Keterangan Lainnya',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF252525),
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        TextFormField(
+                          controller: detailTempatTinggalController,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Nomor kamar/keterangan wajib diisi';
+                            }
+                            return null;
+                          },
+                          decoration: _inputDecoration(
+                            hint: 'Contoh: Kamar Kost No. 7',
+                            icon: Icons.meeting_room_outlined,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

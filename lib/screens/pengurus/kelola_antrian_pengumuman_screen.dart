@@ -376,7 +376,7 @@ class _KelolaAntrianPengumumanScreenState
         ),
         const SizedBox(height: 14),
         const Text(
-          'Kelola Antrean & Pengumuman',
+          'Kelola Antrian & Pengumuman',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -386,7 +386,7 @@ class _KelolaAntrianPengumumanScreenState
         const SizedBox(height: 6),
         const Text(
           'Atur sesi penimbangan sampah dan pencairan dana '
-          'serta pantau antrean warga.',
+          'serta pantau Antrian Warga.',
           style: TextStyle(fontSize: 13, height: 1.4),
         ),
       ],
@@ -1067,7 +1067,7 @@ class _KelolaAntrianPengumumanScreenState
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.groups_outlined),
-        label: 'Antrean Warga',
+        label: 'Antrian Warga',
       ),
       BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Rekap'),
       BottomNavigationBarItem(
