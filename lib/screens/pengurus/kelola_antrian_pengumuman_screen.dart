@@ -7,6 +7,7 @@ import 'verifikasi_warga_screen.dart';
 import 'profil_pengurus.dart';
 import '../../services/announcement_store.dart';
 import 'kelola_gabungan_screen.dart';
+import 'input_timbang_screen.dart';
 
 class KelolaAntrianPengumumanScreen extends StatefulWidget {
   const KelolaAntrianPengumumanScreen({super.key});
@@ -982,10 +983,7 @@ class _KelolaAntrianPengumumanScreenState
         if (timbangan) ...[
           _infoChip(item['kode'] ?? '-'),
           const SizedBox(width: 5),
-          _action(
-            'Input',
-            () => _message('Form input timbang $nama belum dihubungkan.'),
-          ),
+          _action('Input', () => _bukaInputTimbang(item)),
         ] else ...[
           _moneyChip(item['nominal'] ?? '-'),
           const SizedBox(width: 5),
@@ -1056,7 +1054,6 @@ class _KelolaAntrianPengumumanScreenState
     unselectedFontSize: 9.5,
     selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
     items: const [
-      // ... items dan onTap tidak berubah
       BottomNavigationBarItem(
         icon: Icon(Icons.check_circle_outline),
         label: 'Verifikasi',
@@ -1152,6 +1149,24 @@ class _KelolaAntrianPengumumanScreenState
       'berhasil dikirim untuk ${_formatTanggal(tanggal)}, '
       'pukul $mulai–$selesai. Banner beranda warga telah diperbarui.',
     );
+  }
+
+  Future<void> _bukaInputTimbang(Map<String, String> item) async {
+    final selesaiInput = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => InputTimbangScreen(
+          nama: item['nama'] ?? '',
+          alamat: item['alamat'] ?? '',
+          kode: item['kode'] ?? '-',
+        ),
+      ),
+    );
+
+    // Jika setoran disimpan, hapus warga dari antrian timbangan.
+    if (selesaiInput == true && mounted) {
+      setState(() => antreanTimbang.remove(item));
+    }
   }
 
   void _selesaikanDana(Map<String, String> item) {
