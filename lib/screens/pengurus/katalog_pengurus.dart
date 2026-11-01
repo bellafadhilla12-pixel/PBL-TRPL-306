@@ -241,7 +241,7 @@ final List<SampahItem> daftarSampah = [
     kode: 'MJ',
     kategori: 'LAINNYA',
     nama: 'Minyak jelantah',
-    harga: 'Rp 6.500/kg',
+    harga: 'Rp 6.500/liter',
     badge: 'Cair/Liter',
     catatan: 'Ditampung dalam jerigen/botol tertutup rapat',
   ),
