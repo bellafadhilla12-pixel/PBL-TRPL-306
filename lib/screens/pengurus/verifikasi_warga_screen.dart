@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../services/api_client.dart';
 import 'kelola_gabungan_screen.dart';
 import 'kelola_antrian_pengumuman_screen.dart';
 import 'profil_pengurus.dart';
@@ -29,6 +30,7 @@ const _hijauHeader = Color(0xFF0D735B);
 
 /// Data warga yang mendaftar mandiri dan menunggu verifikasi pengurus.
 class WargaMenunggu {
+  final int? id;
   final String nama;
   final String rt;
   final String jam;
@@ -42,6 +44,7 @@ class WargaMenunggu {
   final String detailTempatTinggal;
 
   const WargaMenunggu({
+    this.id,
     required this.nama,
     required this.rt,
     required this.jam,
@@ -75,43 +78,64 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
   // DATA SIMULASI (SEMENTARA, SEBELUM TERHUBUNG BACKEND)
   // =====================================================
 
-  final List<WargaMenunggu> _menunggu = [
-    const WargaMenunggu(
-      nama: 'Hendra Wijaya',
-      rt: 'RT 02',
-      jam: '10:20',
-      telepon: '0821-0678-4545',
-      alamat: 'Blok D1 No. 04, Plamo Garden',
-      statusTempatTinggal: 'Rumah Pribadi',
-      blokRumah: 'D1',
-      nomorRumah: '04',
-      rw: '04',
-    ),
-    const WargaMenunggu(
-      nama: 'Susi Susanti',
-      rt: 'RT 04',
-      jam: '10:20',
-      telepon: '0821-0678-4545',
-      alamat: 'Blok D1 No. 04, Plamo Garden',
-      statusTempatTinggal: 'Rumah Kontrakan',
-      blokRumah: 'D1',
-      nomorRumah: '04',
-      rw: '04',
-    ),
-    const WargaMenunggu(
-      nama: 'Bagus Stan',
-      rt: 'RT 04',
-      jam: '10:20',
-      telepon: '0821-0678-4545',
-      alamat: 'Blok D1 No. 04, Plamo Garden',
-      statusTempatTinggal: 'Lainnya',
-      blokRumah: 'D1',
-      nomorRumah: '04',
-      rw: '04',
-      keteranganTempatTinggal: 'Kost',
-      detailTempatTinggal: 'Kamar Kost No. 7',
-    ),
-  ];
+  final List<WargaMenunggu> _menunggu = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _muatWarga();
+  }
+
+  Future<void> _muatWarga() async {
+    try {
+      final res = await ApiClient.daftarVerifikasi();
+      if (!mounted || !res.isSuccess) return;
+
+      final data = res.dataList.map((m) {
+        final waktu = DateTime.tryParse(m['created_at']?.toString() ?? '');
+        final alamat = m['alamat']?.toString() ?? '-';
+        final blok = RegExp(r'Blok\s+([^,\s]+)', caseSensitive: false)
+                .firstMatch(alamat)
+                ?.group(1) ??
+            '-';
+        final nomor = RegExp(r'No\.?\s*([^,\s]+)', caseSensitive: false)
+                .firstMatch(alamat)
+                ?.group(1) ??
+            '-';
+        final rt = RegExp(r'RT\s*([0-9]+)', caseSensitive: false)
+                .firstMatch(alamat)
+                ?.group(1) ??
+            '-';
+        final rw = RegExp(r'RW\s*([0-9]+)', caseSensitive: false)
+                .firstMatch(alamat)
+                ?.group(1) ??
+            '-';
+        return WargaMenunggu(
+          id: (m['id'] as num?)?.toInt(),
+          nama: m['nama']?.toString() ?? '-',
+          rt: 'RT $rt',
+          jam: waktu == null
+              ? '-'
+              : '${waktu.hour.toString().padLeft(2, '0')}:'
+                  '${waktu.minute.toString().padLeft(2, '0')}',
+          telepon: m['whatsapp']?.toString() ?? '-',
+          alamat: alamat,
+          statusTempatTinggal: 'Rumah Pribadi',
+          blokRumah: blok,
+          nomorRumah: nomor,
+          rw: rw,
+          keteranganTempatTinggal: '',
+          detailTempatTinggal: '',
+        );
+      }).toList();
+
+      setState(() => _menunggu
+        ..clear()
+        ..addAll(data));
+    } catch (_) {
+      // Biarkan daftar kosong bila server belum menyala.
+    }
+  }
 
   static const List<String> _labelNav = [
     'Verifikasi Warga',
@@ -234,7 +258,17 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
     }
   }
 
-  void _verifikasi(WargaMenunggu w) {
+  Future<void> _verifikasi(WargaMenunggu w) async {
+    if (w.id != null) {
+      final res = await ApiClient.verifikasiWarga(w.id!, 'terverifikasi');
+      if (!mounted) return;
+      if (!res.isSuccess) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(res.firstError)));
+        return;
+      }
+    }
+
     setState(() => _menunggu.remove(w));
 
     ScaffoldMessenger.of(
@@ -242,7 +276,17 @@ class _VerifikasiWargaScreenState extends State<VerifikasiWargaScreen> {
     ).showSnackBar(SnackBar(content: Text('${w.nama} berhasil diverifikasi')));
   }
 
-  void _tolak(WargaMenunggu w) {
+  Future<void> _tolak(WargaMenunggu w) async {
+    if (w.id != null) {
+      final res = await ApiClient.verifikasiWarga(w.id!, 'ditolak');
+      if (!mounted) return;
+      if (!res.isSuccess) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(res.firstError)));
+        return;
+      }
+    }
+
     setState(() => _menunggu.remove(w));
 
     ScaffoldMessenger.of(context)

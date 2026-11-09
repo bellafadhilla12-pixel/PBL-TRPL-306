@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../services/api_client.dart';
+
 const sampahGreen = Color(0xFF0D735B);
 const sampahMint = Color(0xFF59CBA9);
 const sampahCream = Color(0xFFF0F0E8);
@@ -62,7 +64,7 @@ class RekapSampahPage extends StatefulWidget {
 }
 
 class _RekapSampahPageState extends State<RekapSampahPage> {
-  final List<KategoriSampah> kategori = [
+  List<KategoriSampah> kategori = [
     KategoriSampah(
       nama: 'Plastik',
       kode: 'P1-P24',
@@ -93,7 +95,7 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
     ),
   ];
 
-  final List<SetoranSampah> setoran = [
+  List<SetoranSampah> setoran = [
     SetoranSampah(
       nama: 'Vania Desinta',
       berat: '5 Kg',
@@ -121,6 +123,74 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
   ];
 
   int get totalNilai => kategori.fold(0, (total, item) => total + item.nilai);
+
+  @override
+  void initState() {
+    super.initState();
+    _muatRekap();
+  }
+
+  Future<void> _muatRekap() async {
+    try {
+      final hasil = await Future.wait([
+        ApiClient.rekapSampah(),
+        ApiClient.transaksi(),
+      ]);
+      if (!mounted) return;
+
+      final rekap = hasil[0];
+      final trx = hasil[1];
+
+      if (rekap.isSuccess) {
+        final items = rekap.data?['items'];
+        if (items is List) {
+          setState(() {
+            kategori = items.whereType<Map>().map((e) {
+              final m = Map<String, dynamic>.from(e);
+              final berat = (m['total_berat_kg'] as num?)?.toDouble() ?? 0;
+              final nilai = (m['total_nilai'] as num?)?.toInt() ?? 0;
+              return KategoriSampah(
+                nama: m['kategori']?.toString() ?? '-',
+                kode: '',
+                warna: _warnaDari(m['warna']?.toString()),
+                nilai: nilai,
+                hargaPerKg: berat > 0 ? (nilai / berat).round() : 0,
+              );
+            }).toList();
+          });
+        }
+      }
+
+      if (trx.isSuccess) {
+        setState(() {
+          setoran = trx.dataList.map((t) {
+            final items = t['items'] as List? ?? [];
+            final pertama = items.isNotEmpty && items.first is Map
+                ? Map<String, dynamic>.from(items.first as Map)
+                : <String, dynamic>{};
+            final warga = t['warga'];
+            return SetoranSampah(
+              nama: warga is Map
+                  ? (warga['nama'] ?? '-').toString()
+                  : '-',
+              berat: '${t['total_berat_kg'] ?? 0} Kg',
+              nilai: (t['total_nilai'] as num?)?.toInt() ?? 0,
+              kategori: pertama['kategori']?.toString() ?? '-',
+            );
+          }).toList();
+        });
+      }
+    } catch (_) {
+      // Data demo tetap tampil bila server belum menyala.
+    }
+  }
+
+  Color _warnaDari(String? hex) {
+    if (hex != null && hex.startsWith('#') && hex.length == 7) {
+      return Color(int.parse('FF${hex.substring(1)}', radix: 16));
+    }
+    return sampahGreen;
+  }
 
   @override
   Widget build(BuildContext context) {

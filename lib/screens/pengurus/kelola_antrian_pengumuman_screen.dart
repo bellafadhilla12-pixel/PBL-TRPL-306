@@ -6,6 +6,7 @@ import 'rekap_gabungan_screen.dart';
 import 'verifikasi_warga_screen.dart';
 import 'profil_pengurus.dart';
 import '../../services/announcement_store.dart';
+import '../../services/api_client.dart';
 import 'kelola_gabungan_screen.dart';
 import 'input_timbang_screen.dart';
 
@@ -41,8 +42,12 @@ class _KelolaAntrianPengumumanScreenState
     super.initState();
     // Refresh status automatically while this screen is open.
     _statusTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+        _muatAntrean();
+      }
     });
+    _muatAntrean();
   }
 
   @override
@@ -212,76 +217,83 @@ class _KelolaAntrianPengumumanScreenState
     });
   }
 
-  final List<Map<String, String>> antreanTimbang = [
-    {
-      'nama': 'Siti Aminah',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'kode': 'AA-001',
-    },
-    {
-      'nama': 'Della Aminah',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'kode': 'AA-002',
-    },
-    {
-      'nama': 'Fahri',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'kode': 'AA-003',
-    },
-    {
-      'nama': 'Aisyah',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'kode': 'AA-004',
-    },
-    {
-      'nama': 'Ainun',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'kode': 'AA-005',
-    },
-  ];
+  List<Map<String, String>> antreanTimbang = [];
+  List<Map<String, String>> antreanDana = [];
 
-  final List<Map<String, String>> antreanDana = [
-    {
-      'nama': 'Siti Aminah',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'nominal': 'Rp 150.000',
-      'status': 'Menunggu',
-    },
-    {
-      'nama': 'Della Aminah',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'nominal': 'Rp 200.000',
-      'status': 'Menunggu',
-    },
-    {
-      'nama': 'Fahri',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'nominal': 'Rp 50.000',
-      'status': 'Menunggu',
-    },
-    {
-      'nama': 'Aisyah',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'nominal': 'Rp 12.000',
-      'status': 'Menunggu',
-    },
-    {
-      'nama': 'Ainun',
-      'telp': '0821-0678-4545',
-      'alamat': 'Blok D1 No. 04, Plamo Garden',
-      'nominal': 'Rp 25.000',
-      'status': 'Menunggu',
-    },
-  ];
+  Future<void> _muatAntrean() async {
+    try {
+      final hasil = await Future.wait([
+        ApiClient.get('/antrean'),
+        ApiClient.get('/pencairan'),
+      ]);
+      if (!mounted) return;
+
+      final timbang = hasil[0];
+      final dana = hasil[1];
+
+      if (timbang.isSuccess) {
+        final data = timbang.dataList
+            .where((a) => a['status']?.toString() != 'batal')
+            .map((a) {
+              final warga = a['warga'];
+              final w = warga is Map
+                  ? Map<String, dynamic>.from(warga)
+                  : <String, dynamic>{};
+              final alamat = w['alamat']?.toString() ?? '-';
+
+              return <String, String>{
+                'id': (a['id'] ?? '').toString(),
+                'user_id': (w['id'] ?? '').toString(),
+                'nama': (w['nama'] ?? '-').toString(),
+                'telp': (w['whatsapp'] ?? '-').toString(),
+                'alamat': alamat,
+                'kode': a['kode']?.toString() ?? '-',
+                'status': a['status']?.toString() ?? '-',
+              };
+            })
+            .toList();
+
+        setState(() => antreanTimbang = data);
+      }
+
+      if (dana.isSuccess) {
+        final data = dana.dataList
+            .where((p) => p['status']?.toString() == 'diajukan')
+            .map((p) {
+              final warga = p['warga'];
+              final w = warga is Map
+                  ? Map<String, dynamic>.from(warga)
+                  : <String, dynamic>{};
+              final alamat = w['alamat']?.toString() ?? '-';
+
+              return <String, String>{
+                'pencairan_id': (p['id'] ?? '').toString(),
+                'nama': (w['nama'] ?? '-').toString(),
+                'telp': (w['whatsapp'] ?? '-').toString(),
+                'alamat': alamat,
+                'nominal':
+                    'Rp ${_formatAngka((p['nominal'] as num?)?.toInt() ?? 0)}',
+                'status': 'Diajukan',
+              };
+            })
+            .toList();
+
+        setState(() => antreanDana = data);
+      }
+    } catch (_) {
+      // Biarkan kosong bila server belum menyala.
+    }
+  }
+
+  String _formatAngka(int value) {
+    final text = value.toString();
+    final buf = StringBuffer();
+    for (var i = 0; i < text.length; i++) {
+      if (i > 0 && (text.length - i) % 3 == 0) buf.write('.');
+      buf.write(text[i]);
+    }
+    return buf.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +315,10 @@ class _KelolaAntrianPengumumanScreenState
                     _tabs(),
                     const SizedBox(height: 14),
                     _formSesi(),
-                    if (pengumumanDikirim) ...[
+                    if (pengumumanDikirim ||
+                        (timbangan
+                            ? antreanTimbang.isNotEmpty
+                            : antreanDana.isNotEmpty)) ...[
                       const SizedBox(height: 24),
                       Text(
                         timbangan
@@ -1107,7 +1122,7 @@ class _KelolaAntrianPengumumanScreenState
     },
   );
 
-  void _kirimSesi() {
+  Future<void> _kirimSesi() async {
     final start = _parseTime(mulai);
     final end = _parseTime(selesai);
 
@@ -1137,8 +1152,14 @@ class _KelolaAntrianPengumumanScreenState
       diterbitkanPada: DateTime.now(),
     );
 
-    // Publikasikan ke state bersama agar banner beranda warga langsung diperbarui.
-    AnnouncementStore.publish(pengumuman);
+    final error = await AnnouncementStore.publish(pengumuman);
+
+    if (!mounted) return;
+
+    if (error != null) {
+      _message(error);
+      return;
+    }
 
     setState(() {
       pengumumanDikirim = true;
@@ -1147,7 +1168,7 @@ class _KelolaAntrianPengumumanScreenState
     _message(
       'Pengumuman ${timbangan ? 'penimbangan sampah' : 'pencairan dana'} '
       'berhasil dikirim untuk ${_formatTanggal(tanggal)}, '
-      'pukul $mulai–$selesai. Banner beranda warga telah diperbarui.',
+      'pukul $mulai–$selesai.',
     );
   }
 
@@ -1159,18 +1180,34 @@ class _KelolaAntrianPengumumanScreenState
           nama: item['nama'] ?? '',
           alamat: item['alamat'] ?? '',
           kode: item['kode'] ?? '-',
+          wargaId: int.tryParse(item['user_id'] ?? ''),
         ),
       ),
     );
 
-    // Jika setoran disimpan, hapus warga dari antrian timbangan.
+    // Jika setoran disimpan, muat ulang antrean dari backend.
     if (selesaiInput == true && mounted) {
-      setState(() => antreanTimbang.remove(item));
+      await _muatAntrean();
     }
   }
 
-  void _selesaikanDana(Map<String, String> item) {
-    setState(() => item['status'] = 'Selesai');
+  Future<void> _selesaikanDana(Map<String, String> item) async {
+    final id = int.tryParse(item['pencairan_id'] ?? '');
+
+    if (id != null) {
+      final res = await ApiClient.patch('/pencairan/$id/setujui');
+      if (!mounted) return;
+
+      if (!res.isSuccess) {
+        _message(res.firstError);
+        return;
+      }
+
+      await _muatAntrean();
+    } else {
+      setState(() => item['status'] = 'Selesai');
+    }
+
     _message('Status pencairan ${item['nama']} diubah menjadi selesai.');
   }
 

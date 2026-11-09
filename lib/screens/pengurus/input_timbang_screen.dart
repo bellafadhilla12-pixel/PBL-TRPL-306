@@ -1,17 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../services/api_client.dart';
 import 'katalog_pengurus.dart';
 
 class _Kategori {
+  final int? id;
   final String kode;
   final String nama;
   final int harga; // per kg (untuk padat) atau per liter (untuk cair)
   final Color warna;
-  const _Kategori(this.kode, this.nama, this.harga, this.warna);
+  const _Kategori(this.kode, this.nama, this.harga, this.warna, {this.id});
 
-  factory _Kategori.fromSampah(SampahItem s) =>
-      _Kategori(s.kode, s.nama, _parseHarga(s.harga), _warnaItem(s.kategori));
+  factory _Kategori.fromSampah(SampahItem s) => _Kategori(
+    s.kode,
+    s.nama,
+    _parseHarga(s.harga),
+    _warnaItem(s.kategori),
+    id: s.id,
+  );
+
+  factory _Kategori.fromJson(Map<String, dynamic> json) {
+    final hargaPerKg = (json['harga_per_kg'] as num?)?.toDouble();
+    final kategori =
+        json['kategori']?.toString() ??
+        json['nama_kategori']?.toString() ??
+        'LAINNYA';
+    return _Kategori(
+      'S${json['id']}',
+      json['nama_sampah']?.toString() ??
+          json['nama_kategori']?.toString() ??
+          '-',
+      hargaPerKg?.round() ?? _parseHarga(json['harga']?.toString() ?? ''),
+      _warnaItem(kategori),
+      id: (json['id'] as num?)?.toInt(),
+    );
+  }
 
   // "Rp 4.500/kg" -> 4500
   static int _parseHarga(String h) {
@@ -74,6 +98,7 @@ class InputTimbangScreen extends StatefulWidget {
   final String nama;
   final String alamat;
   final String kode;
+  final int? wargaId;
   final int saldoAwal;
 
   const InputTimbangScreen({
@@ -81,6 +106,7 @@ class InputTimbangScreen extends StatefulWidget {
     required this.nama,
     required this.alamat,
     required this.kode,
+    this.wargaId,
     this.saldoAwal = 148500,
   });
 
@@ -96,14 +122,39 @@ class _InputTimbangScreenState extends State<InputTimbangScreen> {
   static const grey = Color(0xFF777777);
   static const brown = Color(0xFF8B5A4A);
 
-  // Selalu mengikuti katalog pengurus (daftarSampah).
-  List<_Kategori> get daftarKategori =>
-      daftarSampah.map(_Kategori.fromSampah).toList();
+  // Katalog mengikuti data backend; daftar awal dipakai saat server mati.
+  List<_Kategori> _daftarKategori = katalogAwal
+      .map(_Kategori.fromSampah)
+      .toList();
+  List<_Kategori> get daftarKategori => _daftarKategori;
 
   _Kategori? kategoriDipilih;
   _Satuan satuan = _Satuan.kg;
   final TextEditingController _beratC = TextEditingController();
   final List<_ItemKeranjang> keranjang = [];
+  bool _menyimpan = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _muatKatalog();
+  }
+
+  Future<void> _muatKatalog() async {
+    try {
+      final res = await ApiClient.katalog();
+      if (!mounted) return;
+      if (res.isSuccess && res.dataList.isNotEmpty) {
+        final items = res.dataList.map(_Kategori.fromJson).toList();
+        setState(() {
+          _daftarKategori = items;
+          if (!items.contains(kategoriDipilih)) kategoriDipilih = null;
+        });
+      }
+    } catch (_) {
+      // Tetap pakai katalog awal bila backend belum menyala.
+    }
+  }
 
   @override
   void dispose() {
@@ -204,13 +255,51 @@ class _InputTimbangScreenState extends State<InputTimbangScreen> {
     });
   }
 
-  void _simpan() {
+  Future<void> _simpan() async {
     if (keranjang.isEmpty) {
       _msg('Keranjang masih kosong.');
       return;
     }
-    _msg('Setoran ${widget.nama} Rp ${_rp(totalNilai)} berhasil disimpan.');
-    Navigator.pop(context, true); // true = selesai
+
+    if (widget.wargaId == null) {
+      _msg('Data warga tidak lengkap, tidak bisa mengirim ke server.');
+      return;
+    }
+
+    if (keranjang.any((e) => e.kategori.id == null)) {
+      _msg('Katalog belum terhubung ke server. Coba muat ulang halaman.');
+      return;
+    }
+
+    setState(() => _menyimpan = true);
+
+    try {
+      final res = await ApiClient.post('/transaksi', {
+        'warga_id': widget.wargaId,
+        'catatan': 'Input timbang sesi ${widget.kode}',
+        'items': keranjang
+            .map((e) => {'katalog_id': e.kategori.id, 'berat_kg': e.jumlah})
+            .toList(),
+      });
+
+      if (!mounted) return;
+
+      if (!res.isSuccess) {
+        _msg(res.firstError);
+        return;
+      }
+
+      _msg('Setoran ${widget.nama} Rp ${_rp(totalNilai)} berhasil disimpan.');
+      Navigator.pop(context, true); // true = selesai
+    } catch (_) {
+      if (mounted) {
+        _msg(
+          'Tidak bisa terhubung ke server. Pastikan backend Laravel berjalan.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _menyimpan = false);
+    }
   }
 
   BoxDecoration _cardDeco({Color color = Colors.white, double r = 16}) =>
@@ -253,7 +342,7 @@ class _InputTimbangScreenState extends State<InputTimbangScreen> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: _simpan,
+                  onPressed: _menyimpan ? null : _simpan,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: green,
                     foregroundColor: Colors.white,
@@ -261,10 +350,22 @@ class _InputTimbangScreenState extends State<InputTimbangScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Simpan',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                  ),
+                  child: _menyimpan
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Simpan',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                 ),
               ),
             ],
