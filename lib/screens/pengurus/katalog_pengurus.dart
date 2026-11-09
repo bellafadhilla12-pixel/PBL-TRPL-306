@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../services/api_client.dart';
 import 'rekap_gabungan_screen.dart';
 import 'kelola_gabungan_screen.dart';
 import 'verifikasi_warga_screen.dart';
@@ -8,6 +9,7 @@ import 'profil_pengurus.dart';
 
 // ====== MODEL DATA ======
 class SampahItem {
+  final int? id;
   final String kode;
   final String kategori;
   final String nama;
@@ -17,6 +19,7 @@ class SampahItem {
   final bool berbahaya;
 
   const SampahItem({
+    this.id,
     required this.kode,
     required this.kategori,
     required this.nama,
@@ -27,6 +30,7 @@ class SampahItem {
   });
 
   SampahItem copyWith({
+    int? id,
     String? kode,
     String? kategori,
     String? nama,
@@ -36,6 +40,7 @@ class SampahItem {
     bool? berbahaya,
   }) {
     return SampahItem(
+      id: id ?? this.id,
       kode: kode ?? this.kode,
       kategori: kategori ?? this.kategori,
       nama: nama ?? this.nama,
@@ -67,7 +72,7 @@ Color _warnaKategori(String k) {
 }
 
 // ====== DATA KATALOG AWAL ======
-final List<SampahItem> daftarSampah = [
+final List<SampahItem> katalogAwal = [
   const SampahItem(
     kode: 'P1',
     kategori: 'PLASTIK',
@@ -261,6 +266,69 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
   String _filter = 'Semua';
   String _query = '';
 
+  List<SampahItem> _daftar = List<SampahItem>.from(katalogAwal);
+  final Map<String, int> _kategoriIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _muatKatalog();
+  }
+
+  Future<void> _muatKatalog() async {
+    try {
+      final hasil = await Future.wait([
+        ApiClient.katalog(),
+        ApiClient.kategori(),
+      ]);
+      if (!mounted) return;
+
+      final katalogRes = hasil[0];
+      final kategoriRes = hasil[1];
+
+      if (kategoriRes.isSuccess) {
+        _kategoriIds.clear();
+        for (final k in kategoriRes.dataList) {
+          final nama = (k['nama']?.toString() ?? '').toUpperCase();
+          final id = (k['id'] as num?)?.toInt();
+          if (nama.isNotEmpty && id != null) _kategoriIds[nama] = id;
+        }
+
+        if (_kategoriIds.isNotEmpty) {
+          _kategori
+            ..clear()
+            ..addAll(_kategoriIds.keys.toList()..sort());
+        }
+      }
+
+      if (katalogRes.isSuccess) {
+        final items = katalogRes.dataList.map((m) {
+          final kategori =
+              (m['kategori']?.toString() ?? 'LAINNYA').toUpperCase();
+          return SampahItem(
+            id: (m['id'] as num?)?.toInt(),
+            kode: 'S${m['id']}',
+            kategori: kategori,
+            nama: m['nama_sampah']?.toString() ?? '-',
+            harga: m['harga']?.toString() ?? '-',
+            badge: m['kategori']?.toString() ?? 'Sampah',
+            catatan: m['deskripsi']?.toString() ?? '',
+            berbahaya: kategori == 'LIMBAH',
+          );
+        }).toList();
+
+        setState(() => _daftar = items);
+        if (_filter != 'Semua' && !_kategori.contains(_filter)) {
+          setState(() => _filter = 'Semua');
+        }
+      } else {
+        setState(() {});
+      }
+    } catch (_) {
+      // Data demo tetap tampil bila server belum menyala.
+    }
+  }
+
   final List<String> _kategori = [
     'PLASTIK',
     'LIMBAH',
@@ -292,14 +360,14 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
       f == 'Semua' || s.kategori == f;
 
   int _jumlah(String f) => f == 'Semua'
-      ? daftarSampah.length
-      : daftarSampah.where((s) => _cocokKategori(s, f)).length;
+      ? _daftar.length
+      : _daftar.where((s) => _cocokKategori(s, f)).length;
 
   @override
   Widget build(BuildContext context) {
     final q = _query.toLowerCase().trim();
 
-    final hasil = daftarSampah.where((s) {
+    final hasil = _daftar.where((s) {
       final cocokFilter = _cocokKategori(s, _filter);
 
       final cocokCari =
@@ -352,8 +420,8 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
             (s) => SampahCard(
               key: ValueKey(s.kode),
               item: s,
-              onEdit: () => _dialogSampah(index: daftarSampah.indexOf(s)),
-              onDelete: () => _hapusSampah(daftarSampah.indexOf(s)),
+              onEdit: () => _dialogSampah(index: _daftar.indexOf(s)),
+              onDelete: () => _hapusSampah(_daftar.indexOf(s)),
             ),
           ),
       ],
@@ -422,7 +490,7 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
         child: FilledButton.icon(
           onPressed: _dialogSampah,
           icon: const Icon(Icons.add, size: 18),
-          label: const Text('Tambah Katalog', textAlign: TextAlign.center),
+          label: const Text('Tambah Kategori', textAlign: TextAlign.center),
           style: FilledButton.styleFrom(
             backgroundColor: _hijau,
             foregroundColor: Colors.white,
@@ -494,14 +562,14 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
                 TextSpan(
                   children: [
                     TextSpan(
-                      text: 'Kenapa Harus Dipilah Sesuai Kode? ',
+                      text: 'Kenapa Harus Dipilah Sesuai Kategori? ',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     TextSpan(
-                      text: 'Sampah yang bersih dan dipilah tepat sesuai kode mempermudah timbang posko dan mendapatkan estimasi nilai Rupiah terbaik!',
+                      text: 'Sampah yang bersih dan dipilah tepat sesuai kategori mempermudah timbang posko dan mendapatkan estimasi nilai Rupiah terbaik!',
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
@@ -530,7 +598,7 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
     child: TextField(
       onChanged: (v) => setState(() => _query = v),
       decoration: InputDecoration(
-        hintText: 'Cari kode atau nama sampah, contoh: botol, P3',
+        hintText: 'Cari nama kategori sampah, contoh: plastik, logam',
         hintStyle: const TextStyle(fontSize: 13),
         prefixIcon: const Icon(Icons.search, color: _hijau),
         filled: true,
@@ -603,28 +671,24 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
   // ====== TAMBAH / EDIT KATALOG ======
   Future<void> _dialogSampah({int? index}) async {
     final isEdit = index != null;
-    final item = isEdit ? daftarSampah[index] : null;
+    final item = isEdit ? _daftar[index] : null;
 
-    final kodeController = TextEditingController(text: item?.kode ?? '');
     final namaController = TextEditingController(text: item?.nama ?? '');
     final hargaController = TextEditingController(
-      text: item?.harga.replaceFirst('Rp ', '') ?? '',
+      text: item == null
+          ? ''
+          : item.harga.replaceAll(RegExp(r'[^0-9]'), ''),
     );
-    final badgeController = TextEditingController(text: item?.badge ?? '');
     final catatanController = TextEditingController(text: item?.catatan ?? '');
 
-    String kategori =
-        item?.kategori ??
-        (_semuaKategori.isNotEmpty ? _semuaKategori.first : 'PLASTIK');
-
-    bool berbahaya = item?.berbahaya ?? false;
     final formKey = GlobalKey<FormState>();
 
     final simpan = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(isEdit ? 'Edit Katalog Sampah' : 'Tambah Katalog Sampah'),
+      builder: (dialogContext) => AlertDialog(
+          title: Text(
+            isEdit ? 'Edit Kategori Harga' : 'Tambah Kategori Harga',
+          ),
           content: SizedBox(
             width: 420,
             child: SingleChildScrollView(
@@ -633,59 +697,23 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _input(kodeController, 'Kode sampah', validator: _wajib),
-                    const SizedBox(height: 10),
-                    _input(namaController, 'Nama sampah', validator: _wajib),
-                    const SizedBox(height: 10),
-                    DropdownButtonFormField<String>(
-                      initialValue: _semuaKategori.contains(kategori)
-                          ? kategori
-                          : (_semuaKategori.isNotEmpty
-                                ? _semuaKategori.first
-                                : null),
-                      decoration: const InputDecoration(
-                        labelText: 'Kategori',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: _semuaKategori
-                          .map(
-                            (k) => DropdownMenuItem<String>(
-                              value: k,
-                              child: Text(_labelKategori(k)),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (v) {
-                        if (v != null) {
-                          setDialogState(() => kategori = v);
-                        }
-                      },
+                    _input(
+                      namaController,
+                      'Nama kategori sampah (contoh: Plastik)',
+                      validator: _wajib,
                     ),
                     const SizedBox(height: 10),
                     _input(
                       hargaController,
-                      'Harga (contoh: 4.500/kg)',
+                      'Harga per kg (contoh: 4.500)',
                       validator: _wajib,
                     ),
-                    const SizedBox(height: 10),
-                    _input(badgeController, 'Label / badge', validator: _wajib),
                     const SizedBox(height: 10),
                     _input(
                       catatanController,
-                      'Catatan pemilahan',
+                      'Catatan / deskripsi',
                       validator: _wajib,
                       maxLines: 2,
-                    ),
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      value: berbahaya,
-                      title: const Text(
-                        'Termasuk limbah B3 / berbahaya',
-                        style: TextStyle(fontSize: 13),
-                      ),
-                      onChanged: (v) {
-                        setDialogState(() => berbahaya = v ?? false);
-                      },
                     ),
                   ],
                 ),
@@ -707,62 +735,52 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
             ),
           ],
         ),
-      ),
     );
 
     if (simpan == true && mounted) {
-      final kode = kodeController.text.trim().toUpperCase();
-
-      final duplikat = daftarSampah.asMap().entries.any(
-        (entry) => entry.value.kode.toUpperCase() == kode && entry.key != index,
+      final hargaAngka = int.tryParse(
+        hargaController.text.replaceAll(RegExp(r'[^0-9]'), ''),
       );
 
-      if (duplikat) {
-        _pesan('Kode sampah sudah digunakan. Gunakan kode lain.');
+      if (hargaAngka == null || hargaAngka <= 0) {
+        _pesan('Harga tidak valid.');
       } else {
-        final harga = hargaController.text.trim().replaceFirst(
-          RegExp(r'^Rp\s*', caseSensitive: false),
-          '',
-        );
+        final payload = <String, dynamic>{
+          'nama_kategori': namaController.text.trim(),
+          'harga_per_kg': hargaAngka,
+          'deskripsi': catatanController.text.trim(),
+          'status': 'aktif',
+        };
 
-        final dataBaru = SampahItem(
-          kode: kode,
-          kategori: kategori,
-          nama: namaController.text.trim(),
-          harga: 'Rp $harga',
-          badge: badgeController.text.trim(),
-          catatan: catatanController.text.trim(),
-          berbahaya: berbahaya,
-        );
+        final itemId = isEdit ? item?.id : null;
+        final res = isEdit && itemId != null
+            ? await ApiClient.patch('/katalog/$itemId', payload)
+            : await ApiClient.post('/katalog', payload);
 
-        setState(() {
-          if (isEdit) {
-            daftarSampah[index] = dataBaru;
-          } else {
-            daftarSampah.add(dataBaru);
-          }
+        if (!mounted) return;
 
-          if (!_semuaKategori.contains(_filter)) {
-            _filter = 'Semua';
-          }
-        });
-
-        _pesan(
-          isEdit ? 'Katalog berhasil diubah.' : 'Katalog berhasil ditambahkan.',
-        );
+        if (!res.isSuccess) {
+          _pesan(res.firstError);
+        } else {
+          await _muatKatalog();
+          if (!mounted) return;
+          _pesan(
+            isEdit
+                ? 'Katalog berhasil diubah.'
+                : 'Katalog berhasil ditambahkan.',
+          );
+        }
       }
     }
 
-    kodeController.dispose();
     namaController.dispose();
     hargaController.dispose();
-    badgeController.dispose();
     catatanController.dispose();
   }
 
   // ====== HAPUS KATALOG ======
   Future<void> _hapusSampah(int index) async {
-    final item = daftarSampah[index];
+    final item = _daftar[index];
 
     final yakin = await showDialog<bool>(
       context: context,
@@ -784,15 +802,24 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
     );
 
     if (yakin == true && mounted) {
-      setState(() {
-        daftarSampah.removeAt(index);
+      if (item.id != null) {
+        final res = await ApiClient.delete('/katalog/${item.id}');
+        if (!mounted) return;
 
-        if (_filter != 'Semua' && !_semuaKategori.contains(_filter)) {
-          _filter = 'Semua';
+        if (!res.isSuccess) {
+          _pesan(res.firstError);
+          return;
         }
-      });
+      }
 
-      _pesan('Katalog berhasil dihapus.');
+      await _muatKatalog();
+      if (!mounted) return;
+
+      if (_filter != 'Semua' && !_semuaKategori.contains(_filter)) {
+        setState(() => _filter = 'Semua');
+      }
+
+      _pesan('Katalog berhasil dinonaktifkan.');
     }
   }
 
@@ -890,6 +917,15 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
       text: kategoriLama == null ? '' : _labelKategori(kategoriLama),
     );
 
+    var hargaAwal = '';
+    for (final item in _daftar) {
+      if (item.kategori == kategoriLama) {
+        hargaAwal = item.harga.replaceAll(RegExp(r'[^0-9]'), '');
+        break;
+      }
+    }
+    final hargaController = TextEditingController(text: hargaAwal);
+
     final formKey = GlobalKey<FormState>();
 
     final namaBaru = await showDialog<String>(
@@ -898,16 +934,38 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
         title: Text(kategoriLama == null ? 'Tambah Kategori' : 'Edit Kategori'),
         content: Form(
           key: formKey,
-          child: TextFormField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Nama kategori',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) => value == null || value.trim().isEmpty
-                ? 'Nama kategori wajib diisi.'
-                : null,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: controller,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'Nama kategori',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) => value == null || value.trim().isEmpty
+                    ? 'Nama kategori wajib diisi.'
+                    : null,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: hargaController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Harga per kg',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  final angka = int.tryParse(
+                    (value ?? '').replaceAll(RegExp(r'[^0-9]'), ''),
+                  );
+                  return angka == null || angka <= 0
+                      ? 'Harga wajib diisi dengan angka.'
+                      : null;
+                },
+              ),
+            ],
           ),
         ),
         actions: [
@@ -928,6 +986,8 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
     );
 
     controller.dispose();
+    final hargaInput = hargaController.text;
+    hargaController.dispose();
 
     if (namaBaru == null || !mounted) return;
 
@@ -942,27 +1002,43 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
       return;
     }
 
-    setState(() {
-      if (kategoriLama == null) {
-        _kategori.add(normalized);
-      } else {
-        for (var i = 0; i < daftarSampah.length; i++) {
-          if (daftarSampah[i].kategori == kategoriLama) {
-            daftarSampah[i] = daftarSampah[i].copyWith(kategori: normalized);
-          }
-        }
+    final kategoriId = kategoriLama == null ? null : _kategoriIds[kategoriLama];
 
-        final kategoriIndex = _kategori.indexOf(kategoriLama);
+    if (kategoriLama != null && kategoriId == null) {
+      _pesan('Kategori tidak ditemukan di server.');
+      return;
+    }
 
-        if (kategoriIndex >= 0) {
-          _kategori[kategoriIndex] = normalized;
-        }
+    final harga = int.tryParse(
+      hargaInput.replaceAll(RegExp(r'[^0-9]'), ''),
+    );
+    if (harga == null || harga <= 0) {
+      _pesan('Harga tidak valid.');
+      return;
+    }
 
-        if (_filter == kategoriLama) {
-          _filter = normalized;
-        }
-      }
-    });
+    final payload = <String, dynamic>{
+      'nama_kategori': normalized,
+      'harga_per_kg': harga,
+      'status': 'aktif',
+    };
+    final res = kategoriLama == null
+        ? await ApiClient.post('/katalog', payload)
+        : await ApiClient.patch('/katalog/$kategoriId', payload);
+
+    if (!mounted) return;
+
+    if (!res.isSuccess) {
+      _pesan(res.firstError);
+      return;
+    }
+
+    await _muatKatalog();
+    if (!mounted) return;
+
+    if (_filter == kategoriLama) {
+      setState(() => _filter = normalized);
+    }
 
     _pesan(
       kategoriLama == null
@@ -992,16 +1068,6 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
   }
 
   Future<void> _hapusKategori(String kategori) async {
-    final jumlahItem = daftarSampah.where((s) => s.kategori == kategori).length;
-
-    if (jumlahItem > 0) {
-      _pesan(
-        'Kategori masih digunakan oleh $jumlahItem katalog. '
-        'Edit atau hapus katalog tersebut terlebih dahulu.',
-      );
-      return;
-    }
-
     final yakin = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1022,13 +1088,27 @@ class _KatalogPengurusScreenState extends State<KatalogPengurusScreen> {
     );
 
     if (yakin == true && mounted) {
-      setState(() {
-        _kategori.remove(kategori);
+      final kategoriId = _kategoriIds[kategori];
 
-        if (_filter == kategori) {
-          _filter = 'Semua';
-        }
-      });
+      if (kategoriId == null) {
+        _pesan('Kategori tidak ditemukan di server.');
+        return;
+      }
+
+      final res = await ApiClient.delete('/kategori/$kategoriId');
+      if (!mounted) return;
+
+      if (!res.isSuccess) {
+        _pesan(res.firstError);
+        return;
+      }
+
+      await _muatKatalog();
+      if (!mounted) return;
+
+      if (_filter == kategori) {
+        setState(() => _filter = 'Semua');
+      }
 
       _pesan('Kategori berhasil dihapus.');
     }

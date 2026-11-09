@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+
+import '../../services/api_client.dart';
 import 'login_warga_screen.dart';
 
 class RegistrasiWargaScreen extends StatefulWidget {
@@ -87,47 +87,40 @@ static const Color background =
   setState(() => _isLoading = true);
 
   try {
-    // GANTI URL INI setelah backend MySQL kamu sudah jadi
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:3000/api/warga/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'nama': nama,
-        'whatsapp': whatsapp,
-        'password': password,
-        'blok': blok,
-        'nomor_rumah': nomorRumah,
-        'rt': rt,
-        'rw': rw,
-        'status_tempat_tinggal': statusTempatTinggal,
-        'keterangan_tempat_tinggal':
-            statusTempatTinggal == 'Lainnya'
-                ? keteranganTempatTinggal
-                : null,
-        'detail_tempat_tinggal':
-            statusTempatTinggal == 'Lainnya'
-                ? detailTempatTinggal
-                : null,
-      }),
-    );
+    final res = await ApiClient.registerWarga({
+      'nama': nama,
+      'whatsapp': whatsapp,
+      'password': password,
+      'blok': blok,
+      'nomor_rumah': nomorRumah,
+      'rt': rt,
+      'rw': rw,
+      'status_tempat_tinggal': statusTempatTinggal,
+      'keterangan_tempat_tinggal': statusTempatTinggal == 'Lainnya'
+          ? keteranganTempatTinggal
+          : null,
+      'detail_tempat_tinggal':
+          statusTempatTinggal == 'Lainnya' ? detailTempatTinggal : null,
+    });
 
     if (!mounted) return;
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (res.isSuccess) {
+      ApiClient.setSession(
+        token: res.body['token'] as String?,
+        userRole: 'warga',
+        userNama: nama,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registrasi berhasil, silakan login'),
-        ),
+        SnackBar(content: Text(res.message)),
       );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreenWarga()),
       );
     } else {
-      final data = jsonDecode(response.body);
-      final pesanError = data['message'] ?? 'Registrasi gagal, coba lagi';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(pesanError)),
+        SnackBar(content: Text(res.firstError)),
       );
     }
   } catch (e) {

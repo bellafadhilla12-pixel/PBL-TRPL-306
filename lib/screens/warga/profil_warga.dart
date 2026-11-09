@@ -511,7 +511,7 @@ class ProfilWargaScreen extends StatelessWidget {
                         const SizedBox(height: 3),
                         ValueListenableBuilder<String>(
                           valueListenable: _nomorWa,
-                          builder: (_, nomor, __) => Text(
+                          builder: (_, nomor, _) => Text(
                             nomor,
                             style: const TextStyle(
                               fontSize: 12,

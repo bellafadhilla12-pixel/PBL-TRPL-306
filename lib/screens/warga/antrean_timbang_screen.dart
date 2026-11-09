@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/announcement_store.dart';
+import '../../services/api_client.dart';
 
 class AntreanTimbangScreen extends StatefulWidget {
   const AntreanTimbangScreen({super.key});
@@ -30,6 +31,75 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
 
   final Set<String> selectedWaste = <String>{};
 
+  List<Map<String, dynamic>> _slots = [];
+  bool _memuatSlot = false;
+  bool _mengirimAntrean = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _muatSlot();
+  }
+
+  Future<void> _muatSlot() async {
+    await AnnouncementStore.load();
+    if (!mounted) return;
+
+    final sesi = AnnouncementStore.announcements.value['timbangan'];
+    if (sesi?.id == null) return;
+
+    setState(() => _memuatSlot = true);
+
+    final res = await ApiClient.slots(sesi!.id!);
+    if (!mounted) return;
+
+    if (res.isSuccess) {
+      final raw = res.body['data']?['slots'];
+      if (raw is List) {
+        setState(() {
+          _slots = raw.map((e) {
+            final m = Map<String, dynamic>.from(e as Map);
+            return <String, dynamic>{
+              'time': '${m['mulai']} - ${m['selesai']} WIB',
+              'registered': (m['terdaftar'] as num?)?.toInt() ?? 0,
+              'quota': (m['kuota'] as num?)?.toInt() ?? 0,
+              'available': m['tersedia'] == true,
+            };
+          }).toList();
+        });
+      }
+    }
+
+    // Sinkronkan tiket aktif milik warga pada jadwal ini, agar setelah
+    // login ulang atau kembali dari beranda tiket tidak hilang.
+    final antreanRes = await ApiClient.antreanSaya();
+    if (!mounted) return;
+
+    if (antreanRes.isSuccess) {
+      final aktif = antreanRes.dataList.where((a) {
+        final jadwalId = (a['id_jadwal'] as num?)?.toInt();
+        return jadwalId == sesi.id && a['status']?.toString() == 'menunggu';
+      }).toList();
+
+      if (aktif.isNotEmpty) {
+        final tiket = aktif.first;
+        setState(() {
+          sudahAmbilAntrean = true;
+          nomorAntrean = tiket['kode']?.toString() ?? '-';
+          selectedTime =
+              '${tiket['slot_mulai'] ?? sesi.mulai} - '
+              '${tiket['slot_selesai'] ?? sesi.selesai} WIB';
+          selectedDate = _formatDate(sesi.tanggal);
+        });
+      } else {
+        setState(() => sudahAmbilAntrean = false);
+      }
+    }
+
+    if (mounted) setState(() => _memuatSlot = false);
+  }
+
+
   final List<String> wasteTypes = [
     'Plastik & Botol',
 
@@ -40,37 +110,19 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
     'Besi/Logam',
   ];
 
-  // Slot dibuat mengikuti jam mulai dan selesai dari pengumuman pengurus.
-  // Untuk sementara jumlah pendaftar dimulai dari 0 pada setiap slot.
+  // Satu jadwal penimbangan = satu pilihan slot (bukan 30 menit).
   List<Map<String, dynamic>> _buildTimeSlots(AnnouncementData sesi) {
-    final start = _parseClock(sesi.mulai);
-    final end = _parseClock(sesi.selesai);
-    if (end <= start) return [];
+    if (sesi.mulai.isEmpty || sesi.selesai.isEmpty) return [];
 
-    final slots = <Map<String, dynamic>>[];
-    for (var minute = start; minute + 30 <= end; minute += 30) {
-      final slotStart = _formatClock(minute);
-      final slotEnd = _formatClock(minute + 30);
-      slots.add({
-        'time': '$slotStart - $slotEnd WIB',
-        'registered': 0,
-        'quota': 5,
-        'available': true,
-      });
-    }
-    return slots;
-  }
-
-  int _parseClock(String value) {
-    final clean = value.replaceAll(' WIB', '').trim();
-    final parts = clean.split(':');
-    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
-  }
-
-  String _formatClock(int minutes) {
-    final hour = (minutes ~/ 60).toString().padLeft(2, '0');
-    final minute = (minutes % 60).toString().padLeft(2, '0');
-    return '$hour:$minute';
+    return [
+      {
+        'time': '${sesi.mulai.replaceAll(' WIB', '')} - '
+            '${sesi.selesai.replaceAll(' WIB', '')} WIB',
+        'registered': sesi.terdaftar,
+        'quota': sesi.kuota,
+        'available': sesi.kuota == 0 || sesi.terdaftar < sesi.kuota,
+      },
+    ];
   }
 
   String _formatDate(DateTime date) {
@@ -187,7 +239,15 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
                   const SizedBox(height: 20),
                   _buildSectionTitle(number: '2', title: 'Pilih Slot Waktu'),
                   const SizedBox(height: 10),
-                  ..._buildTimeSlots(sesiTimbangan).map(
+                  if (_memuatSlot)
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 10),
+                      child: LinearProgressIndicator(minHeight: 2),
+                    ),
+                  ...(_slots.isNotEmpty
+                          ? _slots
+                          : _buildTimeSlots(sesiTimbangan))
+                      .map(
                     (slot) => Padding(
                       padding: const EdgeInsets.only(bottom: 9),
                       child: _buildTimeSlot(slot),
@@ -946,7 +1006,9 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
             height: 47,
 
             child: ElevatedButton.icon(
-              onPressed: sudahAmbilAntrean ? null : _buatAntrean,
+              onPressed: (sudahAmbilAntrean || _mengirimAntrean)
+                  ? null
+                  : _buatAntrean,
 
               style: ElevatedButton.styleFrom(
                 backgroundColor: darkGreen,
@@ -978,7 +1040,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
     );
   }
 
-  void _buatAntrean() {
+  Future<void> _buatAntrean() async {
     final sesi = AnnouncementStore.announcements.value['timbangan'];
     if (sesi == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -986,6 +1048,7 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
       );
       return;
     }
+
     selectedDate = _formatDate(sesi.tanggal);
 
     if (selectedTime == null) {
@@ -1006,15 +1069,61 @@ class _AntreanTimbangScreenState extends State<AntreanTimbangScreen> {
       return;
     }
 
-    setState(() {
-      sudahAmbilAntrean = true;
+    if (sesi.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sesi belum tersinkron dengan server. Coba lagi.'),
+        ),
+      );
+      return;
+    }
 
-      nomorAntrean = 'C-02';
-    });
+    final waktu = selectedTime!.replaceAll(' WIB', '').split(' - ');
+    if (waktu.length != 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Format slot waktu tidak valid.')),
+      );
+      return;
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Antrian timbang berhasil dibuat.')),
-    );
+    setState(() => _mengirimAntrean = true);
+
+    try {
+      final res = await ApiClient.buatAntrean(
+        jadwalId: sesi.id!,
+        slotMulai: waktu[0].trim(),
+        slotSelesai: waktu[1].trim(),
+        jenisSampah: selectedWaste.toList(),
+      );
+
+      if (!mounted) return;
+
+      if (!res.isSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res.firstError)),
+        );
+        return;
+      }
+
+      setState(() {
+        sudahAmbilAntrean = true;
+        nomorAntrean = res.data?['kode']?.toString() ?? '-';
+      });
+
+      await _muatSlot();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Antrian timbang berhasil dibuat.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal membuat antrean. Cek koneksi server.')),
+      );
+    } finally {
+      if (mounted) setState(() => _mengirimAntrean = false);
+    }
   }
 
   void _kembaliKeBeranda() {

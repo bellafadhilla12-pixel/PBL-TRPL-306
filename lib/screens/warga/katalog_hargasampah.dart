@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../services/api_client.dart';
+
 // ====== MODEL DATA ======
 class SampahItem {
   final String kode;
@@ -233,6 +235,37 @@ class _KatalogPageState extends State<KatalogPage> {
   String _filter = 'Semua';
   String _query = '';
 
+  /// Data awal memakai daftar lokal; setelah API merespons, diganti data server.
+  List<SampahItem> _data = List<SampahItem>.from(daftarSampah);
+
+  @override
+  void initState() {
+    super.initState();
+    _muatKatalog();
+  }
+
+  Future<void> _muatKatalog() async {
+    final res = await ApiClient.katalog();
+    if (!mounted || !res.isSuccess) return;
+
+    final items = res.dataList.map((m) {
+      final kategori =
+          (m['kategori']?.toString() ?? 'Lainnya').toUpperCase();
+      return SampahItem(
+        kode: 'S${m['id']}',
+        kategori: kategori,
+        nama: m['nama_sampah']?.toString() ?? '-',
+        harga: m['harga']?.toString() ?? '-',
+        badge: m['kategori']?.toString() ?? 'Sampah',
+        catatan: m['deskripsi']?.toString() ?? '',
+      );
+    }).toList();
+
+    if (items.isNotEmpty && mounted) {
+      setState(() => _data = items);
+    }
+  }
+
   // Cek apakah item masuk ke kategori filter tertentu.
   // Dipakai untuk menyaring daftar DAN menghitung angka di chip.
   bool _cocokKategori(SampahItem s, String f) {
@@ -251,12 +284,11 @@ class _KatalogPageState extends State<KatalogPage> {
   }
 
   // Jumlah item per kategori (angka di dalam kurung pada chip).
-  int _jumlah(String f) =>
-      daftarSampah.where((s) => _cocokKategori(s, f)).length;
+  int _jumlah(String f) => _data.where((s) => _cocokKategori(s, f)).length;
 
   @override
   Widget build(BuildContext context) {
-    final hasil = daftarSampah.where((s) {
+    final hasil = _data.where((s) {
       final cocokFilter = _cocokKategori(s, _filter);
       final q = _query.toLowerCase();
       final cocokCari =

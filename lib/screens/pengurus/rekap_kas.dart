@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+import '../../services/api_client.dart';
 
 const kasGreen = Color(0xFF0D735B);
 const kasMint = Color(0xFF59CBA9);
@@ -54,7 +54,7 @@ class _RekapKasPageState extends State<RekapKasPage> {
   String bulanDipilih = 'Semua Bulan';
   bool tampilSemua = false;
 
-  final List<TransaksiKas> transaksi = [
+  List<TransaksiKas> transaksi = [
     TransaksiKas(
       nama: 'Siti Aminah',
       bulan: 'Oktober',
@@ -106,7 +106,7 @@ class _RekapKasPageState extends State<RekapKasPage> {
     ),
   ];
 
-  final List<String> daftarBulan = const [
+  List<String> daftarBulan = const [
     'Semua Bulan',
     'Januari',
     'Februari',
@@ -121,6 +121,50 @@ class _RekapKasPageState extends State<RekapKasPage> {
     'November',
     'Desember',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _muatKas();
+  }
+
+  Future<void> _muatKas() async {
+    try {
+      final res = await ApiClient.get('/pencairan');
+      if (!mounted || !res.isSuccess) return;
+
+      final items = res.dataList.map((p) {
+        final waktu = DateTime.tryParse(p['diajukan_pada']?.toString() ?? '');
+        final warga = p['warga'];
+        return TransaksiKas(
+          nama: warga is Map ? (warga['nama'] ?? '-').toString() : '-',
+          bulan: _namaBulan(waktu?.month),
+          waktu: waktu == null
+              ? '-'
+              : '${waktu.hour.toString().padLeft(2, '0')}:'
+                  '${waktu.minute.toString().padLeft(2, '0')}',
+          nominal: (p['nominal'] as num?)?.toInt() ?? 0,
+          disetujui: ['disetujui', 'selesai']
+              .contains(p['status']?.toString()),
+        );
+      }).toList();
+
+      if (items.isNotEmpty && mounted) {
+        setState(() => transaksi = items);
+      }
+    } catch (_) {
+      // Data demo tetap tampil bila server belum menyala.
+    }
+  }
+
+  String _namaBulan(int? bulan) {
+    const nama = [
+      '', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+    ];
+    if (bulan == null || bulan < 1 || bulan > 12) return '-';
+    return nama[bulan];
+  }
 
   List<TransaksiKas> get transaksiDisetujui {
     return transaksi.where((item) {
@@ -483,128 +527,103 @@ class _RekapKasPageState extends State<RekapKasPage> {
     );
   }
 
-  // Dialog simulasi persetujuan pencairan
-  void tambahPencairan() {
-    final namaController = TextEditingController();
-    final nominalController = TextEditingController();
+  // Menampilkan pengajuan pencairan yang benar-benar menunggu di backend.
+  Future<void> tambahPencairan() async {
+    final res = await ApiClient.get('/pencairan?status=menunggu');
+    if (!mounted) return;
 
-    String bulan = bulanDipilih == 'Semua Bulan'
-        ? 'Oktober'
-        : bulanDipilih;
+    if (!res.isSuccess) {
+      _pesanKas(res.firstError);
+      return;
+    }
 
-    showDialog<void>(
+    final pending = res.dataList;
+    if (pending.isEmpty) {
+      _pesanKas('Tidak ada pengajuan pencairan yang menunggu.');
+      return;
+    }
+
+    await showDialog<void>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, refreshDialog) => AlertDialog(
-          title: const Text('Setujui Pencairan Dana'),
-          content: SingleChildScrollView(
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Setujui Pencairan Dana'),
+        content: SizedBox(
+          width: 360,
+          child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: namaController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nama warga',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: nominalController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  decoration: const InputDecoration(
-                    labelText: 'Nominal pencairan',
-                    prefixText: 'Rp ',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: bulan,
-                  decoration: const InputDecoration(
-                    labelText: 'Bulan',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: daftarBulan
-                      .where((item) => item != 'Semua Bulan')
-                      .map(
-                        (item) => DropdownMenuItem(
-                          value: item,
-                          child: Text(item),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      refreshDialog(() {
-                        bulan = value;
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Batal'),
-            ),
-            FilledButton(
-              onPressed: () {
-                final nama = namaController.text.trim();
-                final nominal = int.tryParse(
-                  nominalController.text.trim(),
-                );
+              children: pending.map((p) {
+                final warga = p['warga'];
+                final nama = warga is Map
+                    ? (warga['nama'] ?? '-').toString()
+                    : '-';
+                final nominal = (p['nominal'] as num?)?.toInt() ?? 0;
+                final id = (p['id'] as num?)?.toInt();
 
-                if (nama.isEmpty ||
-                    nominal == null ||
-                    nominal <= 0) {
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Masukkan nama dan nominal yang valid.',
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: kasMint,
+                    child: Text(
+                      nama.isEmpty ? '?' : nama[0].toUpperCase(),
+                      style: const TextStyle(
+                        color: kasGreen,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  );
-                  return;
-                }
-
-                setState(() {
-                  transaksi.insert(
-                    0,
-                    TransaksiKas(
-                      nama: nama,
-                      bulan: bulan,
-                      waktu: TimeOfDay.now().format(this.context),
-                      nominal: nominal,
-                      disetujui: true,
-                    ),
-                  );
-                });
-
-                Navigator.pop(dialogContext);
-
-                ScaffoldMessenger.of(this.context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Pencairan disetujui. Total diperbarui.',
+                  ),
+                  title: Text(
+                    nama,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  subtitle: Text(
+                    formatRupiah(nominal),
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  trailing: FilledButton(
+                    onPressed: id == null
+                        ? null
+                        : () async {
+                            final approve = await ApiClient.patch(
+                              '/pencairan/$id/setujui',
+                            );
+                            if (!dialogContext.mounted) return;
+
+                            Navigator.pop(dialogContext);
+                            if (!mounted) return;
+
+                            if (!approve.isSuccess) {
+                              _pesanKas(approve.firstError);
+                              return;
+                            }
+
+                            await _muatKas();
+                            if (!mounted) return;
+                            _pesanKas('Pencairan $nama disetujui.');
+                          },
+                    child: const Text('Setujui'),
+                  ),
                 );
-              },
-              child: const Text('Setujui'),
+              }).toList(),
             ),
-          ],
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Tutup'),
+          ),
+        ],
       ),
-    ).then((_) {
-      namaController.dispose();
-      nominalController.dispose();
-    });
+    );
+  }
+
+  void _pesanKas(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 
   // Navigasi bawah jika halaman dibuka secara mandiri

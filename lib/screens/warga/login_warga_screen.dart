@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../services/api_client.dart';
 import '../pengurus/verifikasi_warga_screen.dart';
 import '../ubs/profil_ubs.dart';
 import 'registrasi_warga_screen.dart';
@@ -17,6 +18,7 @@ class _LoginScreenWargaState extends State<LoginScreenWarga> {
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   static const Color darkGreen = Color(0xFF0F6E56);
   static const Color lightMint = Color(0xFFB8E0D2);
@@ -29,62 +31,63 @@ class _LoginScreenWargaState extends State<LoginScreenWarga> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     final identity = _identityController.text.trim();
     final password = _passwordController.text.trim();
 
     if (identity.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Nomor WhatsApp/username dan kata sandi wajib diisi'),
-        ),
-      );
+      _showMessage('Nomor WhatsApp dan kata sandi wajib diisi');
       return;
     }
 
-    // DEMO FRONT-END SEMENTARA:
-    // Kredensial role Pengurus/UBS mengikuti dummy dari implementasi lama.
-    // Identitas lain diarahkan ke alur Warga seperti implementasi sebelumnya.
-    // Saat API tersedia, ganti blok ini dengan respons login dari backend:
-    // backend memvalidasi akun dan mengembalikan role, lalu Flutter
-    // mengarahkan pengguna sesuai role tersebut.
-    final normalizedIdentity = identity.toLowerCase();
+    setState(() => _isLoading = true);
 
-    if (normalizedIdentity == 'pengurus') {
-      if (password == '123') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const VerifikasiWargaScreen()),
-        );
-      } else {
-        _showInvalidCredentials();
+    try {
+      // Backend memvalidasi akun dan mengembalikan role.
+      final res = await ApiClient.login(whatsapp: identity, password: password);
+
+      if (!mounted) return;
+
+      if (!res.isSuccess) {
+        _showMessage(res.firstError);
+        return;
       }
-      return;
-    }
 
-    if (normalizedIdentity == 'ubs') {
-      if (password == '555') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ProfileUbs()),
-        );
-      } else {
-        _showInvalidCredentials();
+      final role = res.body['role']?.toString() ?? 'warga';
+
+      switch (role) {
+        case 'pengurus':
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const VerifikasiWargaScreen(),
+            ),
+          );
+        case 'ubs':
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const ProfileUbs()),
+          );
+        default:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const WhatsAppGatePage()),
+          );
       }
-      return;
+    } catch (_) {
+      if (mounted) {
+        _showMessage(
+          'Tidak bisa terhubung ke server. Pastikan backend Laravel berjalan.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-
-    // Simulasi login Warga. Belum melakukan autentikasi ke database/API.
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const WhatsAppGatePage()),
-    );
   }
 
-  void _showInvalidCredentials() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Username atau kata sandi salah')),
-    );
+  void _showMessage(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 
   void _goToRegister() {
@@ -172,7 +175,7 @@ class _LoginScreenWargaState extends State<LoginScreenWarga> {
                 const SizedBox(height: 16),
                 _buildInputField(
                   controller: _identityController,
-                  hint: 'Nomor WhatsApp / Username',
+                  hint: 'Nomor WhatsApp',
                   icon: Icons.smartphone_outlined,
                   keyboardType: TextInputType.text,
                 ),
@@ -220,7 +223,7 @@ class _LoginScreenWargaState extends State<LoginScreenWarga> {
                   width: double.infinity,
                   height: 54,
                   child: ElevatedButton(
-                    onPressed: _handleLogin,
+                    onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: darkGreen,
                       foregroundColor: Colors.white,
@@ -228,13 +231,22 @@ class _LoginScreenWargaState extends State<LoginScreenWarga> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'Log In',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Log In',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 10),

@@ -6,6 +6,7 @@ import 'antrean_timbang_screen.dart';
 import 'edukasi_warga_screen.dart';
 import 'katalog_hargasampah.dart';
 import '../../services/announcement_store.dart';
+import '../../services/api_client.dart';
 
 class BerandaWargaScreen extends StatefulWidget {
   const BerandaWargaScreen({super.key});
@@ -15,9 +16,15 @@ class BerandaWargaScreen extends StatefulWidget {
 }
 
 class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
-  // Pengumuman jadwal dibaca dari AnnouncementStore.
-  // Data tiket antrean aktif masih berupa simulasi front-end.
+  // Pengumuman jadwal dan tiket antrean dibaca dari Laravel API.
   bool punyaTiketAntrianAktif = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AnnouncementStore.load();
+    _muatAntrean();
+  }
 
   String? nomorAntreanAktif;
   String? tanggalAntreanAktif;
@@ -90,19 +97,73 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
   // =====================================================
 
   Future<void> _bukaAntreanTimbang() async {
-    final result = await Navigator.push<Map<String, dynamic>>(
+    await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(builder: (context) => const AntreanTimbangScreen()),
     );
 
-    if (!mounted || result == null) return;
+    if (!mounted) return;
+    await _muatAntrean();
+  }
 
-    setState(() {
-      punyaTiketAntrianAktif = true;
-      nomorAntreanAktif = result['nomorAntrean'] as String?;
-      tanggalAntreanAktif = result['tanggal'] as String?;
-      waktuAntreanAktif = result['waktu'] as String?;
-    });
+  Future<void> _muatAntrean() async {
+    try {
+      final res = await ApiClient.antreanSaya();
+      if (!mounted || !res.isSuccess) return;
+
+      final aktif = res.dataList.where((a) {
+        final status = a['status']?.toString();
+        return status == 'menunggu' || status == 'dipanggil';
+      }).toList();
+
+      if (aktif.isEmpty) {
+        setState(() {
+          punyaTiketAntrianAktif = false;
+          nomorAntreanAktif = null;
+          tanggalAntreanAktif = null;
+          waktuAntreanAktif = null;
+        });
+        return;
+      }
+
+      final antrean = aktif.first;
+
+      setState(() {
+        punyaTiketAntrianAktif = true;
+        nomorAntreanAktif = antrean['kode']?.toString() ?? '-';
+        tanggalAntreanAktif = _formatTanggalAntrean(
+          antrean['tanggal']?.toString(),
+        );
+        waktuAntreanAktif =
+            '${antrean['slot_mulai']} - ${antrean['slot_selesai']} WIB';
+      });
+    } catch (_) {
+      // Beranda tetap tampil bila server belum menyala.
+    }
+  }
+
+  String _formatTanggalAntrean(String? iso) {
+    if (iso == null || iso.isEmpty) return '-';
+
+    final tanggal = DateTime.tryParse(iso);
+    if (tanggal == null) return iso;
+
+    const bulan = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
+    ];
+
+    return '${tanggal.day} ${bulan[tanggal.month - 1]} ${tanggal.year}';
   }
 
   // =====================================================
@@ -436,7 +497,7 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
           const SizedBox(height: 3),
           _iconTextRow(
             Icons.access_time,
-            '${pengumuman.mulai.replaceAll(' WIB', '')} - ${pengumuman.selesai}',
+            pengumuman.waktuLabel,
           ),
           const SizedBox(height: 14),
           Container(
@@ -459,17 +520,20 @@ class _BerandaWargaScreenState extends State<BerandaWargaScreen> {
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: const LinearProgressIndicator(
-                    value: 0,
+                  child: LinearProgressIndicator(
+                    value: pengumuman.kuota > 0
+                        ? (pengumuman.terdaftar / pengumuman.kuota)
+                            .clamp(0.0, 1.0)
+                        : 0,
                     minHeight: 8,
-                    backgroundColor: Color(0xFFE5E2D8),
-                    valueColor: AlwaysStoppedAnimation(orange),
+                    backgroundColor: const Color(0xFFE5E2D8),
+                    valueColor: const AlwaysStoppedAnimation(orange),
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Data jumlah pendaftar akan tampil setelah fitur antrian terhubung.',
-                  style: TextStyle(
+                Text(
+                  '${pengumuman.terdaftar} dari ${pengumuman.kuota} warga terdaftar',
+                  style: const TextStyle(
                     fontSize: 10.5,
                     color: Color.fromARGB(196, 0, 0, 0),
                     fontWeight: FontWeight.w600,
