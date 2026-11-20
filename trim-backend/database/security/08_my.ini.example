@@ -1,0 +1,24 @@
+; =====================================================================
+; 08_my.ini.example
+; Contoh hardening MySQL untuk instalasi lokal TRIM.
+; Salin nilai yang sesuai ke my.ini Laragon, lalu restart MySQL.
+; =====================================================================
+
+[mysqld]
+; Hanya dengarkan loopback. Aplikasi Flutter tidak terhubung langsung
+; ke MySQL; semua lewat API Laravel di localhost.
+bind-address=127.0.0.1
+
+; Hilangkan DNS reverse lookup. PENTING: jika diaktifkan, akun
+; @'localhost' tidak otomatis cocok untuk koneksi TCP 127.0.0.1.
+; Buat juga akun @'127.0.0.1' atau sesuaikan DB_HOST.
+skip-name-resolve=ON
+
+; Batasi lokasi file import/export. Buat direktori ini terlebih dahulu.
+secure-file-priv=C:/laragon/data/mysql-files
+
+; Jangan izinkan LOAD DATA LOCAL.
+local-infile=OFF
+
+; Aktifkan hanya jika semua koneksi memakai TLS (produksi).
+; require_secure_transport=ON

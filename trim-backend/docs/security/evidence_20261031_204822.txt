@@ -1,0 +1,501 @@
+﻿
+=====================================================================
+EVIDENCE 20 LUARAN KEAMANAN DATABASE TRIM
+=====================================================================
+
+Waktu pengambilan : 20261031_204822
+Database          : trimset
+Query pack        : C:\laragon\www\trim-backend\scripts\..\database\security\evidence_queries.sql
+Diambil oleh      : trim_admin@localhost
+
++---------------------+-------+----------------------+-----------------+
+| waktu               | versi | koneksi              | host            |
++---------------------+-------+----------------------+-----------------+
+| 2026-10-31 20:48:22 | 8.4.3 | trim_admin@localhost | DESKTOP-QU665Q0 |
++---------------------+-------+----------------------+-----------------+
+
+
+=====================================================================
+PAKET QUERY [01] - [20] (database/security/evidence_queries.sql)
+=====================================================================
+
+Tabel/View	Tipe	Engine	Estimasi Baris	Collation
+antrian	BASE TABLE	InnoDB	3	utf8mb4_0900_ai_ci
+audit_log	BASE TABLE	InnoDB	9	utf8mb4_unicode_ci
+detail_transaksi	BASE TABLE	InnoDB	3	utf8mb4_0900_ai_ci
+jadwal_pencairan	BASE TABLE	InnoDB	3	utf8mb4_0900_ai_ci
+jadwal_penimbangan	BASE TABLE	InnoDB	3	utf8mb4_0900_ai_ci
+kategori_sampah	BASE TABLE	InnoDB	4	utf8mb4_0900_ai_ci
+migrations	BASE TABLE	InnoDB	2	utf8mb4_unicode_ci
+password_reset_tokens	BASE TABLE	InnoDB	0	utf8mb4_0900_ai_ci
+pencairan	BASE TABLE	InnoDB	2	utf8mb4_0900_ai_ci
+pengumuman	BASE TABLE	InnoDB	2	utf8mb4_0900_ai_ci
+pengurus	BASE TABLE	InnoDB	0	utf8mb4_0900_ai_ci
+personal_access_tokens	BASE TABLE	InnoDB	0	utf8mb4_unicode_ci
+saldo	BASE TABLE	InnoDB	2	utf8mb4_0900_ai_ci
+transaksi_penimbangan	BASE TABLE	InnoDB	0	utf8mb4_0900_ai_ci
+ubs	BASE TABLE	InnoDB	0	utf8mb4_0900_ai_ci
+users	BASE TABLE	InnoDB	0	utf8mb4_0900_ai_ci
+warga	BASE TABLE	InnoDB	0	utf8mb4_0900_ai_ci
+v_kategori_aktif	VIEW	NULL	NULL	NULL
+v_pencairan_ringkas	VIEW	NULL	NULL	NULL
+v_rekap_kas	VIEW	NULL	NULL	NULL
+v_transaksi_ringkas	VIEW	NULL	NULL	NULL
+v_warga_publik	VIEW	NULL	NULL	NULL
+Tabel	Baris
+users	4
+warga	2
+pengurus	1
+ubs	1
+password_reset_tokens	0
+saldo	2
+kategori_sampah	5
+pengumuman	2
+jadwal_penimbangan	3
+jadwal_pencairan	3
+antrian	3
+transaksi_penimbangan	2
+detail_transaksi	3
+pencairan	2
+personal_access_tokens	0
+audit_log	9
+migrations	2
+Aset	Isi	C	I	A	Klasifikasi
+users	Akun, hash password, role, status	Tinggi	Tinggi	Tinggi	Restricted
+warga	Nama, no. HP, alamat, status verifikasi	Tinggi	Sedang	Sedang	Confidential
+saldo	Saldo tabungan warga	Tinggi	Tinggi	Sedang	Restricted
+transaksi_penimbangan	Transaksi dan nilai rupiah	Sedang	Tinggi	Sedang	Restricted
+detail_transaksi	Berat, harga, subtotal per kategori	Rendah	Tinggi	Sedang	Restricted
+pencairan	Pengajuan, catatan, status pembayaran	Tinggi	Tinggi	Sedang	Restricted
+personal_access_tokens	Token API (hash)	Tinggi	Sedang	Sedang	Restricted
+password_reset_tokens	Token reset password	Tinggi	Sedang	Rendah	Restricted
+audit_log	Jejak aktivitas (actor/action/object/result)	Tinggi	Tinggi	Sedang	Restricted
+antrian	Antrean dan nomor urut warga	Rendah	Sedang	Sedang	Internal
+jadwal_penimbangan	Jadwal, jam, kuota	Rendah	Sedang	Sedang	Internal
+jadwal_pencairan	Jadwal, batas daftar, kuota	Rendah	Sedang	Sedang	Internal
+pengurus	Profil pengurus	Rendah	Sedang	Rendah	Internal
+ubs	Profil UBS	Rendah	Sedang	Rendah	Internal
+kategori_sampah	Nama kategori dan harga acuan	Rendah	Sedang	Rendah	Public/Internal
+pengumuman	Informasi publik	Rendah	Sedang	Rendah	Public
+migrations	Riwayat migrasi	Rendah	Rendah	Rendah	Internal
+Tabel	Kolom	Tipe Data	Klasifikasi	Perlakuan
+audit_log	actor_role	varchar	Internal (kontrol akses)	-
+audit_log	result	varchar	Internal (kontrol akses)	-
+pencairan	jumlah	decimal	Confidential (PII/finansial)	Kontrol akses + audit
+pencairan	catatan	text	Confidential (PII/finansial)	Enkripsi/hash
+pencairan	status	enum	Internal (kontrol akses)	-
+personal_access_tokens	token	varchar	Restricted (kredensial)	Enkripsi/hash
+saldo	saldo_terakhir	decimal	Confidential (PII/finansial)	Kontrol akses + audit
+transaksi_penimbangan	total_nilai	decimal	Confidential (PII/finansial)	Kontrol akses + audit
+transaksi_penimbangan	status	enum	Internal (kontrol akses)	-
+users	password	varchar	Restricted (kredensial)	Enkripsi/hash
+users	role	enum	Internal (kontrol akses)	-
+users	status	enum	Internal (kontrol akses)	-
+warga	no_hp	varchar	Confidential (PII/finansial)	Masking di view
+warga	alamat	text	Confidential (PII/finansial)	Enkripsi/hash
+warga	status_verifikasi	enum	Internal (kontrol akses)	-
+Login Saat Ini	Akun Efektif	Host MySQL	Port	Database Aktif	Versi
+trim_admin@localhost	trim_admin@localhost	DESKTOP-QU665Q0	3306	trimset	8.4.3
+Langkah 03b
+Jalankan: mysql -u trim_app -p -e "SELECT CURRENT_USER(), DATABASE();"
+Grants for trim_admin@localhost
+GRANT USAGE ON *.* TO `trim_admin`@`localhost`
+GRANT ALL PRIVILEGES ON `trimset`.* TO `trim_admin`@`localhost`
+Akun	Operasi	Jenis	Hasil
+trim_app	SELECT trimset.warga	ALLOWED	SUKSES (exit code 0)
+trim_app	SELECT mysql.user	FORBIDDEN	ERROR 1142 (exit code 1)
+trim_app	CREATE TABLE trimset.__probe__ (id INT)	FORBIDDEN	ERROR 1142 (exit code 1)
+trim_app	UPDATE trimset.saldo SET saldo_terakhir = saldo_terakhir	FORBIDDEN	ERROR 1142 (exit code 1)
+trim_app	SELECT trimset.audit_log	FORBIDDEN	ERROR 1142 (exit code 1)
+trim_reader	SELECT v_warga_publik	ALLOWED	SUKSES (exit code 0)
+trim_reader	SELECT trimset.warga	FORBIDDEN	ERROR 1142 (exit code 1)
+trim_reader	DELETE FROM trimset.antrian WHERE 1=0	FORBIDDEN	ERROR 1142 (exit code 1)
+Variabel	Nilai
+bind_address	*
+mysqlx_bind_address	*
+port	3306
+require_secure_transport	OFF
+skip_name_resolve	OFF
+ssl_ca	ca.pem
+tls_version	TLSv1.2,TLSv1.3
+Variabel	Nilai
+authentication_policy	*,,
+bind_address	*
+binlog_format	ROW
+default_storage_engine	InnoDB
+general_log	OFF
+innodb_flush_log_at_trx_commit	1
+local_infile	OFF
+log_bin	ON
+port	3306
+require_secure_transport	OFF
+secure_file_priv	
+skip_name_resolve	OFF
+slow_query_log	OFF
+sql_mode	ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+sync_binlog	1
+tls_version	TLSv1.2,TLSv1.3
+transaction_isolation	REPEATABLE-READ
+version	8.4.3
+version_comment	MySQL Community Server - GPL
+Kontrol	Nilai	Status
+bind_address	*	Not Comply
+skip_name_resolve	0	Partially Comply
+require_secure_transport	0	Not Comply (lokal)
+local_infile	0	Comply
+general_log	0	Comply
+sql_mode	ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZE	Comply
+default_storage_engine	InnoDB	Comply
+transaction_isolation	REPEATABLE-READ	Comply
+log_bin	1	Comply
+innodb_flush_log_at_trx_commit	1	Comply
+sync_binlog	1	Comply
+secure_file_priv		Not Comply
+tls_version	TLSv1.2,TLSv1.3	Comply
+View	Definer	Security	Check Option
+v_kategori_aktif	trim_admin@localhost	DEFINER	NONE
+v_pencairan_ringkas	trim_admin@localhost	DEFINER	NONE
+v_rekap_kas	trim_admin@localhost	DEFINER	NONE
+v_transaksi_ringkas	trim_admin@localhost	DEFINER	NONE
+v_warga_publik	trim_admin@localhost	DEFINER	NONE
+*************************** 1. row ***************************
+                View: v_warga_publik
+         Create View: CREATE ALGORITHM=UNDEFINED DEFINER=`trim_admin`@`localhost` SQL SECURITY DEFINER VIEW `v_warga_publik` AS select `w`.`id_warga` AS `id_warga`,`w`.`nama` AS `nama`,(case when (char_length(`w`.`no_hp`) >= 6) then concat(left(`w`.`no_hp`,4),'****',right(`w`.`no_hp`,2)) else '****' end) AS `no_hp_masked`,`w`.`status_verifikasi` AS `status_verifikasi` from `warga` `w`
+character_set_client: cp850
+collation_connection: cp850_general_ci
+id_warga	nama	no_hp_masked	status_verifikasi
+1	Warga Uji	0812****90	terverifikasi
+2	Siti Rahma	0812****91	menunggu
+Total Warga	Nomor Termask	Nomor Terbuka	Persen Termask
+2	2	0	100.0
+id_warga	nama	no_hp
+1	Warga Uji	081234567890
+2	Siti Rahma	081234567891
+ID	Username	Role	Algo+Cost	Panjang	bcrypt cost 12	Bukan bcrypt (harus 0)
+1	081111111111	pengurus	$2y$12$	60	1	0
+2	082222222222	ubs	$2y$12$	60	1	0
+3	081234567890	warga	$2y$12$	60	1	0
+4	081234567891	warga	$2y$12$	60	1	0
+Kandidat Plaintext
+0
+Total User	Hash Unik	Semua Hash Berbeda
+4	4	1
+ID	Algo+Cost	Salt (22 char)	Hash (31 char)	Total (harus 60)
+1	$2y$12$	2C7R5l7TXuf80Akx.EuOXe	oU647TK/kLAtDojSApWc0siHWfo4l5W	60
+2	$2y$12$	ukerd9wZrAGlh0N9fe4d7u	qHIh/aXbhJNNyzFfponwh5l7AELELgO	60
+3	$2y$12$	BQT6Kpzs3GzVwgapUckewe	bFgY6Tf1gQviSgtWLVkDCNsKkbS678m	60
+4	$2y$12$	A/OtZZXaCTmAQ5djb4q0gu	KkNesLS2I0RKxgvypIN4axAQ6LNMRiC	60
+ID	Ciphertext (awal)	Panjang	Payload Laravel
+1	eyJpdiI6IlYwYnhzbnZtMlAxTjVZbGpxb05lamc9	228	1
+2	eyJpdiI6IjBDcXRNb1VVOERCRVlnVGVEeE53NXc9	228	1
+ID	Ciphertext (awal)	Panjang	Payload Laravel
+1	eyJpdiI6Ims4WEROTHYxdzZ1dzNvUWFsTDRGMEE9	228	1
+2	eyJpdiI6IlhkVERNdG9XMERuUGtTelNCRFNPQ1E9	228	1
+Alamat Belum Terenkripsi	Total Warga
+0	2
+Transaksi	Antrian	Warga	Status Antrian	Total Berat	Total Nilai	Saldo Sekarang	Status Transaksi
+1	1	1	selesai	3.70	26850.00	22250.00	sukses
+2	2	1	selesai	3.00	5400.00	22250.00	sukses
+Transaksi	Kategori	Berat	Harga (trigger)	Subtotal (trigger)
+1	Plastik	2.50	4500.00	11250.00
+1	Logam	1.20	13000.00	15600.00
+2	Kertas/Kardus	3.00	1800.00	5400.00
+A1. Sebelum transaksi
+0
+A2. Di dalam transaksi (belum commit)
+1
+A3. Setelah ROLLBACK
+0
+B2. Di dalam transaksi (belum commit)
+1
+B3. Setelah COMMIT
+1
+Isolation Level	Lock Wait Timeout (detik)	Deadlock Detect
+REPEATABLE-READ	50	1
+ID	Actor	Role	Action	Object	Object ID	Result	Method	Path	HTTP	IP	Timestamp
+1	NULL	NULL	post api/login	http_request	api/login	failed	POST	api/login	422	127.0.0.1	2026-10-28 15:02:12
+2	3	warga	login	auth	3	success	POST	api/login	200	127.0.0.1	2026-10-28 15:02:14
+3	1	pengurus	login	auth	1	success	POST	api/login	200	127.0.0.1	2026-10-28 15:02:15
+4	1	pengurus	update	warga	2	success	PATCH	api/verifikasi/2	NULL	127.0.0.1	2026-10-28 15:02:16
+5	1	pengurus	update	warga	2	success	PATCH	api/verifikasi/2	NULL	127.0.0.1	2026-10-28 15:02:17
+6	3	warga	get api/verifikasi	http_request	api/verifikasi	failed	GET	api/verifikasi	403	127.0.0.1	2026-10-28 15:02:18
+7	4	warga	login	auth	4	success	POST	api/login	200	127.0.0.1	2026-10-28 15:02:19
+8	4	warga	post api/antrean	http_request	api/antrean	failed	POST	api/antrean	422	127.0.0.1	2026-10-28 15:02:20
+9	3	warga	logout	auth	3	success	POST	api/logout	200	127.0.0.1	2026-10-28 15:02:21
+id_audit	action	object_type	old_values	new_values
+4	update	warga	{"status_verifikasi": "menunggu"}	{"status_verifikasi": "terverifikasi"}
+5	update	warga	{"status_verifikasi": "terverifikasi"}	{"status_verifikasi": "menunggu"}
+Action	Result	Jumlah
+login	success	3
+update	success	2
+post api/login	failed	1
+get api/verifikasi	failed	1
+post api/antrean	failed	1
+logout	success	1
+Objek	Jumlah
+base_table	17
+trigger	18
+view	5
+routine	0
+Database	Ukuran (MB)
+trimset	0.67
+Control	CIA	Evidence	Result
+C1 Masking no_hp di view	Confidentiality	2 baris view; 2 termask	PASS
+C2 Enkripsi at-rest alamat warga	Confidentiality	2/2 ciphertext	PASS
+C3 Hash password bcrypt cost 12	Confidentiality	4 akun; 4 sudah bcrypt	PASS
+C4 Least privilege akun aplikasi	Confidentiality	Tidak terlihat dari trim_admin; bukti grant diambil via root (SHOW GRANTS)	INFO
+C5 Trigger integritas bisnis	Integrity	18 trigger aktif	PASS
+C6 Foreign key + CHECK constraint	Integrity	17 FK; 5 CHECK	PASS
+C7 Saldo tidak pernah negatif	Integrity	0 baris negatif dari 2 saldo	PASS
+C8 Audit trail tersedia	Integrity	9 baris audit	PASS
+C9 Token API tidak menumpuk	Availability	0 token tersimpan	PASS (bersih)
+Metrik	Nilai
+base_tables	17
+views	5
+triggers	18
+routines	0
+foreign_keys	17
+check_constraints	5
+audit_rows	9
+active_tokens	0
+plaintext_passwords	0
+unencrypted_alamat	0
+negative_saldo	0
+probe_objects_left	0
+
+
+Hasil eksekusi paket utama: OK (exit 0)
+
+=====================================================================
+BAGIAN [ROOT] - AKUN, GRANT, HOST, DAN BASELINE
+=====================================================================
+
+
+--- [02/03/07] Akun, host, dan status password ---
++---------------+-----------+-----------------------+----------+------------------+--------------+-------------+
+| akun          | host      | plugin                | terkunci | password_expired | password_set | status_host |
++---------------+-----------+-----------------------+----------+------------------+--------------+-------------+
+| root          | localhost | caching_sha2_password | N        | N                |            0 | Comply      |
+| trim_admin    | localhost | caching_sha2_password | N        | N                |            1 | Comply      |
+| trim_app      | localhost | caching_sha2_password | N        | N                |            1 | Comply      |
+| trim_operator | localhost | caching_sha2_password | N        | N                |            1 | Comply      |
+| trim_reader   | localhost | caching_sha2_password | N        | N                |            1 | Comply      |
++---------------+-----------+-----------------------+----------+------------------+--------------+-------------+
+
+
+--- [04] Matriks privilege per objek ---
++---------------------------+------------------------+--------------------------------+
+| akun                      | objek                  | privilege                      |
++---------------------------+------------------------+--------------------------------+
+| 'trim_app'@'localhost'    | antrian                | INSERT, SELECT, UPDATE         |
+| 'trim_app'@'localhost'    | audit_log              | INSERT                         |
+| 'trim_app'@'localhost'    | detail_transaksi       | INSERT, SELECT                 |
+| 'trim_app'@'localhost'    | jadwal_pencairan       | INSERT, SELECT, UPDATE         |
+| 'trim_app'@'localhost'    | jadwal_penimbangan     | INSERT, SELECT, UPDATE         |
+| 'trim_app'@'localhost'    | kategori_sampah        | INSERT, SELECT, UPDATE         |
+| 'trim_app'@'localhost'    | pencairan              | INSERT, SELECT, UPDATE         |
+| 'trim_app'@'localhost'    | pengumuman             | INSERT, SELECT, UPDATE         |
+| 'trim_app'@'localhost'    | pengurus               | SELECT                         |
+| 'trim_app'@'localhost'    | personal_access_tokens | DELETE, INSERT, SELECT, UPDATE |
+| 'trim_app'@'localhost'    | saldo                  | SELECT                         |
+| 'trim_app'@'localhost'    | transaksi_penimbangan  | INSERT, SELECT, UPDATE         |
+| 'trim_app'@'localhost'    | ubs                    | SELECT                         |
+| 'trim_app'@'localhost'    | users                  | INSERT, SELECT                 |
+| 'trim_app'@'localhost'    | warga                  | INSERT, SELECT, UPDATE         |
+| 'trim_reader'@'localhost' | v_kategori_aktif       | SELECT                         |
+| 'trim_reader'@'localhost' | v_pencairan_ringkas    | SELECT                         |
+| 'trim_reader'@'localhost' | v_rekap_kas            | SELECT                         |
+| 'trim_reader'@'localhost' | v_transaksi_ringkas    | SELECT                         |
+| 'trim_reader'@'localhost' | v_warga_publik         | SELECT                         |
++---------------------------+------------------------+--------------------------------+
+
+
+--- [04] Privilege level database ---
++--------------------------+-------------------------+
+| akun                     | privilege               |
++--------------------------+-------------------------+
+| 'trim_admin'@'localhost' | ALTER                   |
+| 'trim_admin'@'localhost' | ALTER ROUTINE           |
+| 'trim_admin'@'localhost' | CREATE                  |
+| 'trim_admin'@'localhost' | CREATE ROUTINE          |
+| 'trim_admin'@'localhost' | CREATE TEMPORARY TABLES |
+| 'trim_admin'@'localhost' | CREATE VIEW             |
+| 'trim_admin'@'localhost' | DELETE                  |
+| 'trim_admin'@'localhost' | DROP                    |
+| 'trim_admin'@'localhost' | EVENT                   |
+| 'trim_admin'@'localhost' | EXECUTE                 |
+| 'trim_admin'@'localhost' | INDEX                   |
+| 'trim_admin'@'localhost' | INSERT                  |
+| 'trim_admin'@'localhost' | LOCK TABLES             |
+| 'trim_admin'@'localhost' | REFERENCES              |
+| 'trim_admin'@'localhost' | SELECT                  |
+| 'trim_admin'@'localhost' | SHOW VIEW               |
+| 'trim_admin'@'localhost' | TRIGGER                 |
+| 'trim_admin'@'localhost' | UPDATE                  |
++--------------------------+-------------------------+
+
+
+--- [05] SHOW GRANTS trim_admin ---
++-----------------------------------------------------------------+
+| Grants for trim_admin@localhost                                 |
++-----------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `trim_admin`@`localhost`                  |
+| GRANT ALL PRIVILEGES ON `trimset`.* TO `trim_admin`@`localhost` |
++-----------------------------------------------------------------+
+
+
+--- [05] SHOW GRANTS trim_app ---
++------------------------------------------------------------------------------------------------------+
+| Grants for trim_app@localhost                                                                        |
++------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `trim_app`@`localhost`                                                         |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`antrian` TO `trim_app`@`localhost`                        |
+| GRANT INSERT ON `trimset`.`audit_log` TO `trim_app`@`localhost`                                      |
+| GRANT SELECT, INSERT ON `trimset`.`detail_transaksi` TO `trim_app`@`localhost`                       |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`jadwal_pencairan` TO `trim_app`@`localhost`               |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`jadwal_penimbangan` TO `trim_app`@`localhost`             |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`kategori_sampah` TO `trim_app`@`localhost`                |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`pencairan` TO `trim_app`@`localhost`                      |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`pengumuman` TO `trim_app`@`localhost`                     |
+| GRANT SELECT ON `trimset`.`pengurus` TO `trim_app`@`localhost`                                       |
+| GRANT SELECT, INSERT, UPDATE, DELETE ON `trimset`.`personal_access_tokens` TO `trim_app`@`localhost` |
+| GRANT SELECT ON `trimset`.`saldo` TO `trim_app`@`localhost`                                          |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`transaksi_penimbangan` TO `trim_app`@`localhost`          |
+| GRANT SELECT ON `trimset`.`ubs` TO `trim_app`@`localhost`                                            |
+| GRANT SELECT, INSERT ON `trimset`.`users` TO `trim_app`@`localhost`                                  |
+| GRANT SELECT, INSERT, UPDATE ON `trimset`.`warga` TO `trim_app`@`localhost`                          |
++------------------------------------------------------------------------------------------------------+
+
+
+--- [05] SHOW GRANTS trim_reader ---
++------------------------------------------------------------------------------+
+| Grants for trim_reader@localhost                                             |
++------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `trim_reader`@`localhost`                              |
+| GRANT SELECT ON `trimset`.`v_kategori_aktif` TO `trim_reader`@`localhost`    |
+| GRANT SELECT ON `trimset`.`v_pencairan_ringkas` TO `trim_reader`@`localhost` |
+| GRANT SELECT ON `trimset`.`v_rekap_kas` TO `trim_reader`@`localhost`         |
+| GRANT SELECT ON `trimset`.`v_transaksi_ringkas` TO `trim_reader`@`localhost` |
+| GRANT SELECT ON `trimset`.`v_warga_publik` TO `trim_reader`@`localhost`      |
++------------------------------------------------------------------------------+
+
+
+--- [05] Privilege global berbahaya ---
++-----------------------------+-------------+
+| akun                        | privilege   |
++-----------------------------+-------------+
+| 'mysql.session'@'localhost' | SHUTDOWN    |
+| 'mysql.session'@'localhost' | SUPER       |
+| 'root'@'localhost'          | CREATE USER |
+| 'root'@'localhost'          | FILE        |
+| 'root'@'localhost'          | PROCESS     |
+| 'root'@'localhost'          | RELOAD      |
+| 'root'@'localhost'          | SHUTDOWN    |
+| 'root'@'localhost'          | SUPER       |
++-----------------------------+-------------+
+
+
+--- [07] Database yang ada ---
++--------------------+
+| Database           |
++--------------------+
+| bank_sampah_db     |
+| ccso               |
+| information_schema |
+| inventaris         |
+| kb_p4              |
+| kb_p5              |
+| kepegawaian        |
+| mysql              |
+| performance_schema |
+| sia                |
+| sys                |
+| tokobukuonline     |
+| trim               |
+| trim_api           |
+| trim_db            |
+| trim_p5            |
+| trim_v2            |
+| trim_v3            |
+| trimset            |
++--------------------+
+
+
+--- [08] Nilai baseline MySQL ---
++--------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+| variabel                       | nilai                                                                                                                 |
++--------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+| authentication_policy          | *,,                                                                                                                   |
+| bind_address                   | *                                                                                                                     |
+| binlog_format                  | ROW                                                                                                                   |
+| default_storage_engine         | InnoDB                                                                                                                |
+| general_log                    | OFF                                                                                                                   |
+| innodb_flush_log_at_trx_commit | 1                                                                                                                     |
+| local_infile                   | OFF                                                                                                                   |
+| log_bin                        | ON                                                                                                                    |
+| port                           | 3306                                                                                                                  |
+| require_secure_transport       | OFF                                                                                                                   |
+| secure_file_priv               |                                                                                                                       |
+| skip_name_resolve              | OFF                                                                                                                   |
+| slow_query_log                 | OFF                                                                                                                   |
+| sql_mode                       | ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION |
+| sync_binlog                    | 1                                                                                                                     |
+| tls_version                    | TLSv1.2,TLSv1.3                                                                                                       |
+| transaction_isolation          | REPEATABLE-READ                                                                                                       |
+| version                        | 8.4.3                                                                                                                 |
+| version_comment                | MySQL Community Server - GPL                                                                                          |
++--------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+
+
+--- [15] Lock & transaksi aktif (saat uji dua sesi) ---
+
+
+--- [16] Grant tabel audit_log ---
++------------------------+-----------+-----------+
+| akun                   | tabel     | privilege |
++------------------------+-----------+-----------+
+| 'trim_app'@'localhost' | audit_log | INSERT    |
++------------------------+-----------+-----------+
+
+
+--- [20] Akun TRIM terdaftar ---
++---------------+-----------+
+| akun          | host      |
++---------------+-----------+
+| trim_admin    | localhost |
+| trim_app      | localhost |
+| trim_operator | localhost |
+| trim_reader   | localhost |
++---------------+-----------+
+
+
+--- [18] Restore verification (sumber vs trimset_restore_test) ---
+SKIP: database uji 'trimset_restore_test' belum ada.
+Jalankan dulu: powershell -ExecutionPolicy Bypass -File .\scripts\restore.ps1 -BackupFile <dump> -TargetDatabase trimset_restore_test
+
+Bagian root selesai.
+
+=====================================================================
+UJI ALLOWED vs FORBIDDEN [06]
+=====================================================================
+
+[PASS] ALLOWED      trim_app      SELECT COUNT(*) FROM trimset.warga                   exit=0 :: +----------+
+[PASS] ALLOWED      trim_app      SELECT COUNT(*) FROM trimset.saldo                   exit=0 :: +----------+
+[PASS] FORBIDDEN    trim_app      SELECT * FROM mysql.user                             exit=1 :: ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_app'@'localhost' for table 'user'
+[PASS] FORBIDDEN    trim_app      CREATE TABLE trimset.__probe_evid__ (id INT)         exit=1 :: ERROR 1142 (42000) at line 1: CREATE command denied to user 'trim_app'@'localhost' for table '__probe_evid__'
+[PASS] FORBIDDEN    trim_app      UPDATE trimset.saldo SET saldo_terakhir = saldo_terakhir exit=1 :: ERROR 1142 (42000) at line 1: UPDATE command denied to user 'trim_app'@'localhost' for table 'saldo'
+[PASS] FORBIDDEN    trim_app      SELECT * FROM trimset.audit_log                      exit=1 :: ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_app'@'localhost' for table 'audit_log'
+[PASS] ALLOWED      trim_reader   SELECT COUNT(*) FROM trimset.v_warga_publik          exit=0 :: +----------+
+[PASS] ALLOWED      trim_reader   SELECT COUNT(*) FROM trimset.v_rekap_kas             exit=0 :: +----------+
+[PASS] FORBIDDEN    trim_reader   SELECT * FROM trimset.warga                          exit=1 :: ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_reader'@'localhost' for table 'warga'
+[PASS] FORBIDDEN    trim_reader   DELETE FROM trimset.antrian WHERE 1=0                exit=1 :: ERROR 1142 (42000) at line 1: DELETE command denied to user 'trim_reader'@'localhost' for table 'antrian'
+
+Cleanup tabel probe __probe_evid__: exit=0
+
+=====================================================================
+RINGKASAN
+=====================================================================
+
+PASS: 11
+FAIL: 0
+File output: C:\laragon\www\trim-backend\scripts\..\docs\security\evidence_20261031_204822.txt
