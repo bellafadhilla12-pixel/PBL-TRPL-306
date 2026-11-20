@@ -1,0 +1,39 @@
+﻿Security tests 2026-10-28T15:16:14
+
+PASS allow  [trim_app] SELECT warga -> 2
+PASS allow  [trim_app] SELECT saldo -> 2
+PASS allow  [trim_app] SELECT personal_access_tokens -> 0
+PASS allow  [trim_app] INSERT users+warga (transaction rollback) -> ok
+PASS allow  [trim_app] UPDATE warga (transaction rollback) -> ok
+PASS allow  [trim_app] INSERT transaksi+detail (transaction rollback) -> ok
+PASS allow  [trim_app] INSERT pencairan (transaction rollback) -> ok
+PASS allow  [trim_app] UPDATE pencairan (transaction rollback) -> ok
+PASS allow  [trim_app] UPDATE antrian (transaction rollback) -> ok
+PASS allow  [trim_app] INSERT audit_log -> ok
+PASS allow  [trim_reader] SELECT v_warga_publik -> 2
+PASS allow  [trim_reader] SELECT v_kategori_aktif -> 5
+PASS allow  [trim_reader] SELECT v_transaksi_ringkas -> 2
+PASS allow  [trim_reader] SELECT v_pencairan_ringkas -> 2
+PASS allow  [trim_reader] SELECT v_rekap_kas -> 1
+PASS deny   [trim_app] SELECT mysql.user -> ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_app'@'localhost' for table 'user'
+PASS deny   [trim_app] DROP TABLE probe -> ERROR 1142 (42000) at line 1: DROP command denied to user 'trim_app'@'localhost' for table '__ddl_probe__'
+PASS deny   [trim_app] ALTER TABLE probe -> ERROR 1142 (42000) at line 1: ALTER command denied to user 'trim_app'@'localhost' for table '__ddl_probe__'
+PASS deny   [trim_app] CREATE TABLE -> ERROR 1142 (42000) at line 1: CREATE command denied to user 'trim_app'@'localhost' for table '__app_probe__'
+PASS deny   [trim_app] CREATE VIEW -> ERROR 1142 (42000) at line 1: CREATE VIEW command denied to user 'trim_app'@'localhost' for table '__app_view_probe__'
+PASS deny   [trim_app] CREATE USER -> ERROR 1227 (42000) at line 1: Access denied; you need (at least one of) the CREATE USER privilege(s) for this operation
+PASS deny   [trim_app] DELETE warga -> ERROR 1142 (42000) at line 1: DELETE command denied to user 'trim_app'@'localhost' for table 'warga'
+PASS deny   [trim_app] UPDATE saldo -> ERROR 1142 (42000) at line 1: UPDATE command denied to user 'trim_app'@'localhost' for table 'saldo'
+PASS deny   [trim_app] UPDATE detail_transaksi -> ERROR 1142 (42000) at line 1: UPDATE command denied to user 'trim_app'@'localhost' for table 'detail_transaksi'
+PASS deny   [trim_app] SELECT audit_log -> ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_app'@'localhost' for table 'audit_log'
+PASS deny   [trim_app] SELECT v_warga_publik -> ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_app'@'localhost' for table 'v_warga_publik'
+PASS deny   [trim_app] UPDATE users -> ERROR 1142 (42000) at line 1: UPDATE command denied to user 'trim_app'@'localhost' for table 'users'
+PASS deny   [trim_app] INSERT pengurus -> ERROR 1142 (42000) at line 1: INSERT command denied to user 'trim_app'@'localhost' for table 'pengurus'
+PASS deny   [trim_app] SELECT migrations -> ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_app'@'localhost' for table 'migrations'
+PASS deny   [trim_app] SELECT password_reset_tokens -> ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_app'@'localhost' for table 'password_reset_tokens'
+PASS deny   [trim_reader] SELECT warga -> ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_reader'@'localhost' for table 'warga'
+PASS deny   [trim_reader] SELECT pencairan -> ERROR 1142 (42000) at line 1: SELECT command denied to user 'trim_reader'@'localhost' for table 'pencairan'
+PASS deny   [trim_reader] INSERT view -> ERROR 1142 (42000) at line 1: INSERT command denied to user 'trim_reader'@'localhost' for table 'v_warga_publik'
+PASS deny   [trim_reader] UPDATE view -> ERROR 1142 (42000) at line 1: UPDATE command denied to user 'trim_reader'@'localhost' for table 'v_rekap_kas'
+PASS deny   [trim_reader] DROP VIEW probe -> ERROR 1142 (42000) at line 1: DROP command denied to user 'trim_reader'@'localhost' for table '__reader_probe_view__'
+
+RESULT pass=35 fail=0

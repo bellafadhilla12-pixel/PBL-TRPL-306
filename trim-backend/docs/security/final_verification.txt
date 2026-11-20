@@ -1,0 +1,46 @@
+﻿Final verification 2026-10-28T15:17:03
+dba_query_user	root@localhost
+base_tables	17
+triggers	18
+views	5
+audit_rows	9
+tokens	0
+warga	1	terverifikasi
+warga	2	menunggu
+antrian	1	selesai
+antrian	2	selesai
+antrian	3	menunggu
+saldo	1	22250.00
+saldo	2	0.00
+transaksi	2
+detail	3
+pencairan	2
+probe_tables	0
+app_user	trim_app@localhost
+app_warga_count	2
+reader_user	trim_reader@localhost
+reader_view_count	1
+GRANT USAGE ON *.* TO `trim_admin`@`localhost`
+GRANT ALL PRIVILEGES ON `trimset`.* TO `trim_admin`@`localhost`
+GRANT USAGE ON *.* TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`antrian` TO `trim_app`@`localhost`
+GRANT INSERT ON `trimset`.`audit_log` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT ON `trimset`.`detail_transaksi` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`jadwal_pencairan` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`jadwal_penimbangan` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`kategori_sampah` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`pencairan` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`pengumuman` TO `trim_app`@`localhost`
+GRANT SELECT ON `trimset`.`pengurus` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE, DELETE ON `trimset`.`personal_access_tokens` TO `trim_app`@`localhost`
+GRANT SELECT ON `trimset`.`saldo` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`transaksi_penimbangan` TO `trim_app`@`localhost`
+GRANT SELECT ON `trimset`.`ubs` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT ON `trimset`.`users` TO `trim_app`@`localhost`
+GRANT SELECT, INSERT, UPDATE ON `trimset`.`warga` TO `trim_app`@`localhost`
+GRANT USAGE ON *.* TO `trim_reader`@`localhost`
+GRANT SELECT ON `trimset`.`v_kategori_aktif` TO `trim_reader`@`localhost`
+GRANT SELECT ON `trimset`.`v_pencairan_ringkas` TO `trim_reader`@`localhost`
+GRANT SELECT ON `trimset`.`v_rekap_kas` TO `trim_reader`@`localhost`
+GRANT SELECT ON `trimset`.`v_transaksi_ringkas` TO `trim_reader`@`localhost`
+GRANT SELECT ON `trimset`.`v_warga_publik` TO `trim_reader`@`localhost`

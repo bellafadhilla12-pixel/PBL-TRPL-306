@@ -1,0 +1,7 @@
+Restore verification
+Backup: C:\laragon\www\trim-backend\storage\backups\trimset_20261028_150230.sql
+Target: trimset_restore_test
+Result:
+Restore OK -> trimset_restore_test
+  tables=17 triggers=18 users=4 transaksi=2
+Database uji trimset_restore_test dihapus setelah verifikasi.
