@@ -64,63 +64,9 @@ class RekapSampahPage extends StatefulWidget {
 }
 
 class _RekapSampahPageState extends State<RekapSampahPage> {
-  List<KategoriSampah> kategori = [
-    KategoriSampah(
-      nama: 'Plastik',
-      kode: 'P1-P24',
-      warna: const Color(0xFF0E755E),
-      nilai: 300000,
-      hargaPerKg: 12000,
-    ),
-    KategoriSampah(
-      nama: 'Logam & Besi',
-      kode: 'C1-C3',
-      warna: const Color(0xFFF6A21D),
-      nilai: 500000,
-      hargaPerKg: 20000,
-    ),
-    KategoriSampah(
-      nama: 'Kertas & Kardus',
-      kode: 'K1-K5',
-      warna: const Color(0xFF526F16),
-      nilai: 200000,
-      hargaPerKg: 15000,
-    ),
-    KategoriSampah(
-      nama: 'Minyak Jelantah',
-      kode: 'MJ',
-      warna: const Color(0xFF805A1F),
-      nilai: 0,
-      hargaPerKg: 8000,
-    ),
-  ];
+  List<KategoriSampah> kategori = [];
 
-  List<SetoranSampah> setoran = [
-    SetoranSampah(
-      nama: 'Vania Desinta',
-      berat: '5 Kg',
-      nilai: 12000,
-      kategori: 'Plastik',
-    ),
-    SetoranSampah(
-      nama: 'Hendra Wijaya',
-      berat: '4.5 Kg',
-      nilai: 14000,
-      kategori: 'Logam & Besi',
-    ),
-    SetoranSampah(
-      nama: 'Agustina',
-      berat: '3 Kg',
-      nilai: 20000,
-      kategori: 'Kertas & Kardus',
-    ),
-    SetoranSampah(
-      nama: 'Bagus Stan',
-      berat: '2 Kg',
-      nilai: 10000,
-      kategori: 'Minyak Jelantah',
-    ),
-  ];
+  List<SetoranSampah> setoran = [];
 
   int get totalNilai => kategori.fold(0, (total, item) => total + item.nilai);
 
@@ -318,41 +264,60 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
           ),
           const SizedBox(height: 16),
 
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: SizedBox(
-              height: 19,
-              child: Row(
-                children: kategori.where((item) => item.nilai > 0).map((item) {
-                  return Expanded(
-                    flex: item.nilai,
-                    child: Tooltip(
-                      message:
-                          '${item.nama}: ${rupiahSampah(item.nilai)} '
-                          '(${item.persentase(totalNilai).toStringAsFixed(1)}%)',
-                      child: Container(color: item.warna),
+          if (kategori.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.inbox_outlined, size: 40, color: Colors.black26),
+                    SizedBox(height: 8),
+                    Text(
+                      'Belum ada data rekap sampah bulan ini.',
+                      style: TextStyle(fontSize: 12, color: Colors.black45),
+                      textAlign: TextAlign.center,
                     ),
-                  );
-                }).toList(),
+                  ],
+                ),
+              ),
+            )
+          else ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: SizedBox(
+                height: 19,
+                child: Row(
+                  children: kategori.where((item) => item.nilai > 0).map((item) {
+                    return Expanded(
+                      flex: item.nilai,
+                      child: Tooltip(
+                        message:
+                            '${item.nama}: ${rupiahSampah(item.nilai)} '
+                            '(${item.persentase(totalNilai).toStringAsFixed(1)}%)',
+                        child: Container(color: item.warna),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              'Total: ${rupiahSampah(totalNilai)}',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: Colors.black54,
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                'Total: ${rupiahSampah(totalNilai)}',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 8),
 
-          ...kategori.map(kartuKategori),
+            ...kategori.map(kartuKategori),
+          ],
         ],
       ),
     );
@@ -452,7 +417,25 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
             ],
           ),
           const SizedBox(height: 14),
-          ...setoran.map(kartuSetoran),
+          if (setoran.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.inbox_outlined, size: 40, color: Colors.black26),
+                    SizedBox(height: 8),
+                    Text(
+                      'Belum ada setoran sampah bulan ini.',
+                      style: TextStyle(fontSize: 12, color: Colors.black45),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            ...setoran.map(kartuSetoran),
         ],
       ),
     );
@@ -460,11 +443,9 @@ class _RekapSampahPageState extends State<RekapSampahPage> {
 
   Widget kartuSetoran(SetoranSampah item) {
     final warna = kategori
-        .firstWhere(
-          (k) => k.nama == item.kategori,
-          orElse: () => kategori.first,
-        )
-        .warna;
+        .where((k) => k.nama == item.kategori)
+        .firstOrNull
+        ?.warna ?? sampahGreen;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

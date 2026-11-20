@@ -43,185 +43,7 @@ Color _warnaKategori(String k) {
 }
 
 // ====== DATA ======
-const List<SampahItem> daftarSampah = [
-  SampahItem(
-    kode: 'P1',
-    kategori: 'PLASTIK',
-    nama: 'Gelas cup bening bersih',
-    harga: 'Rp 4.500/kg',
-    badge: 'Cup Plastik',
-    catatan: 'Label dan tutup dibuang',
-  ),
-  SampahItem(
-    kode: 'P2',
-    kategori: 'PLASTIK',
-    nama: 'Gelas cup bening kotor',
-    harga: 'Rp 2.200/kg',
-    badge: 'Cup Plastik',
-    catatan: 'Label & tutup dibuang',
-  ),
-  SampahItem(
-    kode: 'P3',
-    kategori: 'PLASTIK',
-    nama: 'Botol plastik bersih',
-    harga: 'Rp 3.800/kg',
-    badge: 'Prioritas Tinggi',
-    catatan: 'Label & tutup dilepas',
-  ),
-  SampahItem(
-    kode: 'P4',
-    kategori: 'PLASTIK',
-    nama: 'Botol plastik kotor',
-    harga: 'Rp 1.600/kg',
-    badge: 'Botol Plastik',
-    catatan: 'Nilai lebih rendah dari P3',
-  ),
-  SampahItem(
-    kode: 'P7',
-    kategori: 'PLASTIK',
-    nama: 'Ember',
-    harga: 'Rp 2.500/kg',
-    badge: 'Plastik Keras',
-    catatan: 'Barang plastik keras/tebal',
-  ),
-  SampahItem(
-    kode: 'P8',
-    kategori: 'PLASTIK',
-    nama: 'Tutup galon',
-    harga: 'Rp 3.500/kg',
-    badge: 'Aksesoris Galon',
-    catatan: 'Dipisah tersendiri',
-  ),
-  SampahItem(
-    kode: 'P9',
-    kategori: 'PLASTIK',
-    nama: 'Tutup botol',
-    harga: 'Rp 3.000/kg',
-    badge: 'Aksesoris Botol',
-    catatan: 'Dipisah tersendiri',
-  ),
-  SampahItem(
-    kode: 'P10',
-    kategori: 'PLASTIK',
-    nama: 'Kresek/kantong asoy warna-warni',
-    harga: 'Rp 800/kg',
-    badge: 'Kantong Film',
-    catatan: 'Kering dan bersih',
-  ),
-  SampahItem(
-    kode: 'P18',
-    kategori: 'PLASTIK',
-    nama: 'Ember hitam',
-    harga: 'Rp 1.500/kg',
-    badge: 'Plastik Hitam',
-    catatan: 'Dipisah dari ember warna (P7)',
-  ),
-  SampahItem(
-    kode: 'P20',
-    kategori: 'LIMBAH',
-    nama: 'Aki bekas',
-    harga: 'Rp 12.000/kg',
-    badge: 'Limbah',
-    catatan: 'Sisa air aki wajib dibuang dahulu',
-    berbahaya: true,
-  ),
-  SampahItem(
-    kode: 'P21',
-    kategori: 'PLASTIK',
-    nama: 'Kaset CD',
-    harga: 'Rp 3.500/kg',
-    badge: 'Polikarbonat',
-    catatan: '-',
-  ),
-  SampahItem(
-    kode: 'P23',
-    kategori: 'PLASTIK',
-    nama: 'HDPE',
-    harga: 'Rp 4.000/kg',
-    badge: 'HDPE Tebal',
-    catatan: 'Plastik jenis tebal (galon, botol tebal, dll)',
-  ),
-  SampahItem(
-    kode: 'P24',
-    kategori: 'PLASTIK',
-    nama: 'Gelas cup warna',
-    harga: 'Rp 2.000/kg',
-    badge: 'Cup Berwarna',
-    catatan: 'Dipisah dari cup bening (P1/P2)',
-  ),
-  SampahItem(
-    kode: 'C1',
-    kategori: 'LOGAM',
-    nama: 'Kaleng alka (aluminium)',
-    harga: 'Rp 13.000/kg',
-    badge: 'Aluminium Ringan',
-    catatan: 'Kaleng minuman',
-  ),
-  SampahItem(
-    kode: 'C2',
-    kategori: 'LOGAM',
-    nama: 'Besi kropos',
-    harga: 'Rp 3.200/kg',
-    badge: 'Besi Tua',
-    catatan: 'Besi tua/berkarat',
-  ),
-  SampahItem(
-    kode: 'C3',
-    kategori: 'LOGAM',
-    nama: 'ALMA (aluminium)',
-    harga: 'Rp 15.000/kg',
-    badge: 'Perabot Dapur',
-    catatan: 'Panci/wajan aluminium bekas',
-  ),
-  SampahItem(
-    kode: 'K1',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Karton/kardus',
-    harga: 'Rp 1.800/kg',
-    badge: 'Populer',
-    catatan: 'Dilipat, dipisah dari lakban plastik',
-  ),
-  SampahItem(
-    kode: 'K2',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Buku paket pelajaran',
-    harga: 'Rp 1.500/kg',
-    badge: 'Buku Sekolah',
-    catatan: 'Sampul/cover harus dilepas dulu',
-  ),
-  SampahItem(
-    kode: 'K3',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'HVS (kertas putih)',
-    harga: 'Rp 2.400/kg',
-    badge: 'Dokumen Kantor',
-    catatan: 'Kering dan tanpa klip/staples',
-  ),
-  SampahItem(
-    kode: 'K4',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Kertas padat',
-    harga: 'Rp 1.200/kg',
-    badge: 'Campuran',
-    catatan: 'Kertas campuran/tebal',
-  ),
-  SampahItem(
-    kode: 'K5',
-    kategori: 'KERTAS/KARDUS',
-    nama: 'Koran bekas',
-    harga: 'Rp 1.600/kg',
-    badge: 'Koran/Media',
-    catatan: 'Kering dan rapi',
-  ),
-  SampahItem(
-    kode: 'MJ',
-    kategori: 'LAINNYA',
-    nama: 'Minyak jelantah',
-    harga: 'Rp 6.500/kg',
-    badge: 'Cair/Liter',
-    catatan: 'Ditampung dalam jerigen/botol tertutup rapat',
-  ),
-];
+const List<SampahItem> daftarSampah = [];
 
 // ====== HALAMAN ======
 class KatalogPage extends StatefulWidget {
@@ -261,7 +83,7 @@ class _KatalogPageState extends State<KatalogPage> {
       );
     }).toList();
 
-    if (items.isNotEmpty && mounted) {
+    if (mounted) {
       setState(() => _data = items);
     }
   }
@@ -314,7 +136,24 @@ class _KatalogPageState extends State<KatalogPage> {
             const SizedBox(height: 8),
             _estimasiNote(),
             const SizedBox(height: 12),
-            ...hasil.map((s) => SampahCard(item: s)),
+            if (hasil.isEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Column(
+                  children: [
+                    Icon(Icons.search_off_rounded, size: 38, color: _hijau),
+                    SizedBox(height: 8),
+                    Text('Data katalog tidak ditemukan.'),
+                  ],
+                ),
+              )
+            else
+              ...hasil.map((s) => SampahCard(item: s)),
           ],
         ),
       ),

@@ -54,57 +54,7 @@ class _RekapKasPageState extends State<RekapKasPage> {
   String bulanDipilih = 'Semua Bulan';
   bool tampilSemua = false;
 
-  List<TransaksiKas> transaksi = [
-    TransaksiKas(
-      nama: 'Siti Aminah',
-      bulan: 'Oktober',
-      waktu: '09:30',
-      nominal: 12000,
-      disetujui: true,
-    ),
-    TransaksiKas(
-      nama: 'Abdul Jamal',
-      bulan: 'Oktober',
-      waktu: '10:00',
-      nominal: 24000,
-      disetujui: true,
-    ),
-    TransaksiKas(
-      nama: 'Arifin Ahmad',
-      bulan: 'Oktober',
-      waktu: '10:30',
-      nominal: 150000,
-      disetujui: true,
-    ),
-    TransaksiKas(
-      nama: 'Bagus Abdullah',
-      bulan: 'Oktober',
-      waktu: '11:00',
-      nominal: 50000,
-      disetujui: true,
-    ),
-    TransaksiKas(
-      nama: 'Aisyah Ainun',
-      bulan: 'Oktober',
-      waktu: '11:30',
-      nominal: 13000,
-      disetujui: true,
-    ),
-    TransaksiKas(
-      nama: 'Dewi Lestari',
-      bulan: 'September',
-      waktu: '13:00',
-      nominal: 35000,
-      disetujui: true,
-    ),
-    TransaksiKas(
-      nama: 'Rudi Hartono',
-      bulan: 'Oktober',
-      waktu: '14:00',
-      nominal: 80000,
-      disetujui: false,
-    ),
-  ];
+  List<TransaksiKas> transaksi = [];
 
   List<String> daftarBulan = const [
     'Semua Bulan',
@@ -149,7 +99,7 @@ class _RekapKasPageState extends State<RekapKasPage> {
         );
       }).toList();
 
-      if (items.isNotEmpty && mounted) {
+      if (mounted) {
         setState(() => transaksi = items);
       }
     } catch (_) {

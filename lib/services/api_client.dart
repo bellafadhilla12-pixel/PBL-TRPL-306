@@ -18,7 +18,7 @@ class ApiClient {
   /// Kosongkan agar alamat dipilih otomatis sesuai platform.
   /// Isi dengan IP LAN komputer bila memakai HP fisik, contoh:
   /// `ApiClient.overrideBaseUrl = 'http://192.168.1.10:3000/api';`
-  static String? overrideBaseUrl = 'http://10.108.142.51:3000/api';
+  static String? overrideBaseUrl = 'http://127.0.0.1:3000/api';
 
   static String get baseUrl {
     if (overrideBaseUrl != null) return overrideBaseUrl!;
