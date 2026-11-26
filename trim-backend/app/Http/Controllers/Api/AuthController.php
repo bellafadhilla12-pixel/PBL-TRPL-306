@@ -146,7 +146,7 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'username' => ['Nomor WhatsApp atau kata sandi salah.'],
+                'username' => ['Nomor WhatsApp/Username atau kata sandi salah.'],
             ]);
         }
 

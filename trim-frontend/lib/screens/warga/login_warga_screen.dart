@@ -175,7 +175,7 @@ class _LoginScreenWargaState extends State<LoginScreenWarga> {
                 const SizedBox(height: 16),
                 _buildInputField(
                   controller: _identityController,
-                  hint: 'Nomor WhatsApp',
+                  hint: 'Nomor WhatsApp/Username',
                   icon: Icons.smartphone_outlined,
                   keyboardType: TextInputType.text,
                 ),

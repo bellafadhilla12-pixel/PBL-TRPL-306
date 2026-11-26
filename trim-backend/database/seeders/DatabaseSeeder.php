@@ -28,14 +28,14 @@ class DatabaseSeeder extends Seeder
         // Akun demo: 1 warga terverifikasi, 1 warga menunggu, 1 pengurus, 1 UBS
         // -----------------------------------------------------------------
         $pengurusUser = User::create([
-            'username' => '081111111111',
+            'username' => 'pengurus',
             'password' => '123456',
             'role' => 'pengurus',
             'status' => 'aktif',
         ]);
 
         $ubsUser = User::create([
-            'username' => '082222222222',
+            'username' => 'ubs',
             'password' => '123456',
             'role' => 'ubs',
             'status' => 'aktif',
